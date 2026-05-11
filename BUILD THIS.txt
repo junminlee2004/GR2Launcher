@@ -1,0 +1,8 @@
+cmake -S . -B build -G Ninja ^
+  -DCMAKE_BUILD_TYPE=Release ^
+  -DCMAKE_C_COMPILER=clang-cl ^
+  -DCMAKE_CXX_COMPILER=clang-cl ^
+  -DENABLE_QT_GUI=ON ^
+  -DCMAKE_PREFIX_PATH=C:/Qt/6.11.0/msvc2022_64
+
+cmake --build build --config Release
