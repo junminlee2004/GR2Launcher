@@ -28,6 +28,12 @@
 #include "ui_version_dialog.h"
 #include "version_dialog.h"
 
+// Every ISSfork-sparse release has a tag and a name starting with RELEASE_PREFIX. LATEST_LABEL
+// is the download row and the installed entry that track the newest of them.
+constexpr auto EMULATOR_REPO = "junminlee2004/GR2fork";
+constexpr auto RELEASE_PREFIX = "Pre-release-ISSfork-sparse-";
+constexpr auto LATEST_LABEL = "Pre-release (ISSfork-sparse)";
+
 VersionDialog::VersionDialog(std::shared_ptr<gui_settings> gui_settings, QWidget* parent)
     : QDialog(parent), ui(new Ui::VersionDialog), m_gui_settings(std::move(gui_settings)) {
     ui->setupUi(this);
@@ -312,7 +318,7 @@ void VersionDialog::AddCustomExecutable(const QString& exePath) {
 
 void VersionDialog::DownloadListVersion() {
     QNetworkAccessManager* manager = new QNetworkAccessManager(this);
-    QUrl url("https://api.github.com/repos/shadps4-emu/shadPS4/tags");
+    QUrl url(QString("https://api.github.com/repos/%1/releases").arg(EMULATOR_REPO));
     QNetworkRequest request(url);
     QNetworkReply* reply = manager->get(request);
 
@@ -321,68 +327,10 @@ void VersionDialog::DownloadListVersion() {
             QByteArray response = reply->readAll();
             QJsonDocument doc = QJsonDocument::fromJson(response);
             if (doc.isArray()) {
-                QJsonArray tags = doc.array();
-                ui->downloadTreeWidget->clear();
-
-                QTreeWidgetItem* preReleaseItem = nullptr;
-                QList<QTreeWidgetItem*> otherItems;
-                bool foundPreRelease = false;
-
-                //  > v.0.16.0
-                auto isVersionGreaterThan_0_16_0 = [](const QString& tagName) -> bool {
-                    QRegularExpression versionRegex(R"(v\.?(\d+)\.(\d+)\.(\d+))");
-                    QRegularExpressionMatch match = versionRegex.match(tagName);
-                    if (match.hasMatch()) {
-                        int major = match.captured(1).toInt();
-                        int minor = match.captured(2).toInt();
-                        int patch = match.captured(3).toInt();
-
-                        if (major > 0)
-                            return true;
-                        if (major == 0 && minor >= 16)
-                            return true;
-                        if (major == 0 && minor == 16 && patch > 0)
-                            return true;
-                    }
-                    return false;
-                };
-
-                for (const QJsonValue& value : tags) {
-                    QJsonObject tagObj = value.toObject();
-                    QString tagName = tagObj["name"].toString();
-
-                    if (tagName.startsWith("Pre-release", Qt::CaseInsensitive)) {
-                        if (!foundPreRelease) {
-                            preReleaseItem = new QTreeWidgetItem();
-                            preReleaseItem->setText(0, "Pre-release (Nightly)");
-                            foundPreRelease = true;
-                        }
-                        continue;
-                    }
-                    if (!isVersionGreaterThan_0_16_0(tagName)) {
-                        continue;
-                    }
-
-                    QTreeWidgetItem* item = new QTreeWidgetItem();
-                    item->setText(0, tagName);
-                    otherItems.append(item);
-                }
-
-                // If you didn't find Pre-release, add it manually
-                if (!foundPreRelease) {
-                    preReleaseItem = new QTreeWidgetItem();
-                    preReleaseItem->setText(0, "Pre-release (Nightly)");
-                }
-
-                // Add Pre-release first
-                if (preReleaseItem) {
-                    ui->downloadTreeWidget->addTopLevelItem(preReleaseItem);
-                }
-
-                // Add the others
-                for (QTreeWidgetItem* item : otherItems) {
-                    ui->downloadTreeWidget->addTopLevelItem(item);
-                }
+                QStringList names;
+                for (const QJsonValue& value : doc.array())
+                    names.append(value.toObject()["name"].toString());
+                PopulateDownloadTree(names);
 
                 // Assemble the current list
                 QStringList versionList;
@@ -402,9 +350,6 @@ void VersionDialog::DownloadListVersion() {
                         this, tr("Version list update"),
                         tr("The latest versions have been added to the list for download."));
                 }
-
-                // selects a version in downloadTreeWidget calls the download stream
-                InstallSelectedVersion();
             }
         } else {
             QMessageBox::warning(this, tr("Error"),
@@ -431,7 +376,6 @@ tr("First you need to choose a location to save the versions in\n'Path to save v
                 return;
             }
             QString versionName = item->text(0);
-            QString apiUrl;
             QString platform;
 
 #ifdef Q_OS_WIN
@@ -441,13 +385,6 @@ tr("First you need to choose a location to save the versions in\n'Path to save v
 #elif defined(Q_OS_MAC)
             platform = "macos-sdl";
 #endif
-            if (versionName.contains("Pre-release", Qt::CaseInsensitive)) {
-                apiUrl = "https://api.github.com/repos/shadps4-emu/shadPS4/releases";
-            } else {
-                apiUrl = QString("https://api.github.com/repos/shadps4-emu/"
-                                 "shadPS4/releases/tags/%1")
-                             .arg(versionName);
-            }
 
             { // Message yes/no
                 QMessageBox::StandardButton reply;
@@ -460,7 +397,8 @@ tr("First you need to choose a location to save the versions in\n'Path to save v
             }
 
             QNetworkAccessManager* manager = new QNetworkAccessManager(this);
-            QNetworkRequest request(apiUrl);
+            QNetworkRequest request(
+                QString("https://api.github.com/repos/%1/releases").arg(EMULATOR_REPO));
             QNetworkReply* reply = manager->get(request);
 
             connect(reply, &QNetworkReply::finished, this, [this, reply, platform, versionName]() {
@@ -475,19 +413,15 @@ tr("First you need to choose a location to save the versions in\n'Path to save v
                 QJsonArray assets;
                 QJsonObject release;
 
-                if (versionName.contains("Pre-release", Qt::CaseInsensitive)) {
-                    QJsonArray releases = doc.array();
-                    for (const QJsonValue& val : releases) {
-                        QJsonObject obj = val.toObject();
-                        if (obj["prerelease"].toBool()) {
-                            release = obj;
-                            assets = obj["assets"].toArray();
-                            break;
-                        }
+                for (const QJsonValue& val : doc.array()) {
+                    QJsonObject obj = val.toObject();
+                    QString name = obj["name"].toString();
+                    if (versionName == LATEST_LABEL ? name.startsWith(RELEASE_PREFIX)
+                                                    : name == versionName) {
+                        release = obj;
+                        assets = obj["assets"].toArray();
+                        break;
                     }
-                } else {
-                    release = doc.object();
-                    assets = release["assets"].toArray();
                 }
 
                 QString downloadUrl;
@@ -501,7 +435,9 @@ tr("First you need to choose a location to save the versions in\n'Path to save v
                 }
                 if (downloadUrl.isEmpty()) {
                     QMessageBox::warning(this, tr("Error"),
-                                         tr("No files available for this platform."));
+                                         release.isEmpty()
+                                             ? tr("No pre-releases found.")
+                                             : tr("No files available for this platform."));
                     reply->deleteLater();
                     return;
                 }
@@ -564,7 +500,7 @@ tr("First you need to choose a location to save the versions in\n'Path to save v
                         releaseName.replace(QRegularExpression("\\b[Cc]odename\\s+"), "");
 
                         QString folderName;
-                        if (versionName.contains("Pre-release", Qt::CaseInsensitive)) {
+                        if (versionName == LATEST_LABEL) {
                             folderName = "Pre-release";
                         } else {
                             QString datePart = release["published_at"].toString().left(10);
@@ -639,7 +575,7 @@ tr("First you need to choose a location to save the versions in\n'Path to save v
                                         tr("Version %1 has been downloaded and selected.")
                                             .arg(versionName));
 
-                                    bool is_release = !versionName.contains("Pre-release");
+                                    bool is_release = versionName != LATEST_LABEL;
                                     auto release_name = release["name"].toString();
                                     QString code_name = "";
 
@@ -663,7 +599,7 @@ tr("First you need to choose a location to save the versions in\n'Path to save v
 
                                     VersionManager::Version new_version{
                                         .name = (is_release ? versionName.toStdString()
-                                                            : std::string("Pre-release (Nightly)")),
+                                                            : std::string(LATEST_LABEL)),
                                         .path = exe_path.generic_string(),
                                         .date = release["published_at"]
                                                     .toString()
@@ -678,9 +614,7 @@ tr("First you need to choose a location to save the versions in\n'Path to save v
                                         auto version_list = VersionManager::GetVersionList({});
                                         for (const auto& installedVersion : version_list) {
                                             if (installedVersion.type ==
-                                                    VersionManager::VersionType::Nightly ||
-                                                QString::fromStdString(installedVersion.name)
-                                                    .contains("Pre-release", Qt::CaseInsensitive)) {
+                                                VersionManager::VersionType::Nightly) {
                                                 VersionManager::RemoveVersion(
                                                     installedVersion.name);
                                             }
@@ -811,34 +745,11 @@ void VersionDialog::SaveDownloadCache(const QStringList& versions) {
 
 void VersionDialog::PopulateDownloadTree(const QStringList& versions) {
     ui->downloadTreeWidget->clear();
-
-    QTreeWidgetItem* preReleaseItem = nullptr;
-    QList<QTreeWidgetItem*> otherItems;
-    bool foundPreRelease = false;
-
-    for (const QString& tagName : versions) {
-        if (tagName.startsWith("Pre-release", Qt::CaseInsensitive)) {
-            if (!foundPreRelease) {
-                preReleaseItem = new QTreeWidgetItem();
-                preReleaseItem->setText(0, "Pre-release (Nightly)");
-                foundPreRelease = true;
-            }
-            continue;
-        }
-        QTreeWidgetItem* item = new QTreeWidgetItem();
-        item->setText(0, tagName);
-        otherItems.append(item);
+    ui->downloadTreeWidget->addTopLevelItem(new QTreeWidgetItem({LATEST_LABEL}));
+    for (const QString& name : versions) {
+        if (name.startsWith(RELEASE_PREFIX))
+            ui->downloadTreeWidget->addTopLevelItem(new QTreeWidgetItem({name}));
     }
-
-    if (!foundPreRelease) {
-        preReleaseItem = new QTreeWidgetItem();
-        preReleaseItem->setText(0, "Pre-release (Nightly)");
-    }
-
-    if (preReleaseItem)
-        ui->downloadTreeWidget->addTopLevelItem(preReleaseItem);
-    for (QTreeWidgetItem* item : otherItems)
-        ui->downloadTreeWidget->addTopLevelItem(item);
 
     InstallSelectedVersion();
 }
@@ -882,7 +793,7 @@ void VersionDialog::checkUpdatePre(const bool showMessage) {
     }
 
     QNetworkAccessManager* manager = new QNetworkAccessManager(this);
-    QNetworkRequest request(QUrl("https://api.github.com/repos/shadps4-emu/shadPS4/releases"));
+    QNetworkRequest request(QString("https://api.github.com/repos/%1/releases").arg(EMULATOR_REPO));
     QNetworkReply* reply = manager->get(request);
 
     connect(reply, &QNetworkReply::finished, this, [this, reply, localHash, showMessage]() {
@@ -908,7 +819,7 @@ void VersionDialog::checkUpdatePre(const bool showMessage) {
 
         for (const QJsonValue& val : arr) {
             QJsonObject obj = val.toObject();
-            if (obj["prerelease"].toBool()) {
+            if (obj["tag_name"].toString().startsWith(RELEASE_PREFIX)) {
 
                 latestTag = obj["tag_name"].toString();
 
@@ -922,8 +833,9 @@ void VersionDialog::checkUpdatePre(const bool showMessage) {
         }
 
         if (latestHash.isEmpty()) {
-            QMessageBox::warning(this, tr("Error"),
-                                 tr("Unable to get hash of latest pre-release."));
+            if (showMessage)
+                QMessageBox::warning(this, tr("Error"),
+                                     tr("Unable to get hash of latest pre-release."));
             reply->deleteLater();
             return;
         }
@@ -1029,9 +941,8 @@ void VersionDialog::showPreReleaseUpdateDialog(const QString& localHash, const Q
 
 void VersionDialog::requestChangelog(const QString& localHash, const QString& latestHash,
                                      const QString& latestTag, QTextBrowser* outputView) {
-    QString compareUrlString =
-        QString("https://api.github.com/repos/shadps4-emu/shadPS4/compare/%1...%2")
-            .arg(localHash, latestHash);
+    QString compareUrlString = QString("https://api.github.com/repos/%1/compare/%2...%3")
+                                   .arg(EMULATOR_REPO, localHash, latestHash);
 
     QUrl compareUrl(compareUrlString);
     QNetworkRequest req(compareUrl);
@@ -1090,7 +1001,7 @@ void VersionDialog::requestChangelog(const QString& localHash, const QString& la
 
 void VersionDialog::installPreReleaseByTag(const QString& tagName) {
     QString apiUrl =
-        QString("https://api.github.com/repos/shadps4-emu/shadPS4/releases/tags/%1").arg(tagName);
+        QString("https://api.github.com/repos/%1/releases/tags/%2").arg(EMULATOR_REPO, tagName);
 
     QNetworkAccessManager* mgr = new QNetworkAccessManager(this);
     QNetworkRequest req(apiUrl);
@@ -1138,7 +1049,7 @@ void VersionDialog::installPreReleaseByTag(const QString& tagName) {
 
 void VersionDialog::showDownloadDialog(const QString& tagName, const QString& downloadUrl) {
     QDialog* dlg = new QDialog(this);
-    dlg->setWindowTitle(tr("Downloading Pre-release (Nightly), please wait..."));
+    dlg->setWindowTitle(tr("Downloading %1 , please wait...").arg(LATEST_LABEL));
 
     QVBoxLayout* lay = new QVBoxLayout(dlg);
 
@@ -1258,7 +1169,7 @@ void VersionDialog::showDownloadDialog(const QString& tagName, const QString& do
 
                 auto const exe = m_gui_settings->GetVersionExecutablePath(destFolder);
                 VersionManager::Version new_version = {
-                    .name = "Pre-release (Nightly)",
+                    .name = LATEST_LABEL,
                     .path = exe.toStdString(),
                     .date = QDateTime::currentDateTime().toString("yyyy-MM-dd").toStdString(),
                     .codename = codename.toStdString(),
