@@ -81,10 +81,10 @@ bool MainWindow::Init() {
     std::string remote_url(Common::g_scm_remote_url);
     std::string remote_host = Common::GetRemoteNameFromLink();
     if (remote_host == "shadps4-emu" || remote_url.length() == 0) {
-        window_title = fmt::format("shadPS4QtLauncher v{} {} {}", Common::g_scm_app_version,
+        window_title = fmt::format("GR2Launcher v{} {} {}", Common::g_scm_app_version,
                                    Common::g_scm_branch, Common::g_scm_desc);
     } else {
-        window_title = fmt::format("shadPS4QtLauncher v{} {}/{} {}", Common::g_scm_app_version,
+        window_title = fmt::format("GR2Launcher v{} {}/{} {}", Common::g_scm_app_version,
                                    remote_host, Common::g_scm_branch, Common::g_scm_desc);
     }
     setWindowTitle(QString::fromStdString(window_title));
@@ -1439,7 +1439,7 @@ tr("No emulator version was selected.\nThe Version Manager menu will then open.\
 
     QFileInfo fileInfo(selectedVersion);
     if (!fileInfo.exists()) {
-        QMessageBox::critical(nullptr, "shadPS4",
+        QMessageBox::critical(nullptr, "GR2Launcher",
                               QString(tr("Could not find the emulator executable")));
         return;
     }
@@ -1511,7 +1511,7 @@ void MainWindow::StartEmulatorExecutable(std::filesystem::path emuPath, QString 
     }
     if (!gameArg.isEmpty()) {
         if (!gameFound) {
-            QMessageBox::critical(nullptr, "shadPS4",
+            QMessageBox::critical(nullptr, "GR2Launcher",
                                   QString(tr("Invalid game argument provided")));
             quick_exit(1);
         }
@@ -1522,7 +1522,7 @@ void MainWindow::StartEmulatorExecutable(std::filesystem::path emuPath, QString 
 
     QFileInfo fileInfo(emuPath);
     if (!fileInfo.exists()) {
-        QMessageBox::critical(nullptr, "shadPS4",
+        QMessageBox::critical(nullptr, "GR2Launcher",
                               QString(tr("Could not find the emulator executable")));
         return;
     }
@@ -1564,7 +1564,7 @@ void MainWindow::RestartEmulator() {
     }
 
     QFileInfo fileInfo(exe);
-    QString workDir = fileInfo.absolutePath();
+    QString workDir = QDir::currentPath();
 
     m_ipc_client->startEmulator(fileInfo, args, workDir);
 }

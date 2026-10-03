@@ -27,7 +27,7 @@ GameInstallDialog::GameInstallDialog() : m_gamesDirectory(nullptr) {
     layout->addStretch();
     layout->addWidget(SetupDialogActions());
 
-    setWindowTitle(tr("shadPS4 - Choose directory"));
+    setWindowTitle(tr("GR2Launcher - Choose directory"));
     setWindowIcon(QIcon(":images/shadps4.ico"));
 }
 
@@ -187,6 +187,7 @@ void GameInstallDialog::Save() {
     }
 
     // Save the directories
+    EmulatorSettings.Load();
     EmulatorSettings.AddGameInstallDir(Common::FS::PathFromQString(gamesDirectory));
     EmulatorSettings.SetAddonInstallDir(Common::FS::PathFromQString(addonsDirectory));
     m_gui_settings->SetValue(gui::vm_versionPath, versionDirectory);

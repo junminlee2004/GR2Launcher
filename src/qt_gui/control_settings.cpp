@@ -134,6 +134,7 @@ ControlSettings::ControlSettings(std::shared_ptr<GameInfoClass> game_info_get,
         std::string GUID =
             GamepadSelect::GetGUIDString(gamepads, ui->ActiveGamepadBox->currentIndex());
         ui->DefaultGamepadLabel->setText(tr("ID: ") + QString::fromStdString(GUID).right(16));
+        EmulatorSettings.Load();
         EmulatorSettings.SetDefaultControllerId(GUID);
         EmulatorSettings.Save();
         QMessageBox::information(this, tr("Default Controller Selected"),
@@ -143,6 +144,7 @@ ControlSettings::ControlSettings(std::shared_ptr<GameInfoClass> game_info_get,
     connect(ui->RemoveDefaultGamepadButton, &QPushButton::clicked, this, [this]() {
         ui->DefaultGamepadName->setText(tr("No default selected"));
         ui->DefaultGamepadLabel->setText(tr("n/a"));
+        EmulatorSettings.Load();
         EmulatorSettings.SetDefaultControllerId("");
         EmulatorSettings.Save();
         QMessageBox::information(this, tr("Default Controller Removed"),
@@ -210,10 +212,14 @@ void ControlSettings::SaveControllerConfig(bool CloseOnSave) {
             continue;
         }
 
-        output_string = line.substr(0, equal_pos - 1);
-        input_string = line.substr(equal_pos + 2);
+        output_string = line.substr(0, equal_pos);
+        std::erase_if(output_string, [](unsigned char c) { return std::isspace(c); });
+        input_string = line.substr(std::min(equal_pos + 2, line.size()));
 
-        if (output_string.contains("hotkey")) {
+        // Only the stick deadzones have sliders, so a trigger deadzone line is kept.
+        if (std::find(ControllerOutputs.begin(), ControllerOutputs.end(), output_string) ==
+                ControllerOutputs.end() ||
+            (output_string == "analog_deadzone" && !input_string.contains("joystick"))) {
             lines.push_back(line);
             continue;
         }
@@ -362,6 +368,7 @@ void ControlSettings::SaveControllerConfig(bool CloseOnSave) {
                                      ui->BSlider->value());
     */
 
+    EmulatorSettings.Load();
     EmulatorSettings.SetUseUnifiedInputConfig(!ui->PerGameCheckBox->isChecked());
     EmulatorSettings.Save();
 

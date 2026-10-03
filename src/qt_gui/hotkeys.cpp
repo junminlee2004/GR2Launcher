@@ -164,8 +164,12 @@ void Hotkeys::SetDefault() {
 
 void Hotkeys::SaveHotkeys(bool CloseOnSave) {
     std::vector<std::string> lines, inputs;
+    // The outputs written here, and the legacy name of hotkey_capture_frame. An existing line for
+    // any other output is kept as it is.
+    std::vector<std::string> outputs = {"hotkey_renderdoc_capture"};
 
     auto add_mapping = [&](const QString& buttonText, const std::string& output_name) {
+        outputs.push_back(output_name);
         if (buttonText.toStdString() != "unmapped") {
             lines.push_back(output_name + " = " + buttonText.toStdString());
             inputs.push_back(buttonText.toStdString());
@@ -236,7 +240,9 @@ void Hotkeys::SaveHotkeys(bool CloseOnSave) {
             continue;
         }
 
-        if (!line.contains("hotkey")) {
+        std::string output_string = line.substr(0, equal_pos);
+        std::erase_if(output_string, [](unsigned char c) { return std::isspace(c); });
+        if (std::find(outputs.begin(), outputs.end(), output_string) == outputs.end()) {
             lines.push_back(line);
         }
     }
@@ -311,7 +317,7 @@ void Hotkeys::LoadHotkeys() {
             continue;
 
         std::string output_string = line.substr(0, equal_pos);
-        std::string input_string = line.substr(equal_pos + 2);
+        std::string input_string = line.substr(std::min(equal_pos + 2, line.size()));
 
         bool controllerInputDetected = false;
         for (const std::string& input : ControllerInputs) {

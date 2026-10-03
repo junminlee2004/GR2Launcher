@@ -163,7 +163,7 @@ void CheatsPatches::setupUI() {
 
     // Patch repository
     ui->patchesComboBox->addItem("shadPS4", "shadPS4");
-    ui->patchesComboBox->addItem("GoldHEN", "GoldHEN");
+    ui->patchesComboBox->addItem("GoldHEN (GR2 Fork)", "GoldHEN");
 
     // Download patches
     connect(ui->patchesButton, &QPushButton::clicked, this, [this]() {
@@ -584,7 +584,9 @@ void CheatsPatches::downloadPatches(const QString repository, const bool showMes
         url = "https://api.github.com/repos/shadps4-emu/ps4_cheats/contents/PATCHES";
     }
     if (repository == "GoldHEN") {
-        url = "https://api.github.com/repos/illusion0001/PS4-PS5-Game-Patch/contents/patches/xml";
+        url =
+            "https://api.github.com/repos/junminlee2004/GR2fork_GoldHEN_Patch_Repository/contents/"
+            "patches/xml";
     }
     QNetworkAccessManager* downloadManager = new QNetworkAccessManager(this);
     QNetworkRequest request(url);

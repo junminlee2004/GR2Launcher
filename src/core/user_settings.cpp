@@ -264,12 +264,40 @@ bool UserSettingsImpl::Save() const {
         j["Users"] = m_userManager.GetUsers();
         j["Users"]["commit_hash"] = std::string(Common::g_scm_rev);
 
+        json existing;
+        if (std::ifstream in{path}; in.good()) {
+            existing = json::parse(in, nullptr, false);
+        }
+        if (!existing.is_object()) {
+            existing = json::object();
+        }
+
+        json& users = existing["Users"];
+        if (users.is_object()) {
+            // Each user is merged over the file's entry with the same user_id, which keeps the
+            // keys unknown to the launcher. The array itself is replaced, dropping removed users.
+            json& old_users = users["user"];
+            for (json& user : j["Users"]["user"]) {
+                const auto old =
+                    std::find_if(old_users.begin(), old_users.end(), [&user](const json& entry) {
+                        return entry.contains("user_id") && entry["user_id"] == user["user_id"];
+                    });
+                if (old != old_users.end()) {
+                    old->update(user);
+                    user = *old;
+                }
+            }
+            users.update(j["Users"]);
+        } else {
+            users = j["Users"];
+        }
+
         std::ofstream out(path);
         if (!out) {
             LOG_ERROR(Config, "Failed to open user settings for writing: {}", path.string());
             return false;
         }
-        out << std::setw(2) << j;
+        out << std::setw(2) << existing;
         return !out.fail();
     } catch (const std::exception& e) {
         LOG_ERROR(Config, "Error saving user settings: {}", e.what());

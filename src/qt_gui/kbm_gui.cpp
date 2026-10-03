@@ -242,6 +242,8 @@ void KBMSettings::EnableMappingButtons() {
 void KBMSettings::SaveKBMConfig(bool close_on_save) {
     std::string output_string = "", input_string = "";
     std::vector<std::string> lines, inputs;
+    // The outputs written here. An existing line for any other output is kept as it is.
+    std::vector<std::string> outputs = {"mouse_to_joystick", "mouse_movement_params"};
 
     // Comment lines for config file
     lines.push_back("#Feeling lost? Check out the Help section!");
@@ -252,6 +254,7 @@ void KBMSettings::SaveKBMConfig(bool close_on_save) {
     for (const auto& entry : ButtonsList) {
         input_string = entry.first->text().toStdString();
         output_string = entry.second;
+        outputs.push_back(output_string);
         if (input_string != "unmapped") {
             lines.push_back(output_string + " = " + input_string);
             inputs.push_back(input_string);
@@ -295,8 +298,9 @@ void KBMSettings::SaveKBMConfig(bool close_on_save) {
             continue;
         }
 
-        output_string = line.substr(0, equal_pos - 1);
-        input_string = line.substr(equal_pos + 2);
+        output_string = line.substr(0, equal_pos);
+        std::erase_if(output_string, [](unsigned char c) { return std::isspace(c); });
+        input_string = line.substr(std::min(equal_pos + 2, line.size()));
 
         bool controllerInputdetected = false;
         for (const std::string& input : ControllerInputs) {
@@ -307,8 +311,8 @@ void KBMSettings::SaveKBMConfig(bool close_on_save) {
             }
         }
 
-        if (controllerInputdetected || output_string == "analog_deadzone" ||
-            output_string == "override_controller_color" || output_string.contains("hotkey")) {
+        if (controllerInputdetected ||
+            std::find(outputs.begin(), outputs.end(), output_string) == outputs.end()) {
             lines.push_back(line);
         }
     }
@@ -356,6 +360,7 @@ QString(tr("Cannot bind any unique input more than once. Duplicate inputs mapped
     }
     output_file.close();
 
+    EmulatorSettings.Load();
     EmulatorSettings.SetUseUnifiedInputConfig(!ui->PerGameCheckBox->isChecked());
     EmulatorSettings.Save();
 
@@ -432,7 +437,7 @@ void KBMSettings::SetUIValuestoMappings(std::string config_id) {
             continue;
 
         std::string output_string = line.substr(0, equal_pos - 1);
-        std::string input_string = line.substr(equal_pos + 2);
+        std::string input_string = line.substr(std::min(equal_pos + 2, line.size()));
 
         bool controllerInputdetected = false;
         for (const std::string& input : ControllerInputs) {

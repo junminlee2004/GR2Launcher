@@ -391,7 +391,8 @@ public:
     } // setupUi
 
     void retranslateUi(QMainWindow* MainWindow) {
-        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "shadPS4", nullptr));
+        MainWindow->setWindowTitle(
+            QCoreApplication::translate("MainWindow", "GR2Launcher", nullptr));
         addElfFolderAct->setText(
             QCoreApplication::translate("MainWindow", "Open/Add Elf Folder", nullptr));
         bootGameAct->setText(QCoreApplication::translate("MainWindow", "Boot Game", nullptr));
@@ -399,7 +400,7 @@ public:
         updaterAct->setText(
             QCoreApplication::translate("MainWindow", "Check for Updates", nullptr));
 #endif
-        aboutAct->setText(QCoreApplication::translate("MainWindow", "About shadPS4", nullptr));
+        aboutAct->setText(QCoreApplication::translate("MainWindow", "About GR2Launcher", nullptr));
         configureAct->setText(QCoreApplication::translate("MainWindow", "Configure...", nullptr));
         configureHotkeys->setText(
             QCoreApplication::translate("MainWindow", "Customize Hotkeys", nullptr));
@@ -410,10 +411,10 @@ public:
 #endif // QT_CONFIG(tooltip)
         menuRecent->setTitle(QCoreApplication::translate("MainWindow", "Recent Games", nullptr));
         shadFolderAct->setText(
-            QCoreApplication::translate("MainWindow", "Open shadPS4 Folder", nullptr));
+            QCoreApplication::translate("MainWindow", "Open User Folder", nullptr));
         exitAct->setText(QCoreApplication::translate("MainWindow", "Exit", nullptr));
 #if QT_CONFIG(tooltip)
-        exitAct->setToolTip(QCoreApplication::translate("MainWindow", "Exit shadPS4", nullptr));
+        exitAct->setToolTip(QCoreApplication::translate("MainWindow", "Exit GR2Launcher", nullptr));
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(statustip)
         exitAct->setStatusTip(

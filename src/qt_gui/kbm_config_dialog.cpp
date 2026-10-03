@@ -47,6 +47,7 @@ EditorDialog::EditorDialog(QWidget* parent) : QDialog(parent) {
 
     // Connect checkbox signal
     connect(unifiedInputCheckBox, &QCheckBox::toggled, this, [](bool checked) {
+        EmulatorSettings.Load();
         EmulatorSettings.SetUseUnifiedInputConfig(!checked);
         EmulatorSettings.Save();
     });

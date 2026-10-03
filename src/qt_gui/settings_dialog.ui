@@ -158,6 +158,13 @@
                     </property>
                    </widget>
                   </item>
+                  <item>
+                   <widget class="QCheckBox" name="showFpsCounterCheckBox">
+                    <property name="text">
+                     <string>Show FPS Counter</string>
+                    </property>
+                   </widget>
+                  </item>
                  </layout>
                 </widget>
                </item>
@@ -708,6 +715,11 @@
                  <item>
                   <property name="text">
                    <string>Debug</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Tuning</string>
                   </property>
                  </item>
                  <item>
@@ -1478,6 +1490,158 @@
            </layout>
           </item>
           <item>
+           <layout class="QHBoxLayout" name="onlineLayout">
+            <item>
+             <widget class="QGroupBox" name="gr2OnlineGroupBox">
+              <property name="title">
+               <string>Gravity Rush 2 Online</string>
+              </property>
+              <layout class="QFormLayout" name="gr2OnlineLayout">
+               <item row="0" column="0">
+                <widget class="QLabel" name="gr2HostLabel">
+                 <property name="text">
+                  <string>Server Host</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="gr2HostLineEdit"/>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="gr2PortLabel">
+                 <property name="text">
+                  <string>Server Port</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="gr2PortLineEdit">
+                 <property name="placeholderText">
+                  <string notr="true">8443</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0" colspan="2">
+                <widget class="QCheckBox" name="networkConnectedCheckBox">
+                 <property name="text">
+                  <string>Set &quot;Network Connected&quot; to True</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="shadnetGroupBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="title">
+               <string>ShadNet</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+              </property>
+              <layout class="QFormLayout" name="formLayout">
+               <property name="sizeConstraint">
+                <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+               </property>
+               <property name="fieldGrowthPolicy">
+                <enum>QFormLayout::FieldGrowthPolicy::AllNonFixedFieldsGrow</enum>
+               </property>
+               <property name="labelAlignment">
+                <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+               </property>
+               <property name="horizontalSpacing">
+                <number>6</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>6</number>
+               </property>
+               <property name="leftMargin">
+                <number>9</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <item row="0" column="0" colspan="2">
+                <widget class="QCheckBox" name="shadnetCheckBox">
+                 <property name="text">
+                  <string>Enable shadNet</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="serverLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Server</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="signalingInfoLabel">
+                 <property name="text">
+                  <string>Signaling Info</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLineEdit" name="signalingInfoLineEdit"/>
+               </item>
+               <item row="6" column="0">
+                <widget class="QCheckBox" name="upnpCheckBox">
+                 <property name="text">
+                  <string>Enable UPNP</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="serverLineEdit">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="servWebApiLabel">
+                 <property name="text">
+                  <string>WebAPI Server</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLineEdit" name="servWebApiLineEdit"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
            <layout class="QHBoxLayout" name="horizontalLayout_5"/>
           </item>
          </layout>
@@ -1563,9 +1727,44 @@
                 </widget>
                </item>
                <item>
+                <widget class="QCheckBox" name="gyroSwapYawRollCheckBox">
+                 <property name="text">
+                  <string>Swap Gyro Yaw/Roll (Handheld)</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="gyroInvertYawCheckBox">
+                 <property name="text">
+                  <string>Invert Gyro Yaw</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="gyroInvertXCheckBox">
+                 <property name="text">
+                  <string>Invert Gyro Pitch</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="gyroInvertRollCheckBox">
+                 <property name="text">
+                  <string>Invert Gyro Roll</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QCheckBox" name="backgroundControllerCheckBox">
                  <property name="text">
                   <string>Enable Background Controller Input</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="keyboardAsKeyboardCheckBox">
+                 <property name="text">
+                  <string>Use Keyboard as Keyboard</string>
                  </property>
                 </widget>
                </item>
@@ -2447,16 +2646,44 @@
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="readbackLinearImagesCheckBox">
-                 <property name="text">
-                  <string>Enable Readback Linear Images</string>
+                <widget class="QGroupBox" name="readbackLinearImagesGroupBox">
+                 <property name="title">
+                  <string>Readback Linear Images</string>
                  </property>
+                 <layout class="QVBoxLayout" name="readbackLinearImagesLayout">
+                  <item>
+                   <widget class="QComboBox" name="readbackLinearImagesComboBox">
+                    <item>
+                     <property name="text">
+                      <string>Off</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Default</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Async</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
                 </widget>
                </item>
                <item>
                 <widget class="QCheckBox" name="dmaCheckBox">
                  <property name="text">
                   <string>Enable Direct Memory Access</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="userfaultfdCheckBox">
+                 <property name="text">
+                  <string>Enable userfaultfd Memory Tracking</string>
                  </property>
                 </widget>
                </item>
@@ -2471,20 +2698,6 @@
                 <widget class="QCheckBox" name="neoCheckBox">
                  <property name="text">
                   <string>Enable PS4 Neo Mode</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="shadnetCheckBox">
-                 <property name="text">
-                  <string>Enable shadNet</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="networkConnectedCheckBox">
-                 <property name="text">
-                  <string>Set &quot;Network Connected&quot; to True</string>
                  </property>
                 </widget>
                </item>
@@ -2506,113 +2719,6 @@
              </widget>
             </item>
             <item>
-             <widget class="QGroupBox" name="shadnetGroupBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="title">
-               <string>ShadNet</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-              </property>
-              <layout class="QFormLayout" name="formLayout">
-               <property name="sizeConstraint">
-                <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
-               </property>
-               <property name="fieldGrowthPolicy">
-                <enum>QFormLayout::FieldGrowthPolicy::AllNonFixedFieldsGrow</enum>
-               </property>
-               <property name="labelAlignment">
-                <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
-               </property>
-               <property name="horizontalSpacing">
-                <number>6</number>
-               </property>
-               <property name="verticalSpacing">
-                <number>6</number>
-               </property>
-               <property name="leftMargin">
-                <number>9</number>
-               </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="bottomMargin">
-                <number>200</number>
-               </property>
-               <item row="1" column="0">
-                <widget class="QLabel" name="serverLabel">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Server</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="signalingInfoLabel">
-                 <property name="text">
-                  <string>Signaling Info</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="1">
-                <widget class="QLineEdit" name="signalingInfoLineEdit"/>
-               </item>
-               <item row="6" column="0">
-                <widget class="QCheckBox" name="upnpCheckBox">
-                 <property name="text">
-                  <string>Enable UPNP</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="serverLineEdit">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="servWebApiLabel">
-                 <property name="text">
-                  <string>WebAPI Server</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="1">
-                <widget class="QLineEdit" name="servWebApiLineEdit"/>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
              <layout class="QVBoxLayout" name="verticalLayout_10">
               <item>
                <widget class="QGroupBox" name="dmemGroupBox">
@@ -2622,6 +2728,49 @@
                 <layout class="QVBoxLayout" name="verticalLayout_4">
                  <item>
                   <widget class="QSpinBox" name="dmemSpinBox">
+                   <property name="frame">
+                    <bool>true</bool>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                   </property>
+                   <property name="specialValueText">
+                    <string/>
+                   </property>
+                   <property name="accelerated">
+                    <bool>true</bool>
+                   </property>
+                   <property name="correctionMode">
+                    <enum>QAbstractSpinBox::CorrectionMode::CorrectToNearestValue</enum>
+                   </property>
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
+                   <property name="suffix">
+                    <string notr="true">MB</string>
+                   </property>
+                   <property name="minimum">
+                    <number>0</number>
+                   </property>
+                   <property name="maximum">
+                    <number>100000</number>
+                   </property>
+                   <property name="value">
+                    <number>0</number>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="fmemGroupBox">
+                <property name="title">
+                 <string>Additional FMem Allocation</string>
+                </property>
+                <layout class="QVBoxLayout" name="fmemLayout">
+                 <item>
+                  <widget class="QSpinBox" name="fmemSpinBox">
                    <property name="frame">
                     <bool>true</bool>
                    </property>
@@ -2687,7 +2836,7 @@
                     <string notr="true">Hz</string>
                    </property>
                    <property name="minimum">
-                    <number>60</number>
+                    <number>30</number>
                    </property>
                    <property name="maximum">
                     <number>9999</number>
@@ -2776,6 +2925,15 @@
        </layout>
       </widget>
      </widget>
+     <widget class="QScrollArea" name="tuningTab">
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <attribute name="title">
+       <string>Tuning</string>
+      </attribute>
+      <widget class="TuningPage" name="tuningPage"/>
+     </widget>
     </widget>
    </item>
    <item>
@@ -2806,6 +2964,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TuningPage</class>
+   <extends>QWidget</extends>
+   <header>src/qt_gui/tuning_page.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../shadps4.qrc"/>
  </resources>

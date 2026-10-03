@@ -27,12 +27,12 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "CompanyName", "\0"
-            VALUE "FileDescription", "shadPS4 - PlayStation 4 Emulator\0"
+            VALUE "FileDescription", "GR2Launcher - Gravity Rush 2 launcher for shadPS4\0"
             VALUE "FileVersion", "0" "." "0" "." xstr(APP_VERSION) ".0\0"
-            VALUE "InternalName", "shadPS4\0"
+            VALUE "InternalName", "GR2Launcher\0"
             VALUE "LegalCopyright", "Copyright 2025 shadPS4 Team\0"
-            VALUE "OriginalFilename", "shadPS4QtLauncher.exe\0"
-            VALUE "ProductName", "shadPS4\0"
+            VALUE "OriginalFilename", "GR2Launcher.exe\0"
+            VALUE "ProductName", "GR2Launcher\0"
             VALUE "ProductVersion", "0" "." "0" "." xstr(APP_VERSION) ".0\0"
         END
     END

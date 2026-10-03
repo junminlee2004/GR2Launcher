@@ -85,6 +85,14 @@ private:
         "pad_left",     "pad_right", "axis_left_x", "axis_left_y", "axis_right_x",
         "axis_right_y", "back"};
 
+    // The outputs SaveControllerConfig writes. A line for any other output is kept as it is.
+    const std::vector<std::string> ControllerOutputs = {
+        "l1",           "r1",           "pad_up",    "cross",          "touchpad_left",
+        "l2",           "r2",           "pad_down",  "circle",         "touchpad_center",
+        "l3",           "r3",           "pad_left",  "square",         "touchpad_right",
+        "axis_left_x",  "axis_left_y",  "pad_right", "triangle",       "override_controller_color",
+        "axis_right_x", "axis_right_y", "options",   "analog_deadzone"};
+
 protected:
     void closeEvent(QCloseEvent* event) override {
         Cleanup();

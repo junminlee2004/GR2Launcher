@@ -10,6 +10,7 @@
 #include <QDirIterator>
 #include <QFileDialog>
 #include <QHoverEvent>
+#include <QIntValidator>
 #include <QMessageBox>
 #include <SDL3/SDL.h>
 #include <fmt/format.h>
@@ -23,6 +24,7 @@
 #include "background_music_player.h"
 #include "common/logging/log.h"
 #include "core/emulator_state.h"
+#include "core/gr2_online.h"
 #include "log_presets_dialog.h"
 #include "sdl_event_wrapper.h"
 #include "settings_dialog.h"
@@ -140,10 +142,9 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
     // Add a small clear "x" button inside the Log Filter input
     ui->logFilterLineEdit->setClearButtonEnabled(true);
 
+    EmulatorSettings.Load();
     if (is_game_specific) {
         EmulatorSettings.Load(gs_serial);
-    } else {
-        EmulatorSettings.Load();
     }
 
     if (is_game_specific) {
@@ -155,10 +156,13 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
         ui->tabWidgetSettings->setTabVisible(1, false);
         ui->chooseHomeTabComboBox->removeItem(1);
 
+        // General tab: the FPS counter has no per-game value
+        ui->showFpsCounterCheckBox->setVisible(false);
+
     } else {
         // Experimental tab
         ui->tabWidgetSettings->setTabVisible(8, false);
-        ui->chooseHomeTabComboBox->removeItem(8);
+        ui->chooseHomeTabComboBox->removeItem(9);
     }
 
     // to do: unhide when implemented
@@ -166,6 +170,9 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
 
 #ifndef _WIN32
     ui->redZoneGroupBox->setVisible(false);
+#endif
+#ifndef __linux__
+    ui->userfaultfdCheckBox->setVisible(false);
 #endif
 
     ui->buttonBox->button(QDialogButtonBox::StandardButton::Close)->setFocus();
@@ -185,7 +192,8 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
                         {tr("Paths"), "Paths"},
                         {tr("Log"), "Log"},
                         {tr("Debug"), "Debug"},
-                        {tr("Experimental"), "Experimental"}};
+                        {tr("Experimental"), "Experimental"},
+                        {tr("Tuning"), "Tuning"}};
     micMap = {{tr("None"), "None"}, {tr("Default Device"), "Default Device"}};
     audioBackendMap = {{0, "SDL"}, {1, "OpenAL"}};
 
@@ -249,6 +257,12 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
     ui->audioBackendComboBox->setCurrentIndex(EmulatorSettings.GetAudioBackend());
     RefreshAudioDevices();
 
+    // Connected before the values are loaded, so the Tuning tab also sees the loaded choice.
+    connect(ui->readbackLinearImagesComboBox, &QComboBox::currentIndexChanged, ui->tuningPage,
+            [this](int index) {
+                ui->tuningPage->SetOutside("readback_linear_images_enabled", index != 0);
+            });
+
     InitializeEmulatorLanguages();
     LoadValuesFromConfig();
 
@@ -268,7 +282,11 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
             SaveSettings();
         } else if (button == ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)) {
             SetDefaultValues();
-            EmulatorSettings.SetDefaultValues();
+            if (is_game_specific) {
+                EmulatorSettings.ClearGameSpecificOverrides();
+            } else {
+                EmulatorSettings.SetDefaultValues();
+            }
             SaveSettings();
             LoadValuesFromConfig();
         } else if (button == ui->buttonBox->button(QDialogButtonBox::Close)) {
@@ -371,6 +389,8 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
                                          tr("%1 successfully created.").arg(launcherDir));
             }
         });
+
+        ui->gr2PortLineEdit->setValidator(new QIntValidator(1, 65535, this));
     }
 
     // INPUT TAB
@@ -527,6 +547,7 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
         ui->consoleLanguageGroupBox->installEventFilter(this);
         ui->emulatorLanguageGroupBox->installEventFilter(this);
         ui->showSplashCheckBox->installEventFilter(this);
+        ui->showFpsCounterCheckBox->installEventFilter(this);
         ui->discordRPCCheckbox->installEventFilter(this);
         ui->volumeSliderElement->installEventFilter(this);
 #ifdef ENABLE_UPDATER
@@ -544,12 +565,18 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
         ui->disableTrophycheckBox->installEventFilter(this);
         ui->OpenCustomTrophyLocationButton->installEventFilter(this);
         ui->PortableUserFolderGroupBox->installEventFilter(this);
+        ui->gr2OnlineGroupBox->installEventFilter(this);
 
         // Input
         ui->hideCursorGroupBox->installEventFilter(this);
         ui->idleTimeoutGroupBox->installEventFilter(this);
         ui->backgroundControllerCheckBox->installEventFilter(this);
         ui->motionControlsCheckBox->installEventFilter(this);
+        ui->gyroSwapYawRollCheckBox->installEventFilter(this);
+        ui->gyroInvertYawCheckBox->installEventFilter(this);
+        ui->gyroInvertXCheckBox->installEventFilter(this);
+        ui->gyroInvertRollCheckBox->installEventFilter(this);
+        ui->keyboardAsKeyboardCheckBox->installEventFilter(this);
         ui->micComboBox->installEventFilter(this);
         ui->usbComboBox->installEventFilter(this);
 
@@ -602,9 +629,10 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
 
         // Experimental
         ui->readbacksGroupBox->installEventFilter(this);
-        ui->readbackLinearImagesCheckBox->installEventFilter(this);
+        ui->readbackLinearImagesGroupBox->installEventFilter(this);
         ui->dumpShadersCheckBox->installEventFilter(this);
         ui->dmaCheckBox->installEventFilter(this);
+        ui->userfaultfdCheckBox->installEventFilter(this);
         ui->devkitCheckBox->installEventFilter(this);
         ui->neoCheckBox->installEventFilter(this);
         ui->networkConnectedCheckBox->installEventFilter(this);
@@ -612,6 +640,12 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
         ui->shaderCacheArchiveCheckBox->installEventFilter(this);
         ui->shadnetCheckBox->installEventFilter(this);
         ui->dmemGroupBox->installEventFilter(this);
+        ui->fmemGroupBox->installEventFilter(this);
+
+        // Tuning
+        connect(ui->tuningPage, &TuningPage::DescriptionChanged, this, [this](const QString& text) {
+            ui->descriptionText->setText(text.isEmpty() ? defaultTextEdit : text);
+        });
     }
 
     SDL_InitSubSystem(SDL_INIT_EVENTS);
@@ -642,7 +676,7 @@ void SettingsDialog::closeEvent(QCloseEvent* event) {
 
 void SettingsDialog::LoadValuesFromConfig() {
     std::filesystem::path gs_config_file =
-        Common::FS::GetUserPath(Common::FS::PathType::CustomConfigs) / (gs_serial);
+        Common::FS::GetUserPath(Common::FS::PathType::CustomConfigs) / (gs_serial + ".json");
 
     std::error_code error;
     bool is_newly_created = false;
@@ -682,6 +716,7 @@ void SettingsDialog::LoadValuesFromConfig() {
         ui->BGMVolumeSlider->setValue(
             m_gui_settings->GetValue(gui::gl_backgroundMusicVolume).toInt());
         ui->discordRPCCheckbox->setChecked(EmulatorSettings.IsDiscordRPCEnabled());
+        ui->showFpsCounterCheckBox->setChecked(EmulatorSettings.IsShowFpsCounter());
 
         ui->enableCompatibilityCheckBox->setChecked(
             m_gui_settings->GetValue(gui::glc_showCompatibility).toBool());
@@ -715,8 +750,12 @@ void SettingsDialog::LoadValuesFromConfig() {
         languageIndexes.size());
 
     ui->readbacksModeComboBox->setCurrentIndex(EmulatorSettings.GetReadbacksMode());
-    ui->readbackLinearImagesCheckBox->setChecked(EmulatorSettings.IsReadbackLinearImagesEnabled());
+    ui->readbackLinearImagesComboBox->setCurrentIndex(
+        !EmulatorSettings.IsReadbackLinearImagesEnabled() ? 0
+        : EmulatorSettings.IsReadbackLinearImagesAsync()  ? 2
+                                                          : 1);
     ui->dmaCheckBox->setChecked(EmulatorSettings.IsDirectMemoryAccessEnabled());
+    ui->userfaultfdCheckBox->setChecked(EmulatorSettings.IsUserfaultfdTracking());
     ui->neoCheckBox->setChecked(EmulatorSettings.IsNeo());
     ui->devkitCheckBox->setChecked(EmulatorSettings.IsDevKit());
     ui->networkConnectedCheckBox->setChecked(EmulatorSettings.IsConnectedToNetwork());
@@ -728,10 +767,21 @@ void SettingsDialog::LoadValuesFromConfig() {
         QString::fromStdString(EmulatorSettings.GetShadNetWebApiServer()));
     ui->signalingInfoLineEdit->setText(QString::fromStdString(EmulatorSettings.GetSignalingInfo()));
     ui->upnpCheckBox->setChecked(EmulatorSettings.IsUPnPEnabled());
+    const auto gr2_server = Gr2Online::ReadServer(gs_serial);
+    ui->gr2HostLineEdit->setText(QString::fromStdString(gr2_server.host));
+    ui->gr2PortLineEdit->setText(gr2_server.port ? QString::number(gr2_server.port) : QString());
+    if (is_game_specific) {
+        // An empty field follows config.json.
+        const auto global_server = Gr2Online::ReadServer();
+        ui->gr2HostLineEdit->setPlaceholderText(QString::fromStdString(global_server.host));
+        if (global_server.port) {
+            ui->gr2PortLineEdit->setPlaceholderText(QString::number(global_server.port));
+        }
+    }
     ui->vblankSpinBox->setValue(EmulatorSettings.GetVblankFrequency());
     ui->dmemSpinBox->setValue(EmulatorSettings.GetExtraDmemInMBytes());
-    ui->redZoneComboBox->setCurrentIndex(
-        static_cast<int>(EmulatorSettings.GetWindowsGuestRedZoneProtectionMode()));
+    ui->fmemSpinBox->setValue(EmulatorSettings.GetExtraFmemInMBytes());
+    ui->redZoneComboBox->setCurrentIndex(EmulatorSettings.IsRedZonePatchingEnabled());
 
     // First options is auto selection -1, so gpuId on the GUI will always have to subtract 1
     // when setting and add 1 when getting to select the correct gpu in Qt
@@ -753,7 +803,12 @@ void SettingsDialog::LoadValuesFromConfig() {
     OnCursorStateChanged(EmulatorSettings.GetCursorState());
     ui->idleTimeoutSpinBox->setValue(EmulatorSettings.GetCursorHideTimeout());
     ui->motionControlsCheckBox->setChecked(EmulatorSettings.IsMotionControlsEnabled());
+    ui->gyroSwapYawRollCheckBox->setChecked(EmulatorSettings.IsGyroSwapYawRoll());
+    ui->gyroInvertYawCheckBox->setChecked(EmulatorSettings.IsGyroInvertYaw());
+    ui->gyroInvertXCheckBox->setChecked(EmulatorSettings.IsGyroInvertX());
+    ui->gyroInvertRollCheckBox->setChecked(EmulatorSettings.IsGyroInvertRoll());
     ui->backgroundControllerCheckBox->setChecked(EmulatorSettings.IsBackgroundControllerInput());
+    ui->keyboardAsKeyboardCheckBox->setChecked(EmulatorSettings.IsKeyboardUsedAsKeyboard());
     ui->usbComboBox->setCurrentIndex(EmulatorSettings.GetUsbDeviceBackend());
     ui->cameraComboBox->setCurrentIndex(EmulatorSettings.GetCameraId() + 1);
 
@@ -767,7 +822,8 @@ void SettingsDialog::LoadValuesFromConfig() {
     ui->horizontalVolumeSlider->setValue(EmulatorSettings.GetVolumeSlider());
     ui->volumeText->setText(QString::number(ui->horizontalVolumeSlider->sliderPosition()) + "%");
 
-    std::string fullScreenMode = EmulatorSettings.GetFullScreenMode();
+    std::string fullScreenMode =
+        EmulatorSettings.IsFullScreen() ? EmulatorSettings.GetFullScreenMode() : "Windowed";
     QString translatedText_FullscreenMode =
         screenModeMap.key(QString::fromStdString(fullScreenMode));
     ui->displayModeComboBox->setCurrentText(translatedText_FullscreenMode);
@@ -812,6 +868,7 @@ void SettingsDialog::LoadValuesFromConfig() {
     ui->hostMarkersCheckBox->setChecked(EmulatorSettings.IsVkHostMarkersEnabled());
     ui->copyGPUBuffersCheckBox->setChecked(EmulatorSettings.IsCopyGpuBuffers());
     ui->collectShaderCheckBox->setChecked(EmulatorSettings.IsShaderCollect());
+    ui->tuningPage->Load();
 
     ui->audioBackendComboBox->setCurrentIndex(EmulatorSettings.GetAudioBackend());
     const QString backend = ui->audioBackendComboBox->currentText();
@@ -838,9 +895,9 @@ void SettingsDialog::LoadValuesFromConfig() {
     }
     ui->chooseHomeTabComboBox->setCurrentText(translatedText);
 
-    QStringList tabNames = {tr("General"), tr("Frontend"), tr("Graphics"),
-                            tr("User"),    tr("Input"),    tr("Paths"),
-                            tr("Log"),     tr("Debug"),    tr("Experimental")};
+    QStringList tabNames = {tr("General"),      tr("Frontend"), tr("Graphics"), tr("User"),
+                            tr("Input"),        tr("Paths"),    tr("Log"),      tr("Debug"),
+                            tr("Experimental"), tr("Tuning")};
     int indexTab = tabNames.indexOf(translatedText);
     if (indexTab == -1 || !ui->tabWidgetSettings->isTabVisible(indexTab) || is_newly_created)
         indexTab = 0;
@@ -926,6 +983,8 @@ void SettingsDialog::updateNoteTextEdit(const QString& elementName) {
         text = tr("Emulator Language:\\nSets the language of the emulator's user interface.");
     } else if (elementName == "showSplashCheckBox") {
         text = tr("Show Splash Screen:\\nShows the game's splash screen (a special image) while the game is starting.");
+    } else if (elementName == "showFpsCounterCheckBox") {
+        text = tr("Show FPS Counter:\\nShows the emulator's FPS counter when a game starts.");
     } else if (elementName == "discordRPCCheckbox") {
         text = tr("Enable Discord Rich Presence:\\nDisplays the emulator icon and relevant information on your Discord profile.");
     #ifdef ENABLE_UPDATER
@@ -974,6 +1033,8 @@ void SettingsDialog::updateNoteTextEdit(const QString& elementName) {
     //User
     if (elementName == "OpenCustomTrophyLocationButton") {
         text = tr("Open the custom trophy images/sounds folder:\\nYou can add custom images to the trophies and an audio.\\nAdd the files to custom_trophy with the following names:\\ntrophy.wav OR trophy.mp3, bronze.png, gold.png, platinum.png, silver.png\\nNote: The sound will only work in QT versions.");
+    } else if (elementName == "gr2OnlineGroupBox") {
+        text = tr("Gravity Rush 2 Online:\\nThe server Gravity Rush 2 sends its online requests to. Without a host, online play is off. The port is 8443 unless one is set; a host typed as host:port or as a URL is stored as a separate host and port on save.\\nIn game-specific settings an empty field uses the global value shown in grey.\\nOnline play also needs \"Network Connected\" set to true. The player name and token come from the shadNet sign-in of player 1.");
     }
 
     // Input
@@ -983,6 +1044,16 @@ void SettingsDialog::updateNoteTextEdit(const QString& elementName) {
         text = tr("Hide Idle Cursor Timeout:\\nThe duration (seconds) after which the cursor that has been idle hides itself.");
     } else if (elementName == "backgroundControllerCheckBox") {
         text = tr("Enable Controller Background Input:\\nAllow shadPS4 to detect controller inputs when the game window is not in focus.");
+    } else if (elementName == "gyroSwapYawRollCheckBox") {
+        text = tr("Swap Gyro Yaw/Roll (Handheld):\\nA device held upright, like a Steam Deck or ROG Ally, measures the game's yaw on its roll axis and the other way round. This swaps the two axes back.");
+    } else if (elementName == "gyroInvertYawCheckBox") {
+        text = tr("Invert Gyro Yaw:\\nNegates the yaw axis of the motion controls. Applies together with the yaw/roll swap.");
+    } else if (elementName == "gyroInvertXCheckBox") {
+        text = tr("Invert Gyro Pitch:\\nNegates the pitch axis of the motion controls.");
+    } else if (elementName == "gyroInvertRollCheckBox") {
+        text = tr("Invert Gyro Roll:\\nNegates the roll axis of the motion controls.");
+    } else if (elementName == "keyboardAsKeyboardCheckBox") {
+        text = tr("Use Keyboard as Keyboard:\\nPasses the host keyboard to games that read a PS4 keyboard. When disabled, such games see a keyboard with no keys pressed.");
     }
 
     // Graphics
@@ -1084,10 +1155,14 @@ void SettingsDialog::updateNoteTextEdit(const QString& elementName) {
         text = tr("shadNet:\\nCompatibility is very limited at the moment.\\nYou can register at https://www.shadps4.net/shadnet/register/.");
     } else if (elementName == "readbacksGroupBox") {
         text = tr("Readbacks:\\nEnable GPU memory readbacks and writebacks.\\nThis is required for proper behavior in some games.\\nMight cause stability and/or performance issues.");
-    } else if (elementName == "readbackLinearImagesCheckBox") {
-        text = tr("Enable Readback Linear Images:\\nEnables async downloading of GPU modified linear images.\\nMight fix issues in some games.");
+    } else if (elementName == "readbackLinearImagesGroupBox") {
+        text = tr("Readback Linear Images:\\nDownloads GPU modified linear images to guest memory.\\nMight fix issues in some games.\\nOff: Linear images are not read back.\\nDefault: A fence waits for the GPU before the pixels are written.\\nAsync: Each image is copied to a staging buffer, and a background thread writes it once the GPU finishes, so the game sees the pixels up to a frame late. Suits values a game reads every frame, like exposure and lighting.");
     } else if (elementName == "dmemGroupBox") {
         text = tr("Additional DMem Allocation:\\nForces allocation of the specified amount of additional DMem. Crashes or causes issues in some games.");
+    } else if (elementName == "fmemGroupBox") {
+        text = tr("Additional FMem Allocation:\\nAdds the specified amount to the flexible memory (FMem) a game can allocate.");
+    } else if (elementName == "userfaultfdCheckBox") {
+        text = tr("Enable userfaultfd Memory Tracking:\\nLinux only. Asks the emulator to track GPU memory writes with userfaultfd instead of signals. Builds whose readbacks need read faults log a warning and keep the signal method.");
     }
 
     // clang-format on
@@ -1112,9 +1187,14 @@ bool SettingsDialog::eventFilter(QObject* obj, QEvent* event) {
 
 void SettingsDialog::UpdateSettings(bool is_specific) {
     EmulatorSettings.SetReadbacksMode(ui->readbacksModeComboBox->currentIndex(), is_specific);
-    EmulatorSettings.SetReadbackLinearImagesEnabled(ui->readbackLinearImagesCheckBox->isChecked(),
-                                                    is_specific);
+    const int linear_images = ui->readbackLinearImagesComboBox->currentIndex();
+    EmulatorSettings.SetReadbackLinearImagesEnabled(linear_images != 0, is_specific);
+    // Off keeps the choice between Default and Async.
+    if (linear_images != 0) {
+        EmulatorSettings.SetReadbackLinearImagesAsync(linear_images == 2, is_specific);
+    }
     EmulatorSettings.SetDirectMemoryAccessEnabled(ui->dmaCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetUserfaultfdTracking(ui->userfaultfdCheckBox->isChecked(), is_specific);
     EmulatorSettings.SetDevKit(ui->devkitCheckBox->isChecked(), is_specific);
     EmulatorSettings.SetNeo(ui->neoCheckBox->isChecked(), is_specific);
     EmulatorSettings.SetConnectedToNetwork(ui->networkConnectedCheckBox->isChecked(), is_specific);
@@ -1129,9 +1209,9 @@ void SettingsDialog::UpdateSettings(bool is_specific) {
     EmulatorSettings.SetUPnPEnabled(ui->upnpCheckBox->isChecked(), is_specific);
     EmulatorSettings.SetVblankFrequency(ui->vblankSpinBox->value(), is_specific);
     EmulatorSettings.SetExtraDmemInMBytes(ui->dmemSpinBox->value(), is_specific);
-    EmulatorSettings.SetWindowsGuestRedZoneProtectionMode(
-        static_cast<WindowsGuestRedZoneProtectionMode>(ui->redZoneComboBox->currentIndex()),
-        is_specific);
+    EmulatorSettings.SetExtraFmemInMBytes(ui->fmemSpinBox->value(), is_specific);
+    EmulatorSettings.SetRedZonePatchingEnabled(ui->redZoneComboBox->currentIndex() == 1,
+                                               is_specific);
 
     EmulatorSettings.SetFullScreen(
         screenModeMap.value(ui->displayModeComboBox->currentText()) != "Windowed", is_specific);
@@ -1140,8 +1220,14 @@ void SettingsDialog::UpdateSettings(bool is_specific) {
     EmulatorSettings.SetPresentMode(
         presentModeMap.value(ui->presentModeComboBox->currentText()).toStdString(), is_specific);
     EmulatorSettings.SetMotionControlsEnabled(ui->motionControlsCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetGyroSwapYawRoll(ui->gyroSwapYawRollCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetGyroInvertYaw(ui->gyroInvertYawCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetGyroInvertX(ui->gyroInvertXCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetGyroInvertRoll(ui->gyroInvertRollCheckBox->isChecked(), is_specific);
     EmulatorSettings.SetBackgroundControllerInput(ui->backgroundControllerCheckBox->isChecked(),
                                                   is_specific);
+    EmulatorSettings.SetKeyboardUsedAsKeyboard(ui->keyboardAsKeyboardCheckBox->isChecked(),
+                                               is_specific);
     EmulatorSettings.SetTrophyPopupDisabled(ui->disableTrophycheckBox->isChecked(), is_specific);
     EmulatorSettings.SetTrophyNotificationDuration(ui->popUpDurationSpinBox->value(), is_specific);
 
@@ -1201,6 +1287,7 @@ void SettingsDialog::UpdateSettings(bool is_specific) {
                                                  is_specific);
     EmulatorSettings.SetShaderCollect(ui->collectShaderCheckBox->isChecked(), is_specific);
     EmulatorSettings.SetCopyGpuBuffers(ui->copyGPUBuffersCheckBox->isChecked(), is_specific);
+    ui->tuningPage->Save(is_specific);
 
     const std::string backend = ui->audioBackendComboBox->currentText().toStdString();
     EmulatorSettings.SetAudioBackend(ui->audioBackendComboBox->currentIndex(), is_specific);
@@ -1236,6 +1323,7 @@ void SettingsDialog::UpdateSettings(bool is_specific) {
         BackgroundMusicPlayer::getInstance().setVolume(ui->BGMVolumeSlider->value());
 
         EmulatorSettings.SetDiscordRPCEnabled(ui->discordRPCCheckbox->isChecked());
+        EmulatorSettings.SetShowFpsCounter(ui->showFpsCounterCheckBox->isChecked());
         m_gui_settings->SetValue(gui::glc_showCompatibility,
                                  ui->enableCompatibilityCheckBox->isChecked());
         m_gui_settings->SetValue(gui::gen_checkCompatibilityAtStartup,
@@ -1316,6 +1404,9 @@ void SettingsDialog::SaveSettings() {
     } else {
         EmulatorSettings.Save();
     }
+    Gr2Online::WriteServer(
+        {ui->gr2HostLineEdit->text().trimmed().toStdString(), ui->gr2PortLineEdit->text().toInt()},
+        gs_serial);
 };
 
 void SettingsDialog::PollSDLevents() {
@@ -1445,7 +1536,7 @@ void SettingsDialog::GetPhysicalDevices() {
     // Create Vulkan instance
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pApplicationName = "shadPS4QtLauncher";
+    appInfo.pApplicationName = "GR2Launcher";
     appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.pEngineName = "No Engine";
     appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);

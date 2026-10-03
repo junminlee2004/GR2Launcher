@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
 
     QApplication a(argc, argv);
 
-    QApplication::setDesktopFileName("net.shadps4.qtlauncher");
+    QApplication::setDesktopFileName("GR2Launcher");
 
     // Load configurations and initialize Qt application
     std::shared_ptr<EmulatorState> m_emu_state = std::make_shared<EmulatorState>();
@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
         {"-h",
          [&](int&) {
              std::cout
-                 << "Usage: shadps4 [options]\n"
+                 << "Usage: GR2Launcher [options]\n"
                     "Options:\n"
                     "  No arguments: Opens the GUI.\n"
                     "  -e, --emulator <name|path>    Specify the emulator version/path you want to "

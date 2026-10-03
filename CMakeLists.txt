@@ -269,11 +269,12 @@ set(CORE src/core/file_format/elf.cpp
          src/core/file_sys/backends/host_directory_backend.h
          src/core/file_sys/backends/zarchive_backend.cpp
          src/core/file_sys/backends/zarchive_backend.h
-         src/core/cpu_patches.h
          src/core/emulator_state.cpp
          src/core/emulator_state.h
          src/core/emulator_settings.cpp
          src/core/emulator_settings.h
+         src/core/gr2_online.cpp
+         src/core/gr2_online.h
          src/core/user_manager.cpp
          src/core/user_manager.h
          src/core/user_settings.cpp
@@ -336,6 +337,9 @@ set(QT_GUI src/qt_gui/about_dialog.cpp
            src/qt_gui/settings_dialog.cpp
            src/qt_gui/settings_dialog.h
            src/qt_gui/settings_dialog.ui
+           src/qt_gui/tuning_page.cpp
+           src/qt_gui/tuning_page.h
+           src/qt_gui/tuning_table.cpp
            src/qt_gui/gui_settings.cpp
            src/qt_gui/gui_settings.h
            src/qt_gui/settings.cpp
@@ -491,8 +495,7 @@ endif()
 install(TARGETS shadPS4QtLauncher BUNDLE DESTINATION .)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    install(FILES "dist/net.shadps4.shadps4-qtlauncher.desktop" DESTINATION "share/applications")
+    install(FILES "dist/GR2Launcher.desktop" DESTINATION "share/applications")
     install(FILES "dist/net.shadps4.shadps4-qtlauncher.metainfo.xml" DESTINATION "share/metainfo")
-    install(FILES ".github/shadps4.png" DESTINATION "share/icons/hicolor/512x512/apps" RENAME "net.shadps4.shadPS4.png")
-    install(FILES "src/images/net.shadps4.shadPS4.svg" DESTINATION "share/icons/hicolor/scalable/apps")
+    install(FILES "src/images/GR2Launcher.png" DESTINATION "share/icons/hicolor/512x512/apps")
 endif()

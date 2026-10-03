@@ -33,6 +33,9 @@ void IpcClient::startEmulator(const QFileInfo& exe, const QStringList& args, con
     if (!disable_ipc) {
         env.insert("SHADPS4_ENABLE_IPC", "true");
     }
+    // Steam sets SDL_GAMECONTROLLER_IGNORE_DEVICES for the programs it starts, so SDL in the
+    // emulator would see only Steam's virtual pad, which has no motion sensors.
+    env.remove("SDL_GAMECONTROLLER_IGNORE_DEVICES");
     process->setProcessEnvironment(env);
 
     process->setWorkingDirectory(workDir.isEmpty() ? exe.absolutePath() : workDir);
