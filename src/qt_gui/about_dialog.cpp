@@ -153,13 +153,14 @@ bool AboutDialog::eventFilter(QObject* obj, QEvent* event) {
         }
     } else if (event->type() == QEvent::MouseButtonPress) {
         if (obj == ui->image_1) {
-            QDesktopServices::openUrl(QUrl("https://github.com/shadps4-emu/shadPS4"));
+            QDesktopServices::openUrl(QUrl("https://github.com/junminlee2004/GR2fork"));
         } else if (obj == ui->image_2) {
-            QDesktopServices::openUrl(QUrl("https://discord.gg/bFJxfftGW6"));
+            QDesktopServices::openUrl(QUrl("https://discord.gg/hnHRpzxGzG"));
         } else if (obj == ui->image_3) {
-            QDesktopServices::openUrl(QUrl("https://www.youtube.com/@shadPS4/videos"));
+            QDesktopServices::openUrl(
+                QUrl("https://www.youtube.com/watch?v=O8z6QPOaGDg&list=PLOgHncbXc__M&pp=sAgC"));
         } else if (obj == ui->image_4) {
-            QDesktopServices::openUrl(QUrl("https://ko-fi.com/shadps4"));
+            QDesktopServices::openUrl(QUrl("https://ko-fi.com/junminlee2004"));
         } else if (obj == ui->image_5) {
             QDesktopServices::openUrl(QUrl("https://shadps4.net"));
         }

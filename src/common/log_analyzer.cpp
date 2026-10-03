@@ -172,8 +172,8 @@ optional<string> CheckResults(std::string const& game_id) {
     if (!(entries[0]->GetParsedData().has_value() && *entries[0]->GetParsedData() == game_id)) {
         return entries[0]->description;
     }
-    if (!(entries[1]->GetParsedData().has_value() &&
-          !entries[1]->GetParsedData()->contains("WIP"))) {
+    // Every build of the fork reports a WIP version, so only a missing version fails.
+    if (!entries[1]->GetParsedData().has_value()) {
         return entries[1]->description;
     }
 

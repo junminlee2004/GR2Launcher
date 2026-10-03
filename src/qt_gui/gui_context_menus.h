@@ -968,44 +968,26 @@ public:
                                       "an invalid report:") +
                                        "\n" + error_string);
                 auto okButton = msgBox.addButton(tr("Ok"), QMessageBox::AcceptRole);
-                auto infoButton = msgBox.addButton(tr("Info"), QMessageBox::ActionRole);
                 msgBox.setEscapeButton(okButton);
                 msgBox.exec();
-                // what the fuck qt in what world is this better than the old supposedly deprecated
-                // api
-                if (msgBox.clickedButton() == infoButton) {
-                    QDesktopServices::openUrl(
-                        QUrl("https://github.com/shadps4-compatibility/shadps4-game-compatibility/"
-                             "?tab=readme-ov-file#rules"));
-                }
                 return changedFavorite;
             }
-            if (m_games[itemID].compatibility.issue_number == "") {
-                QUrl url = QUrl("https://github.com/shadps4-compatibility/"
-                                "shadps4-game-compatibility/issues/new");
-                QUrlQuery query;
-                auto add_q_item = [&query](char const* id, std::string const& val) {
-                    query.addQueryItem(id, QString::fromStdString(val));
-                };
-                query.addQueryItem(
-                    "title", QString("%1 - %2").arg(QString::fromStdString(m_games[itemID].serial),
-                                                    (m_games[itemID].name)));
-                add_q_item("template", "game_compatibility.yml");
-                add_q_item("game-name", (m_games[itemID].name));
-                add_q_item("game-serial", m_games[itemID].serial);
-                add_q_item("game-version", m_games[itemID].version);
-                add_q_item("emulator-version", *LogAnalyzer::entries[1]->GetParsedData());
-                add_q_item("processor", *LogAnalyzer::entries[9]->GetParsedData());
-                add_q_item("graphics-card", *LogAnalyzer::entries[10]->GetParsedData());
-                url.setQuery(query);
-
-                QDesktopServices::openUrl(url);
-            } else {
-                auto url_issues = "https://github.com/shadps4-compatibility/"
-                                  "shadps4-game-compatibility/issues/";
-                QDesktopServices::openUrl(
-                    QUrl(url_issues + m_games[itemID].compatibility.issue_number));
-            }
+            // Reports go to the fork's own issues. It has no issue form, so the details are the
+            // body of a plain issue.
+            QUrl url = QUrl("https://github.com/junminlee2004/GR2fork/issues/new");
+            QUrlQuery query;
+            query.addQueryItem("title", QString::fromStdString(m_games[itemID].serial + " - " +
+                                                               m_games[itemID].name));
+            const std::string body =
+                "Game: " + m_games[itemID].name + "\nSerial: " + m_games[itemID].serial +
+                "\nGame version: " + m_games[itemID].version +
+                "\nEmulator version: " + *LogAnalyzer::entries[1]->GetParsedData() +
+                "\nProcessor: " + *LogAnalyzer::entries[9]->GetParsedData() +
+                "\nGraphics card: " + *LogAnalyzer::entries[10]->GetParsedData() +
+                "\n\nWhat happens:\n\n\nAttach the log of this run.";
+            query.addQueryItem("body", QString::fromStdString(body));
+            url.setQuery(query);
+            QDesktopServices::openUrl(url);
         }
         return changedFavorite;
     }

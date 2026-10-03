@@ -24,13 +24,13 @@ static inline constexpr char const* const is_valid_report_suite = R"(
 -The game ID in the log does not match the game ID of the selected game.
 [Loader] <Info> ^ emulator.cpp:# Run: Game id: @ Title: *
 #Entry
--The emulator version wasn't an official release one.
+-No emulator version was found.
 [Loader] <Info> ^ emulator.cpp:# Run: Starting shadps4 emulator +
 
 #MatchValueEntry
--The emulator version wasn't an official release one.
+-The emulator wasn't a GR2fork build.
 [Loader] <Info> ^ emulator.cpp:# Run: Remote https://github.com/@(/)*
-shadps4-emu
+junminlee2004
 #MatchValueEntry
 -The log type was not snyc.
 [Config] <Info> ^ emulator.cpp:# Run: Log sync: @

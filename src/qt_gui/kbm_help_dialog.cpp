@@ -322,7 +322,7 @@ Q: What happens if I accidentally make a typo in the config?
 A: The code recognises the line as wrong and skips it, so the rest of the file will get parsed, but that line in question will be treated like a comment line. You can find these lines in the log if you search for 'input_handler'.
 
 Q: I want to bind <input> to <output>, but your code doesn't support <input>!
-A: Some keys are intentionally omitted, but if you read the bindings through, and you're sure it is not there and isn't one of the intentionally disabled ones, open an issue on https://github.com/shadps4-emu/shadPS4.
+A: Some keys are intentionally omitted, but if you read the bindings through, and you're sure it is not there and isn't one of the intentionally disabled ones, open an issue on https://github.com/junminlee2004/GR2fork.
 
 Q: What does default.ini do?
 A: If you're using per-game configs, it's the base from which all new games generate their config file. If you use the unified config, then default.ini is used for every game directly instead.
