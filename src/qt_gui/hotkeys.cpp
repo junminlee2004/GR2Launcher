@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include <fstream>
+#include <map>
+#include <set>
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QPainter>
@@ -65,7 +67,9 @@ Hotkeys::Hotkeys(std::shared_ptr<IpcClient> ipc_client, bool isGameRunning, QWid
                      ui->volDownButtonKB,
                      ui->screenshotButtonKB,
                      ui->screenshotOverlayButtonKB,
-                     ui->settingsButtonKB};
+                     ui->settingsButtonKB,
+                     ui->mouseTouchpadButton,
+                     ui->mouseTouchpadSwipeButton};
 
     connect(ui->buttonBox, &QDialogButtonBox::clicked, this, [this](QAbstractButton* button) {
         if (button == ui->buttonBox->button(QDialogButtonBox::Save)) {
@@ -160,6 +164,8 @@ void Hotkeys::SetDefault() {
 
     ui->mouseJoystickButton->setText("f7");
     ui->mouseGyroButton->setText("f6");
+    ui->mouseTouchpadButton->setText("delete");
+    ui->mouseTouchpadSwipeButton->setText("unmapped");
 }
 
 void Hotkeys::SaveHotkeys(bool CloseOnSave) {
@@ -218,16 +224,28 @@ void Hotkeys::SaveHotkeys(bool CloseOnSave) {
 
     add_mapping(ui->mouseJoystickButton->text(), "hotkey_toggle_mouse_to_joystick");
     add_mapping(ui->mouseGyroButton->text(), "hotkey_toggle_mouse_to_gyro");
+    add_mapping(ui->mouseTouchpadButton->text(), "hotkey_toggle_mouse_to_touchpad");
+    add_mapping(ui->mouseTouchpadSwipeButton->text(), "hotkey_toggle_mouse_to_touchpad_swipe");
+
+    // The emulator adds the default binding of a hotkey that has no line in global.ini.
+    for (const std::string& output : outputs) {
+        if (output != "hotkey_renderdoc_capture" &&
+            std::ranges::none_of(
+                lines, [&](const std::string& l) { return l.starts_with(output + " = "); }))
+            lines.push_back(output + " = unmapped");
+    }
 
     auto hotkey_file = Input::GetFoolproofInputConfigFile("global");
     std::fstream file(hotkey_file);
     int lineCount = 0;
     std::string line;
+    std::set<std::string> touchpad_toggles;
     while (std::getline(file, line)) {
         lineCount++;
 
+        // A '#' after the '=' starts a trailing comment, and the line is sorted as usual.
         std::size_t comment_pos = line.find('#');
-        if (comment_pos != std::string::npos) {
+        if (comment_pos != std::string::npos && line.find('=') > comment_pos) {
             if (!line.contains("Anything put here will be loaded for all games") &&
                 !line.contains("alongside the game's config or default.ini depending on your"))
                 lines.push_back(line);
@@ -242,7 +260,13 @@ void Hotkeys::SaveHotkeys(bool CloseOnSave) {
 
         std::string output_string = line.substr(0, equal_pos);
         std::erase_if(output_string, [](unsigned char c) { return std::isspace(c); });
-        if (std::find(outputs.begin(), outputs.end(), output_string) == outputs.end()) {
+        const std::string input_string = line.substr(equal_pos + 1, comment_pos - equal_pos - 1);
+        // A touchpad toggle button shows the first line of its hotkey that is not unmapped. The
+        // emulator binds every line, so the later ones are kept.
+        if (std::find(outputs.begin(), outputs.end(), output_string) == outputs.end() ||
+            (output_string.starts_with("hotkey_toggle_mouse_to_touchpad") &&
+             QString::fromStdString(input_string).trimmed() != "unmapped" &&
+             !touchpad_toggles.insert(output_string).second)) {
             lines.push_back(line);
         }
     }
@@ -309,20 +333,48 @@ void Hotkeys::LoadHotkeys() {
     int lineCount = 0;
     std::string line = "";
 
+    // Hotkeys with no line in global.ini get these bindings from the emulator.
+    std::map<std::string, std::pair<QRightClickButton*, QString>> default_bindings = {
+        {"hotkey_fullscreen", {ui->fullscreenButtonKB, "f11"}},
+        {"hotkey_pause", {ui->pauseButtonKB, "f9"}},
+        {"hotkey_show_fps", {ui->fpsButtonKB, "f10"}},
+        {"hotkey_quit", {ui->quitButtonKB, "lctrl, lshift, end"}},
+        {"hotkey_reload_inputs", {ui->reloadButtonKB, "f8"}},
+        {"hotkey_volume_up", {ui->volUpButtonKB, "kpplus"}},
+        {"hotkey_volume_down", {ui->volDownButtonKB, "kpminus"}},
+        {"hotkey_capture_frame", {ui->screenshotButtonKB, "f12"}},
+        {"hotkey_screenshot_with_overlays", {ui->screenshotOverlayButtonKB, "lalt, f12"}},
+        {"hotkey_emulator_settings", {ui->settingsButtonKB, "f3"}},
+        {"hotkey_toggle_mouse_to_joystick", {ui->mouseJoystickButton, "f7"}},
+        {"hotkey_toggle_mouse_to_gyro", {ui->mouseGyroButton, "f6"}},
+        {"hotkey_toggle_mouse_to_touchpad", {ui->mouseTouchpadButton, "delete"}},
+    };
+
+    // A touchpad toggle shows its first line that is not unmapped, the one SaveHotkeys rewrites.
+    ui->mouseTouchpadButton->setText("unmapped");
+    ui->mouseTouchpadSwipeButton->setText("unmapped");
+    QRightClickButton* legacy_capture_button = nullptr;
+    QString legacy_capture;
+
     while (std::getline(file, line)) {
         lineCount++;
 
+        line = line.substr(0, line.find('#'));
         std::size_t equal_pos = line.find('=');
         if (equal_pos == std::string::npos)
             continue;
 
         std::string output_string = line.substr(0, equal_pos);
-        std::string input_string = line.substr(std::min(equal_pos + 2, line.size()));
+        std::erase_if(output_string, [](unsigned char c) { return std::isspace(c); });
+        std::string input_string =
+            QString::fromStdString(line.substr(equal_pos + 1)).trimmed().toStdString();
+        default_bindings.erase(output_string);
 
         bool controllerInputDetected = false;
         for (const std::string& input : ControllerInputs) {
             // Needed to avoid detecting backspace while detecting back
-            if (input_string.contains(input) && !input_string.contains("backspace")) {
+            if (input_string.contains(input) && !input_string.contains("backspace") &&
+                !input_string.contains("backslash") && !input_string.contains("sidebuttonback")) {
                 controllerInputDetected = true;
                 break;
             }
@@ -352,6 +404,13 @@ void Hotkeys::LoadHotkeys() {
             ui->mouseJoystickButton->setText(QString::fromStdString(input_string));
         } else if (output_string.contains("hotkey_toggle_mouse_to_gyro")) {
             ui->mouseGyroButton->setText(QString::fromStdString(input_string));
+        } else if (output_string.contains("hotkey_toggle_mouse_to_touchpad_swipe")) {
+            // Tested first: the touchpad toggle's name is contained in this one.
+            if (ui->mouseTouchpadSwipeButton->text() == "unmapped")
+                ui->mouseTouchpadSwipeButton->setText(QString::fromStdString(input_string));
+        } else if (output_string.contains("hotkey_toggle_mouse_to_touchpad")) {
+            if (ui->mouseTouchpadButton->text() == "unmapped")
+                ui->mouseTouchpadButton->setText(QString::fromStdString(input_string));
         } else if (output_string.contains("hotkey_volume_up")) {
             controllerInputDetected
                 ? ui->volUpButtonPad->setText(QString::fromStdString(input_string))
@@ -372,10 +431,21 @@ void Hotkeys::LoadHotkeys() {
             controllerInputDetected
                 ? ui->settingsButtonPad->setText(QString::fromStdString(input_string))
                 : ui->settingsButtonKB->setText(QString::fromStdString(input_string));
+        } else if (output_string == "hotkey_renderdoc_capture") {
+            legacy_capture_button =
+                controllerInputDetected ? ui->screenshotButtonPad : ui->screenshotButtonKB;
+            legacy_capture = QString::fromStdString(input_string);
         }
     }
 
     file.close();
+    // Without a hotkey_capture_frame line, the emulator binds it to the input of the legacy
+    // hotkey_renderdoc_capture line.
+    if (legacy_capture_button && default_bindings.erase("hotkey_capture_frame"))
+        legacy_capture_button->setText(legacy_capture);
+    for (const auto& [output, binding] : default_bindings) {
+        binding.first->setText(binding.second);
+    }
 }
 
 void Hotkeys::CheckGamePad() {

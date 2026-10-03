@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include <fstream>
+#include <map>
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QPushButton>
@@ -47,7 +48,15 @@ ControlSettings::ControlSettings(std::shared_ptr<GameInfoClass> game_info_get,
                    ui->DpadUpButton,
                    ui->DpadDownButton,
                    ui->DpadLeftButton,
-                   ui->DpadRightButton};
+                   ui->DpadRightButton,
+                   ui->TouchpadUpButton,
+                   ui->TouchpadDownButton,
+                   ui->TouchpadTwoFingerButton,
+                   ui->TouchpadSwipeUpButton,
+                   ui->TouchpadSwipeDownButton,
+                   ui->TouchpadSwipeLeftButton,
+                   ui->TouchpadSwipeRightButton,
+                   ui->MouseGyroRollButton};
 
     AxisList = {ui->LStickUpButton,    ui->LStickDownButton, ui->LStickLeftButton,
                 ui->LStickRightButton, ui->RStickUpButton,   ui->RStickDownButton,
@@ -184,6 +193,20 @@ void ControlSettings::SaveControllerConfig(bool CloseOnSave) {
         return;
     }
 
+    // The emulator unmaps a swipe combo direction that repeats the hold input or another direction.
+    const QStringList combo = {
+        ui->SwipeComboHoldBox->currentText(), ui->SwipeComboUpBox->currentText(),
+        ui->SwipeComboDownBox->currentText(), ui->SwipeComboLeftBox->currentText(),
+        ui->SwipeComboRightBox->currentText()};
+    for (int i = 1; i < combo.size(); i++) {
+        if (combo[i] != "unmapped" && combo.indexOf(combo[i]) < i) {
+            QMessageBox::information(this, tr("Unable to Save"),
+                                     tr("Each swipe combo input must differ from the hold button "
+                                        "and from the other swipe combo inputs."));
+            return;
+        }
+    }
+
     std::string config_id;
     config_id = (ui->ProfileComboBox->currentText() == tr("Common Config"))
                     ? "default"
@@ -196,12 +219,32 @@ void ControlSettings::SaveControllerConfig(bool CloseOnSave) {
     std::string output_string = "", input_string = "";
     std::fstream file(config_file);
 
+    // A button shows the last controller binding of its output and rewrites only that line. The
+    // emulator binds every line, so the earlier ones are kept. Parsed like SetUIValuestoMappings.
+    std::map<std::string, int> shown_line;
+    std::ifstream shown_file(config_file);
+    for (int n = 1; std::getline(shown_file, line); n++) {
+        std::erase_if(line, [](unsigned char c) { return std::isspace(c); });
+        line = line.substr(0, line.find('#'));
+        const std::size_t equal_pos = line.find('=');
+        if (equal_pos == std::string::npos)
+            continue;
+        const std::string input = line.substr(equal_pos + 1);
+        if (!input.contains("backspace") && !input.contains("backslash") &&
+            !input.contains("sidebuttonback") &&
+            std::ranges::any_of(ControllerInputs,
+                                [&](const std::string& token) { return input.contains(token); }))
+            shown_line[line.substr(0, equal_pos)] = n;
+    }
+
     while (std::getline(file, line)) {
         lineCount++;
 
+        // A '#' after the '=' starts a trailing comment, and the line is sorted as usual.
         std::size_t comment_pos = line.find('#');
-        if (comment_pos != std::string::npos) {
-            if (!line.contains("Range of deadzones"))
+        if (comment_pos != std::string::npos && line.find('=') > comment_pos) {
+            if (!line.contains("Range of deadzones") &&
+                !line.contains("Hold-combo touchpad swipes"))
                 lines.push_back(line);
             continue;
         }
@@ -214,7 +257,7 @@ void ControlSettings::SaveControllerConfig(bool CloseOnSave) {
 
         output_string = line.substr(0, equal_pos);
         std::erase_if(output_string, [](unsigned char c) { return std::isspace(c); });
-        input_string = line.substr(std::min(equal_pos + 2, line.size()));
+        input_string = line.substr(equal_pos + 1, comment_pos - equal_pos - 1);
 
         // Only the stick deadzones have sliders, so a trigger deadzone line is kept.
         if (std::find(ControllerOutputs.begin(), ControllerOutputs.end(), output_string) ==
@@ -227,14 +270,19 @@ void ControlSettings::SaveControllerConfig(bool CloseOnSave) {
         bool controllerInputdetected = false;
         for (std::string input : ControllerInputs) {
             // Needed to avoid detecting backspace while detecting back
-            if (input_string.contains(input) && !input_string.contains("backspace")) {
+            if (input_string.contains(input) && !input_string.contains("backspace") &&
+                !input_string.contains("backslash") && !input_string.contains("sidebuttonback")) {
                 controllerInputdetected = true;
                 break;
             }
         }
 
-        if (controllerInputdetected || output_string == "analog_deadzone" ||
-            output_string == "override_controller_color") {
+        // The shown binding is rewritten from its button. Value lines have no input type and are
+        // always rewritten.
+        if ((controllerInputdetected && shown_line[output_string] == lineCount) ||
+            output_string == "analog_deadzone" || output_string == "override_controller_color" ||
+            output_string.starts_with("touchpad_swipe_combo_") ||
+            output_string == "touchpad_swipe_button_delay") {
             line.erase();
             continue;
         }
@@ -283,6 +331,17 @@ void ControlSettings::SaveControllerConfig(bool CloseOnSave) {
 
     lines.push_back("");
 
+    add_mapping(ui->TouchpadUpButton->text(), "touchpad_up");
+    add_mapping(ui->TouchpadDownButton->text(), "touchpad_down");
+    add_mapping(ui->TouchpadTwoFingerButton->text(), "touchpad_two_finger");
+    add_mapping(ui->TouchpadSwipeUpButton->text(), "touchpad_swipe_up");
+    add_mapping(ui->TouchpadSwipeDownButton->text(), "touchpad_swipe_down");
+    add_mapping(ui->TouchpadSwipeLeftButton->text(), "touchpad_swipe_left");
+    add_mapping(ui->TouchpadSwipeRightButton->text(), "touchpad_swipe_right");
+    add_mapping(ui->MouseGyroRollButton->text(), "mouse_gyro_roll_mode");
+
+    lines.push_back("");
+
     output_string = "axis_left_x";
     input_string = ui->LStickRightButton->text().toStdString();
     lines.push_back(output_string + " = " + input_string);
@@ -319,6 +378,25 @@ void ControlSettings::SaveControllerConfig(bool CloseOnSave) {
     std::string LightBarB = std::to_string(ui->BSlider->value());
     lines.push_back("override_controller_color = " + OverrideLB + ", " + LightBarR + ", " +
                     LightBarG + ", " + LightBarB);
+
+    // Combo inputs reuse mapped buttons on purpose, so they stay out of the duplicate check.
+    lines.push_back("");
+    lines.push_back(std::string("touchpad_swipe_combo_enabled = ") +
+                    (ui->SwipeComboEnableCheckBox->isChecked() ? "true" : "false"));
+    lines.push_back("touchpad_swipe_combo_hold = " +
+                    ui->SwipeComboHoldBox->currentText().toStdString());
+    lines.push_back("touchpad_swipe_combo_up = " +
+                    ui->SwipeComboUpBox->currentText().toStdString());
+    lines.push_back("touchpad_swipe_combo_down = " +
+                    ui->SwipeComboDownBox->currentText().toStdString());
+    lines.push_back("touchpad_swipe_combo_left = " +
+                    ui->SwipeComboLeftBox->currentText().toStdString());
+    lines.push_back("touchpad_swipe_combo_right = " +
+                    ui->SwipeComboRightBox->currentText().toStdString());
+    lines.push_back(std::string("touchpad_swipe_combo_hold_passthrough = ") +
+                    (ui->SwipeComboPassthroughCheckBox->isChecked() ? "true" : "false"));
+    lines.push_back("touchpad_swipe_button_delay = " +
+                    std::to_string(ui->SwipeDelaySpinBox->value()));
 
     // Prevent duplicate inputs that break the input engine
     bool duplicateFound = false;
@@ -420,6 +498,25 @@ void ControlSettings::SetDefault() {
     ui->BSlider->setValue(255);
     ui->LightbarCheckBox->setChecked(false);
     ui->PerGameCheckBox->setChecked(false);
+    ResetTouchpadExtras();
+}
+
+// The emulator's built-in values, shown when a profile has no line for them.
+void ControlSettings::ResetTouchpadExtras() {
+    for (QRightClickButton* button :
+         {ui->TouchpadUpButton, ui->TouchpadDownButton, ui->TouchpadTwoFingerButton,
+          ui->TouchpadSwipeUpButton, ui->TouchpadSwipeDownButton, ui->TouchpadSwipeLeftButton,
+          ui->TouchpadSwipeRightButton, ui->MouseGyroRollButton}) {
+        button->setText("unmapped");
+    }
+    ui->SwipeComboEnableCheckBox->setChecked(false);
+    ui->SwipeComboPassthroughCheckBox->setChecked(false);
+    ui->SwipeComboHoldBox->setCurrentText("l3");
+    ui->SwipeComboUpBox->setCurrentText("triangle");
+    ui->SwipeComboDownBox->setCurrentText("cross");
+    ui->SwipeComboLeftBox->setCurrentText("square");
+    ui->SwipeComboRightBox->setCurrentText("circle");
+    ui->SwipeDelaySpinBox->setValue(200);
 }
 
 void ControlSettings::AddBoxItems() {
@@ -429,6 +526,16 @@ void ControlSettings::AddBoxItems() {
     }
     ui->ProfileComboBox->setCurrentText(tr("Common Config"));
     ui->TitleLabel->setText(tr("Common Config"));
+
+    const QStringList combo_inputs = {
+        "unmapped",    "cross",        "circle",     "square",   "triangle",  "l1",
+        "r1",          "l2",           "r2",         "l3",       "r3",        "options",
+        "back",        "pad_up",       "pad_down",   "pad_left", "pad_right", "lpaddle_high",
+        "lpaddle_low", "rpaddle_high", "rpaddle_low"};
+    for (QComboBox* box : {ui->SwipeComboHoldBox, ui->SwipeComboUpBox, ui->SwipeComboDownBox,
+                           ui->SwipeComboLeftBox, ui->SwipeComboRightBox}) {
+        box->addItems(combo_inputs);
+    }
 }
 
 void ControlSettings::SetUIValuestoMappings() {
@@ -439,6 +546,15 @@ void ControlSettings::SetUIValuestoMappings() {
 
     const auto config_file = Input::GetFoolproofInputConfigFile(config_id);
     std::ifstream file(config_file);
+    ResetTouchpadExtras();
+
+    // A token missing from the list is added, so a hand-edited key or alias survives a save.
+    auto set_slot = [](QComboBox* box, const std::string& token) {
+        const QString text = token.empty() ? QString("unmapped") : QString::fromStdString(token);
+        if (box->findText(text) == -1)
+            box->addItem(text);
+        box->setCurrentText(text);
+    };
 
     bool CrossExists = false, CircleExists = false, SquareExists = false, TriangleExists = false,
          L1Exists = false, L2Exists = false, L3Exists = false, R1Exists = false, R2Exists = false,
@@ -451,7 +567,7 @@ void ControlSettings::SetUIValuestoMappings() {
     while (std::getline(file, line)) {
         lineCount++;
 
-        line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
+        std::erase_if(line, [](unsigned char c) { return std::isspace(c); });
         if (line.empty())
             continue;
 
@@ -469,10 +585,33 @@ void ControlSettings::SetUIValuestoMappings() {
         bool controllerInputdetected = false;
         for (std::string input : ControllerInputs) {
             // Needed to avoid detecting backspace while detecting back
-            if (input_string.contains(input) && !input_string.contains("backspace")) {
+            if (input_string.contains(input) && !input_string.contains("backspace") &&
+                !input_string.contains("backslash") && !input_string.contains("sidebuttonback")) {
                 controllerInputdetected = true;
                 break;
             }
+        }
+
+        if (output_string == "touchpad_swipe_combo_enabled") {
+            ui->SwipeComboEnableCheckBox->setChecked(input_string == "true" || input_string == "1");
+        } else if (output_string == "touchpad_swipe_combo_hold_passthrough") {
+            ui->SwipeComboPassthroughCheckBox->setChecked(input_string == "true" ||
+                                                          input_string == "1");
+        } else if (output_string == "touchpad_swipe_combo_hold") {
+            set_slot(ui->SwipeComboHoldBox, input_string);
+        } else if (output_string == "touchpad_swipe_combo_up") {
+            set_slot(ui->SwipeComboUpBox, input_string);
+        } else if (output_string == "touchpad_swipe_combo_down") {
+            set_slot(ui->SwipeComboDownBox, input_string);
+        } else if (output_string == "touchpad_swipe_combo_left") {
+            set_slot(ui->SwipeComboLeftBox, input_string);
+        } else if (output_string == "touchpad_swipe_combo_right") {
+            set_slot(ui->SwipeComboRightBox, input_string);
+        } else if (output_string == "touchpad_swipe_button_delay") {
+            bool ok;
+            const int delay = QString::fromStdString(input_string).toInt(&ok);
+            if (ok && delay >= 1)
+                ui->SwipeDelaySpinBox->setValue(delay);
         }
 
         if (controllerInputdetected) {
@@ -530,6 +669,22 @@ void ControlSettings::SetUIValuestoMappings() {
             } else if (output_string == "touchpad_right") {
                 ui->TouchpadRightButton->setText(QString::fromStdString(input_string));
                 TouchpadRightExists = true;
+            } else if (output_string == "touchpad_up") {
+                ui->TouchpadUpButton->setText(QString::fromStdString(input_string));
+            } else if (output_string == "touchpad_down") {
+                ui->TouchpadDownButton->setText(QString::fromStdString(input_string));
+            } else if (output_string == "touchpad_two_finger") {
+                ui->TouchpadTwoFingerButton->setText(QString::fromStdString(input_string));
+            } else if (output_string == "touchpad_swipe_up") {
+                ui->TouchpadSwipeUpButton->setText(QString::fromStdString(input_string));
+            } else if (output_string == "touchpad_swipe_down") {
+                ui->TouchpadSwipeDownButton->setText(QString::fromStdString(input_string));
+            } else if (output_string == "touchpad_swipe_left") {
+                ui->TouchpadSwipeLeftButton->setText(QString::fromStdString(input_string));
+            } else if (output_string == "touchpad_swipe_right") {
+                ui->TouchpadSwipeRightButton->setText(QString::fromStdString(input_string));
+            } else if (output_string == "mouse_gyro_roll_mode") {
+                ui->MouseGyroRollButton->setText(QString::fromStdString(input_string));
             } else if (output_string == "axis_left_x") {
                 ui->LStickRightButton->setText(QString::fromStdString(input_string));
                 ui->LStickLeftButton->setText(QString::fromStdString(input_string));

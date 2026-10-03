@@ -1107,6 +1107,162 @@
                </item>
               </layout>
              </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_15">
+               <item>
+                <widget class="QGroupBox" name="gb_touchup">
+                 <property name="title">
+                  <string>Touchpad Up</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                 <layout class="QVBoxLayout" name="gb_touchup_layout">
+                  <item>
+                   <widget class="QRightClickButton" name="TouchpadUpButton">
+                    <property name="text">
+                     <string>unmapped</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="gb_touchdown">
+                 <property name="title">
+                  <string>Touchpad Down</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                 <layout class="QVBoxLayout" name="gb_touchdown_layout">
+                  <item>
+                   <widget class="QRightClickButton" name="TouchpadDownButton">
+                    <property name="text">
+                     <string>unmapped</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="gb_touchtwofinger">
+                 <property name="toolTip">
+                  <string>Presses the touchpad with one finger on each half (a two-finger click).</string>
+                 </property>
+                 <property name="title">
+                  <string>Touchpad Two Finger</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                 <layout class="QVBoxLayout" name="gb_touchtwofinger_layout">
+                  <item>
+                   <widget class="QRightClickButton" name="TouchpadTwoFingerButton">
+                    <property name="text">
+                     <string>unmapped</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_16">
+               <item>
+                <widget class="QGroupBox" name="gb_swipeup">
+                 <property name="toolTip">
+                  <string>Pressing the input plays a touchpad swipe from the center toward this edge.</string>
+                 </property>
+                 <property name="title">
+                  <string>Swipe Up</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                 <layout class="QVBoxLayout" name="gb_swipeup_layout">
+                  <item>
+                   <widget class="QRightClickButton" name="TouchpadSwipeUpButton">
+                    <property name="text">
+                     <string>unmapped</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="gb_swipedown">
+                 <property name="toolTip">
+                  <string>Pressing the input plays a touchpad swipe from the center toward this edge.</string>
+                 </property>
+                 <property name="title">
+                  <string>Swipe Down</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                 <layout class="QVBoxLayout" name="gb_swipedown_layout">
+                  <item>
+                   <widget class="QRightClickButton" name="TouchpadSwipeDownButton">
+                    <property name="text">
+                     <string>unmapped</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="gb_swipeleft">
+                 <property name="toolTip">
+                  <string>Pressing the input plays a touchpad swipe from the center toward this edge.</string>
+                 </property>
+                 <property name="title">
+                  <string>Swipe Left</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                 <layout class="QVBoxLayout" name="gb_swipeleft_layout">
+                  <item>
+                   <widget class="QRightClickButton" name="TouchpadSwipeLeftButton">
+                    <property name="text">
+                     <string>unmapped</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="gb_swiperight">
+                 <property name="toolTip">
+                  <string>Pressing the input plays a touchpad swipe from the center toward this edge.</string>
+                 </property>
+                 <property name="title">
+                  <string>Swipe Right</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                 <layout class="QVBoxLayout" name="gb_swiperight_layout">
+                  <item>
+                   <widget class="QRightClickButton" name="TouchpadSwipeRightButton">
+                    <property name="text">
+                     <string>unmapped</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </item>
             </layout>
            </item>
            <item>
@@ -1930,6 +2086,146 @@
             </widget>
            </item>
           </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_17" stretch="1,0,0">
+         <item>
+          <widget class="QGroupBox" name="gb_swipe_combo">
+           <property name="title">
+            <string>Touchpad Swipe Combo (hold + press)</string>
+           </property>
+           <layout class="QVBoxLayout" name="gb_swipe_combo_layout">
+            <item>
+             <widget class="QCheckBox" name="SwipeComboEnableCheckBox">
+              <property name="toolTip">
+               <string>While the hold button is held, the four inputs below play touchpad swipes instead of their normal actions.</string>
+              </property>
+              <property name="text">
+               <string>Enable hold-combo swipes</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QGridLayout" name="swipe_combo_grid">
+              <item row="0" column="0">
+               <widget class="QLabel" name="SwipeComboHoldLabel">
+                <property name="text">
+                 <string>Hold button</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="SwipeComboUpLabel">
+                <property name="text">
+                 <string>Swipe Up</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QLabel" name="SwipeComboDownLabel">
+                <property name="text">
+                 <string>Swipe Down</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QLabel" name="SwipeComboLeftLabel">
+                <property name="text">
+                 <string>Swipe Left</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="4">
+               <widget class="QLabel" name="SwipeComboRightLabel">
+                <property name="text">
+                 <string>Swipe Right</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QComboBox" name="SwipeComboHoldBox"/>
+              </item>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="SwipeComboUpBox"/>
+              </item>
+              <item row="1" column="2">
+               <widget class="QComboBox" name="SwipeComboDownBox"/>
+              </item>
+              <item row="1" column="3">
+               <widget class="QComboBox" name="SwipeComboLeftBox"/>
+              </item>
+              <item row="1" column="4">
+               <widget class="QComboBox" name="SwipeComboRightBox"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="SwipeComboPassthroughCheckBox">
+              <property name="toolTip">
+               <string>When checked, the hold button also keeps its normal action while held. When unchecked, it only acts as the combo modifier while held.</string>
+              </property>
+              <property name="text">
+               <string>Hold button keeps its normal action</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="gb_swipe_delay">
+           <property name="toolTip">
+            <string>Time a button-triggered swipe takes to move from the center of the touchpad to its end point. Applies to the Swipe buttons and to the swipe combo.</string>
+           </property>
+           <property name="title">
+            <string>Swipe Travel Time</string>
+           </property>
+           <layout class="QVBoxLayout" name="gb_swipe_delay_layout">
+            <item>
+             <widget class="QSpinBox" name="SwipeDelaySpinBox">
+              <property name="suffix">
+               <string notr="true"> ms</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>10000</number>
+              </property>
+              <property name="singleStep">
+               <number>10</number>
+              </property>
+              <property name="value">
+               <number>200</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="gb_gyro_roll">
+           <property name="toolTip">
+            <string>While held, sideways mouse movement rolls instead of pans in mouse-to-gyro mode.</string>
+           </property>
+           <property name="title">
+            <string>Mouse Gyro Roll Mode (hold)</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+           <layout class="QVBoxLayout" name="gb_gyro_roll_layout">
+            <item>
+             <widget class="QRightClickButton" name="MouseGyroRollButton">
+              <property name="text">
+               <string>unmapped</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </item>

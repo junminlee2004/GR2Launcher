@@ -75,15 +75,11 @@ private:
     Ui::Hotkeys* ui;
 
     const std::vector<std::string> ControllerInputs = {
-        "cross",        "circle",    "square",      "triangle",    "l1",
-        "r1",           "l2",        "r2",          "l3",
-
-        "r3",           "options",   "pad_up",
-
-        "pad_down",
-
-        "pad_left",     "pad_right", "axis_left_x", "axis_left_y", "axis_right_x",
-        "axis_right_y", "back"};
+        "cross",        "circle",   "square",    "triangle",     "l1",          "r1",
+        "l2",           "r2",       "l3",        "r3",           "options",     "pad_up",
+        "pad_down",     "pad_left", "pad_right", "axis_left_x",  "axis_left_y", "axis_right_x",
+        "axis_right_y", "back",     "share",     "lpaddle_high", "lpaddle_low", "rpaddle_high",
+        "rpaddle_low",  "l4",       "l5",        "r4",           "r5",          "qam"};
 
 protected:
     void closeEvent(QCloseEvent* event) override {

@@ -43,6 +43,7 @@ private:
     bool eventFilter(QObject* obj, QEvent* event) override;
     void AddBoxItems();
     void SetUIValuestoMappings();
+    void ResetTouchpadExtras();
     void GetGameTitle();
     void CheckGamePad();
     void processSDLEvents(int Type, int Input, int Value);
@@ -75,23 +76,24 @@ private:
     QFuture<void> Polling;
 
     const std::vector<std::string> ControllerInputs = {
-        "cross",        "circle",    "square",      "triangle",    "l1",
-        "r1",           "l2",        "r2",          "l3",
-
-        "r3",           "options",   "pad_up",
-
-        "pad_down",
-
-        "pad_left",     "pad_right", "axis_left_x", "axis_left_y", "axis_right_x",
-        "axis_right_y", "back"};
+        "cross",        "circle",   "square",    "triangle",     "l1",          "r1",
+        "l2",           "r2",       "l3",        "r3",           "options",     "pad_up",
+        "pad_down",     "pad_left", "pad_right", "axis_left_x",  "axis_left_y", "axis_right_x",
+        "axis_right_y", "back",     "share",     "lpaddle_high", "lpaddle_low", "rpaddle_high",
+        "rpaddle_low",  "l4",       "l5",        "r4",           "r5",          "qam"};
 
     // The outputs SaveControllerConfig writes. A line for any other output is kept as it is.
     const std::vector<std::string> ControllerOutputs = {
-        "l1",           "r1",           "pad_up",    "cross",          "touchpad_left",
-        "l2",           "r2",           "pad_down",  "circle",         "touchpad_center",
-        "l3",           "r3",           "pad_left",  "square",         "touchpad_right",
-        "axis_left_x",  "axis_left_y",  "pad_right", "triangle",       "override_controller_color",
-        "axis_right_x", "axis_right_y", "options",   "analog_deadzone"};
+        "l1", "r1", "pad_up", "cross", "touchpad_left", "l2", "r2", "pad_down", "circle",
+        "touchpad_center", "l3", "r3", "pad_left", "square", "touchpad_right", "axis_left_x",
+        "axis_left_y", "pad_right", "triangle", "override_controller_color", "axis_right_x",
+        "axis_right_y", "options", "analog_deadzone", "touchpad_up", "touchpad_down",
+        "touchpad_two_finger", "touchpad_swipe_up", "touchpad_swipe_down", "touchpad_swipe_left",
+        "touchpad_swipe_right", "mouse_gyro_roll_mode",
+        // Swipe combo and swipe travel time lines, always rewritten.
+        "touchpad_swipe_combo_enabled", "touchpad_swipe_combo_hold", "touchpad_swipe_combo_up",
+        "touchpad_swipe_combo_down", "touchpad_swipe_combo_left", "touchpad_swipe_combo_right",
+        "touchpad_swipe_combo_hold_passthrough", "touchpad_swipe_button_delay"};
 
 protected:
     void closeEvent(QCloseEvent* event) override {

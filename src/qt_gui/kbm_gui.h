@@ -55,6 +55,7 @@ private:
     void EnableMappingButtons();
     void SetMapping(QString input);
     void Cleanup();
+    void WriteDeckGyroHotkey();
 
     std::string RunningGameSerial;
     QMap<int, QString> pressedKeys;
@@ -62,20 +63,21 @@ private:
     bool EnableMapping = false;
     bool MappingCompleted = false;
     bool HelpWindowOpen = false;
+    // Set by the Steam Deck gyro preset; the next save writes its hotkey into global.ini.
+    bool deck_gyro_hotkey_pending = false;
     QString mapping;
     int MappingTimer;
     QTimer* timer;
     QRightClickButton* MappingButton;
     QList<QPair<QRightClickButton*, std::string>> ButtonsList;
     std::string config_id;
+    // The file's text for these lines, written back while their widgets are untouched, since the
+    // widgets cannot hold every value the emulator accepts.
+    std::string sensitivity_text, swipe_threshold_text;
     const std::vector<std::string> ControllerInputs = {
-        "cross",        "circle",    "square",      "triangle",    "l1",
-        "r1",           "l2",        "r2",          "l3",
-
-        "r3",           "options",   "pad_up",
-
-        "pad_down",
-
-        "pad_left",     "pad_right", "axis_left_x", "axis_left_y", "axis_right_x",
-        "axis_right_y", "back"};
+        "cross",        "circle",   "square",    "triangle",     "l1",          "r1",
+        "l2",           "r2",       "l3",        "r3",           "options",     "pad_up",
+        "pad_down",     "pad_left", "pad_right", "axis_left_x",  "axis_left_y", "axis_right_x",
+        "axis_right_y", "back",     "share",     "lpaddle_high", "lpaddle_low", "rpaddle_high",
+        "rpaddle_low",  "l4",       "l5",        "r4",           "r5",          "qam"};
 };

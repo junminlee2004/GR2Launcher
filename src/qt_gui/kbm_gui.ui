@@ -263,7 +263,7 @@
              <number>0</number>
             </property>
             <item>
-             <layout class="QVBoxLayout" name="scrollAreaLayout" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+             <layout class="QVBoxLayout" name="scrollAreaLayout" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
               <property name="spacing">
                <number>0</number>
               </property>
@@ -1688,6 +1688,416 @@
                </widget>
               </item>
               <item>
+               <widget class="QFrame" name="touchpadUpFrame">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Shadow::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_36">
+                 <item>
+                  <widget class="QLabel" name="touchpadUpLabel">
+                   <property name="text">
+                    <string>Touchpad Up</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadUpButton">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadUpButton2">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadUpButton3">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="touchpadDownFrame">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Shadow::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_37">
+                 <item>
+                  <widget class="QLabel" name="touchpadDownLabel">
+                   <property name="text">
+                    <string>Touchpad Down</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadDownButton">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadDownButton2">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadDownButton3">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="touchpadTwoFingerFrame">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Shadow::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_38">
+                 <item>
+                  <widget class="QLabel" name="touchpadTwoFingerLabel">
+                   <property name="toolTip">
+                    <string>Presses the touchpad with one finger on each half (a two-finger click).</string>
+                   </property>
+                   <property name="text">
+                    <string>Touchpad Two Finger</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadTwoFingerButton">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadTwoFingerButton2">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadTwoFingerButton3">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="touchpadSwipeUpFrame">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Shadow::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_39">
+                 <item>
+                  <widget class="QLabel" name="touchpadSwipeUpLabel">
+                   <property name="toolTip">
+                    <string>Pressing the input plays a touchpad swipe from the center toward this edge.</string>
+                   </property>
+                   <property name="text">
+                    <string>Touchpad Swipe Up</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadSwipeUpButton">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadSwipeUpButton2">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadSwipeUpButton3">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="touchpadSwipeDownFrame">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Shadow::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_40">
+                 <item>
+                  <widget class="QLabel" name="touchpadSwipeDownLabel">
+                   <property name="toolTip">
+                    <string>Pressing the input plays a touchpad swipe from the center toward this edge.</string>
+                   </property>
+                   <property name="text">
+                    <string>Touchpad Swipe Down</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadSwipeDownButton">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadSwipeDownButton2">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadSwipeDownButton3">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="touchpadSwipeLeftFrame">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Shadow::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_41">
+                 <item>
+                  <widget class="QLabel" name="touchpadSwipeLeftLabel">
+                   <property name="toolTip">
+                    <string>Pressing the input plays a touchpad swipe from the center toward this edge.</string>
+                   </property>
+                   <property name="text">
+                    <string>Touchpad Swipe Left</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadSwipeLeftButton">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadSwipeLeftButton2">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadSwipeLeftButton3">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="touchpadSwipeRightFrame">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Shadow::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_42">
+                 <item>
+                  <widget class="QLabel" name="touchpadSwipeRightLabel">
+                   <property name="toolTip">
+                    <string>Pressing the input plays a touchpad swipe from the center toward this edge.</string>
+                   </property>
+                   <property name="text">
+                    <string>Touchpad Swipe Right</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadSwipeRightButton">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadSwipeRightButton2">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="TouchpadSwipeRightButton3">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="gyroRollFrame">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Shadow::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_43">
+                 <item>
+                  <widget class="QLabel" name="gyroRollLabel">
+                   <property name="toolTip">
+                    <string>While held, sideways mouse movement rolls instead of pans in mouse-to-gyro mode.</string>
+                   </property>
+                   <property name="text">
+                    <string>Mouse Gyro Roll Mode (hold)</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="MouseGyroRollButton">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="MouseGyroRollButton2">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="MouseGyroRollButton3">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
                <layout class="QHBoxLayout" name="mouseSettingsLayout">
                 <item>
                  <widget class="QGroupBox" name="MouseParamsBox">
@@ -1884,6 +2294,195 @@
                     </layout>
                    </item>
                    <item>
+                    <layout class="QHBoxLayout" name="globalSensLayout">
+                     <item>
+                      <widget class="QLabel" name="GlobalSensitivityLabel_text">
+                       <property name="font">
+                        <font>
+                         <bold>false</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Global Sensitivity (def 1.00):</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QSlider" name="GlobalSensitivitySlider">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="focusPolicy">
+                        <enum>Qt::FocusPolicy::NoFocus</enum>
+                       </property>
+                       <property name="minimum">
+                        <number>10</number>
+                       </property>
+                       <property name="maximum">
+                        <number>500</number>
+                       </property>
+                       <property name="pageStep">
+                        <number>10</number>
+                       </property>
+                       <property name="value">
+                        <number>100</number>
+                       </property>
+                       <property name="orientation">
+                        <enum>Qt::Orientation::Horizontal</enum>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="GlobalSensitivityLabel">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>30</width>
+                         <height>16777215</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string notr="true">1.00</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalSensLayout">
+                     <item>
+                      <widget class="QLabel" name="HorizontalSensitivityLabel_text">
+                       <property name="font">
+                        <font>
+                         <bold>false</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Horizontal Sensitivity (def 1.00):</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QSlider" name="HorizontalSensitivitySlider">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="focusPolicy">
+                        <enum>Qt::FocusPolicy::NoFocus</enum>
+                       </property>
+                       <property name="minimum">
+                        <number>10</number>
+                       </property>
+                       <property name="maximum">
+                        <number>500</number>
+                       </property>
+                       <property name="pageStep">
+                        <number>10</number>
+                       </property>
+                       <property name="value">
+                        <number>100</number>
+                       </property>
+                       <property name="orientation">
+                        <enum>Qt::Orientation::Horizontal</enum>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="HorizontalSensitivityLabel">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>30</width>
+                         <height>16777215</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string notr="true">1.00</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="verticalSensLayout">
+                     <item>
+                      <widget class="QLabel" name="VerticalSensitivityLabel_text">
+                       <property name="font">
+                        <font>
+                         <bold>false</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Vertical Sensitivity (def 1.00):</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QSlider" name="VerticalSensitivitySlider">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="focusPolicy">
+                        <enum>Qt::FocusPolicy::NoFocus</enum>
+                       </property>
+                       <property name="minimum">
+                        <number>10</number>
+                       </property>
+                       <property name="maximum">
+                        <number>500</number>
+                       </property>
+                       <property name="pageStep">
+                        <number>10</number>
+                       </property>
+                       <property name="value">
+                        <number>100</number>
+                       </property>
+                       <property name="orientation">
+                        <enum>Qt::Orientation::Horizontal</enum>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="VerticalSensitivityLabel">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>30</width>
+                         <height>16777215</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string notr="true">1.00</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
                     <widget class="QLabel" name="MoreInfoLabel">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
@@ -1950,6 +2549,108 @@
                       <bool>true</bool>
                      </property>
                     </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="mouseModeLayout">
+                <item>
+                 <widget class="QGroupBox" name="mouseModeGB">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="title">
+                   <string>Mouse Mode at Startup</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignmentFlag::AlignCenter</set>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_20">
+                   <item>
+                    <widget class="QComboBox" name="MouseDefaultModeBox">
+                     <property name="focusPolicy">
+                      <enum>Qt::FocusPolicy::NoFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>The mode the mouse starts in when a game launches. Joystick also needs Mouse to Joystick set to left or right. The mouse mode hotkeys switch modes in game.</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QGroupBox" name="touchpadSwipeGB">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="title">
+                   <string>Touchpad Swipe</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignmentFlag::AlignCenter</set>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_21">
+                   <item>
+                    <widget class="QCheckBox" name="TouchpadSwipeEnabledCheckBox">
+                     <property name="toolTip">
+                      <string>A left click and drag with the mouse or a touch screen plays a touchpad swipe in the drag direction, and a short click taps the touchpad center. While this is on, left click is used only for swipes. The touchpad swipe hotkey toggles this in game.</string>
+                     </property>
+                     <property name="text">
+                      <string>Left click and drag plays touchpad swipes</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="swipeThresholdLayout">
+                     <item>
+                      <widget class="QLabel" name="TouchpadSwipeThresholdLabel_text">
+                       <property name="text">
+                        <string>Swipe threshold:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QSpinBox" name="TouchpadSwipeThresholdSpinBox">
+                       <property name="toolTip">
+                        <string>Shortest drag, in window pixels, that counts as a swipe. A shorter drag is a tap.</string>
+                       </property>
+                       <property name="suffix">
+                        <string notr="true"> px</string>
+                       </property>
+                       <property name="minimum">
+                        <number>1</number>
+                       </property>
+                       <property name="maximum">
+                        <number>500</number>
+                       </property>
+                       <property name="value">
+                        <number>15</number>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </item>
                   </layout>
                  </widget>

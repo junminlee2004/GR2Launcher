@@ -188,7 +188,9 @@ Controller:
         Input-only:
              'lpaddle_low', 'lpaddle_high', 'back' = 'share' (Xbox and PS4 names)
         Output-only:
-            'touchpad_left', 'touchpad_center', 'touchpad_right'
+            'touchpad_left', 'touchpad_center', 'touchpad_right',
+            'touchpad_up', 'touchpad_down', 'touchpad_two_finger', 'touchpad_swipe_up',
+            'touchpad_swipe_down', 'touchpad_swipe_left', 'touchpad_swipe_right'
     Axes if you bind them to a button input:
         'axis_left_x_plus', 'axis_left_x_minus', 'axis_left_y_plus', 'axis_left_y_minus',
         'axis_right_x_plus', ..., 'axis_right_y_minus',
@@ -238,7 +240,8 @@ Emulator hotkeys:
     These are regarded as normal bindings, but they are put in a special config named global.ini by default, which is a config that is always loaded alongside the main config (If you want to, you can use this to set some common bindings that'll be in effect for every game, then put only the game specific bindings in their respective files). This doesn't mean you can't add them to the normal configs, you can absolutely make game specific emulator hokeys as well.
     'hotkey_pause', 'hotkey_fullscreen', 'hotkey_show_fps',
     'hotkey_quit', 'hotkey_reload_inputs', 'hotkey_toggle_mouse_to_joystick',
-    'hotkey_toggle_mouse_to_gyro', 'hotkey_renderdoc_capture'
+    'hotkey_toggle_mouse_to_gyro', 'hotkey_renderdoc_capture',
+    'hotkey_toggle_mouse_to_touchpad', 'hotkey_toggle_mouse_to_touchpad_swipe'
 
 'leftjoystick_halfmode' and 'rightjoystick_halfmode' = <key>;
     These are a pair of input modifiers that change the way keyboard button-bound axes work. By default, those push the joystick to the max in their respective direction, but if their respective 'joystick_halfmode' modifier value is true, they only push it... halfway. With this, you can change from run to walk in games like Bloodborne.
@@ -269,7 +272,30 @@ Emulator hotkeys:
     Valid devices: 'leftjoystick', 'rightjoystick', 'l2', 'r2'
 
 'mouse_gyro_roll_mode':
-    Controls whether moving the mouse sideways causes a panning or a rolling motion while mouse-to-gyro emulation is active.)";
+    Controls whether moving the mouse sideways causes a panning or a rolling motion while mouse-to-gyro emulation is active.
+
+'mouse_sensitivity' = float, float, float
+    Global, horizontal and vertical multipliers for mouse-to-joystick movement. All three values are required. Default: 1, 1, 1
+
+'mouse_default_mode' = 'off', 'joystick', 'gyro', 'touchpad' or 'touchpad_swipe'
+    The mouse mode a game starts in. 'joystick' also needs 'mouse_to_joystick'. 'touchpad_swipe' only turns on 'touchpad_swipe_enabled'; 'off' also turns it off.
+
+'touchpad_swipe_enabled' = 'true' or 'false'
+    A left click and drag plays a touchpad swipe in the drag direction, and a short click taps the touchpad center. While this is on, left click is used only for swipes.
+
+'touchpad_swipe_threshold' = float
+    The shortest drag, in window pixels, that counts as a swipe. Default: 15
+
+'touchpad_swipe_button_delay' = integer
+    Milliseconds a button-triggered swipe takes from the center of the touchpad to its end point, for the 'touchpad_swipe_*' outputs and the swipe combo. Default: 200
+
+'touchpad_swipe_combo_enabled' and 'touchpad_swipe_combo_hold_passthrough' = 'true' or 'false'
+'touchpad_swipe_combo_hold', 'touchpad_swipe_combo_up', 'touchpad_swipe_combo_down',
+'touchpad_swipe_combo_left', 'touchpad_swipe_combo_right' = <input>
+    While the hold input is held, pressing the up, down, left or right input plays a touchpad swipe instead of its normal action. Each slot takes one button, trigger, key or mouse button, or 'unmapped'. A missing slot uses its default: hold 'l3', up 'triangle', down 'cross', left 'square', right 'circle'. With passthrough on, the hold input keeps its normal action too. Only the first controller drives the combo.
+
+Settings in global.ini:
+    The Controllers and Keyboard/Mouse dialogs show and save only the selected config. Saving one of them writes every value it shows, such as the deadzones, 'mouse_sensitivity' and the touchpad swipe settings, into that config, which loads after global.ini, so the saved value replaces a global.ini line for the same setting. The lightbar override is the exception: an 'override_controller_color' saved as 'false' leaves a 'true' one in global.ini in effect. 'mouse_default_mode' is left out when it is 'off'. Bindings from both files add up instead.)";
 }
 
 QString HelpDialog::faq() {

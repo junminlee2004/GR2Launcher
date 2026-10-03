@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include <fstream>
+#include <map>
+#include <sstream>
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QMouseEvent>
@@ -33,6 +35,11 @@ KBMSettings::KBMSettings(std::shared_ptr<GameInfoClass> game_info_get,
     ui->MouseJoystickBox->addItem("none");
     ui->MouseJoystickBox->addItem("right");
     ui->MouseJoystickBox->addItem("left");
+
+    ui->MouseDefaultModeBox->addItem(tr("Off"), "off");
+    ui->MouseDefaultModeBox->addItem(tr("Joystick"), "joystick");
+    ui->MouseDefaultModeBox->addItem(tr("Gyro"), "gyro");
+    ui->MouseDefaultModeBox->addItem(tr("Touchpad"), "touchpad");
 
     ui->ProfileComboBox->addItem(tr("Common Config"));
     for (int i = 0; i < m_game_info->m_games.size(); i++) {
@@ -125,7 +132,47 @@ KBMSettings::KBMSettings(std::shared_ptr<GameInfoClass> game_info_get,
         {ui->RHalfButton, "rightjoystick_halfmode"},
         {ui->RHalfButton2, "rightjoystick_halfmode"},
         {ui->RHalfButton3, "rightjoystick_halfmode"},
+        {ui->TouchpadUpButton, "touchpad_up"},
+        {ui->TouchpadUpButton2, "touchpad_up"},
+        {ui->TouchpadUpButton3, "touchpad_up"},
+        {ui->TouchpadDownButton, "touchpad_down"},
+        {ui->TouchpadDownButton2, "touchpad_down"},
+        {ui->TouchpadDownButton3, "touchpad_down"},
+        {ui->TouchpadTwoFingerButton, "touchpad_two_finger"},
+        {ui->TouchpadTwoFingerButton2, "touchpad_two_finger"},
+        {ui->TouchpadTwoFingerButton3, "touchpad_two_finger"},
+        {ui->TouchpadSwipeUpButton, "touchpad_swipe_up"},
+        {ui->TouchpadSwipeUpButton2, "touchpad_swipe_up"},
+        {ui->TouchpadSwipeUpButton3, "touchpad_swipe_up"},
+        {ui->TouchpadSwipeDownButton, "touchpad_swipe_down"},
+        {ui->TouchpadSwipeDownButton2, "touchpad_swipe_down"},
+        {ui->TouchpadSwipeDownButton3, "touchpad_swipe_down"},
+        {ui->TouchpadSwipeLeftButton, "touchpad_swipe_left"},
+        {ui->TouchpadSwipeLeftButton2, "touchpad_swipe_left"},
+        {ui->TouchpadSwipeLeftButton3, "touchpad_swipe_left"},
+        {ui->TouchpadSwipeRightButton, "touchpad_swipe_right"},
+        {ui->TouchpadSwipeRightButton2, "touchpad_swipe_right"},
+        {ui->TouchpadSwipeRightButton3, "touchpad_swipe_right"},
+        {ui->MouseGyroRollButton, "mouse_gyro_roll_mode"},
+        {ui->MouseGyroRollButton2, "mouse_gyro_roll_mode"},
+        {ui->MouseGyroRollButton3, "mouse_gyro_roll_mode"},
     };
+
+    // Connected before the first load so the labels follow the loaded values.
+    connect(ui->GlobalSensitivitySlider, &QSlider::valueChanged, this, [this](int value) {
+        ui->GlobalSensitivityLabel->setText(QString::number(value / 100.0, 'f', 2));
+        sensitivity_text.clear();
+    });
+    connect(ui->HorizontalSensitivitySlider, &QSlider::valueChanged, this, [this](int value) {
+        ui->HorizontalSensitivityLabel->setText(QString::number(value / 100.0, 'f', 2));
+        sensitivity_text.clear();
+    });
+    connect(ui->VerticalSensitivitySlider, &QSlider::valueChanged, this, [this](int value) {
+        ui->VerticalSensitivityLabel->setText(QString::number(value / 100.0, 'f', 2));
+        sensitivity_text.clear();
+    });
+    connect(ui->TouchpadSwipeThresholdSpinBox, &QSpinBox::valueChanged, this,
+            [this] { swipe_threshold_text.clear(); });
 
     ButtonConnects();
     SetUIValuestoMappings("default");
@@ -153,6 +200,22 @@ KBMSettings::KBMSettings(std::shared_ptr<GameInfoClass> game_info_get,
     ui->buttonBox->button(QDialogButtonBox::Apply)->setText(tr("Apply"));
     ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)->setText(tr("Restore Defaults"));
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));
+
+    QPushButton* deck_gyro_button =
+        ui->buttonBox->addButton(tr("Steam Deck Gyro Preset"), QDialogButtonBox::ActionRole);
+    deck_gyro_button->setToolTip(
+        tr("Starts games in mouse-to-gyro mode and binds the L5 back paddle (lpaddle_low) to the "
+           "mouse-to-gyro toggle hotkey. Both are saved on Apply or Save."));
+    connect(deck_gyro_button, &QPushButton::clicked, this, [this] {
+        ui->MouseDefaultModeBox->setCurrentIndex(ui->MouseDefaultModeBox->findData("gyro"));
+        deck_gyro_hotkey_pending = true;
+        QMessageBox::information(
+            this, tr("Steam Deck Gyro Preset"),
+            tr("Mouse Mode at Startup is now Gyro, and the mouse-to-gyro toggle hotkey will be "
+               "the L5 back paddle (lpaddle_low).\n\nApply or Save writes both: the mode into "
+               "this config, and the hotkey into global.ini in place of the current toggle "
+               "binding."));
+    });
 
     connect(ui->HelpButton, &QPushButton::clicked, this, &KBMSettings::onHelpClicked);
     connect(ui->TextEditorButton, &QPushButton::clicked, this, [this]() {
@@ -243,7 +306,9 @@ void KBMSettings::SaveKBMConfig(bool close_on_save) {
     std::string output_string = "", input_string = "";
     std::vector<std::string> lines, inputs;
     // The outputs written here. An existing line for any other output is kept as it is.
-    std::vector<std::string> outputs = {"mouse_to_joystick", "mouse_movement_params"};
+    std::vector<std::string> outputs = {"mouse_to_joystick",      "mouse_movement_params",
+                                        "mouse_sensitivity",      "mouse_default_mode",
+                                        "touchpad_swipe_enabled", "touchpad_swipe_threshold"};
 
     // Comment lines for config file
     lines.push_back("#Feeling lost? Check out the Help section!");
@@ -251,10 +316,12 @@ void KBMSettings::SaveKBMConfig(bool close_on_save) {
     lines.push_back("#Keyboard bindings");
     lines.push_back("");
 
+    std::map<std::string, int> free_slots;
     for (const auto& entry : ButtonsList) {
         input_string = entry.first->text().toStdString();
         output_string = entry.second;
         outputs.push_back(output_string);
+        free_slots[output_string]++;
         if (input_string != "unmapped") {
             lines.push_back(output_string + " = " + input_string);
             inputs.push_back(input_string);
@@ -271,6 +338,29 @@ void KBMSettings::SaveKBMConfig(bool close_on_save) {
     output_string = "mouse_movement_params";
     lines.push_back(output_string + " = " + input_string);
 
+    if (sensitivity_text.empty()) {
+        lines.push_back(std::format("mouse_sensitivity = {:.2f}, {:.2f}, {:.2f}",
+                                    ui->GlobalSensitivitySlider->value() / 100.f,
+                                    ui->HorizontalSensitivitySlider->value() / 100.f,
+                                    ui->VerticalSensitivitySlider->value() / 100.f));
+    } else {
+        lines.push_back("mouse_sensitivity = " + sensitivity_text);
+    }
+    // Off is the startup default and is left out, because a mode line also resets the running
+    // mode on every input reload.
+    if (ui->MouseDefaultModeBox->currentIndex() != 0) {
+        lines.push_back("mouse_default_mode = " +
+                        ui->MouseDefaultModeBox->currentData().toString().toStdString());
+    }
+    lines.push_back(std::string("touchpad_swipe_enabled = ") +
+                    (ui->TouchpadSwipeEnabledCheckBox->isChecked() ? "true" : "false"));
+    if (swipe_threshold_text.empty()) {
+        lines.push_back("touchpad_swipe_threshold = " +
+                        std::to_string(ui->TouchpadSwipeThresholdSpinBox->value()));
+    } else {
+        lines.push_back("touchpad_swipe_threshold = " + swipe_threshold_text);
+    }
+
     lines.push_back("");
     const auto config_file = Input::GetFoolproofInputConfigFile(config_id);
     std::fstream file(config_file);
@@ -284,8 +374,9 @@ void KBMSettings::SaveKBMConfig(bool close_on_save) {
             continue;
         }
 
+        // A '#' after the '=' starts a trailing comment, and the line is sorted as usual.
         std::size_t comment_pos = line.find('#');
-        if (comment_pos != std::string::npos) {
+        if (comment_pos != std::string::npos && line.find('=') > comment_pos) {
             if (!line.contains("Keyboard bindings") && !line.contains("Feeling lost") &&
                 !line.contains("Alternatives for users"))
                 lines.push_back(line);
@@ -300,19 +391,25 @@ void KBMSettings::SaveKBMConfig(bool close_on_save) {
 
         output_string = line.substr(0, equal_pos);
         std::erase_if(output_string, [](unsigned char c) { return std::isspace(c); });
-        input_string = line.substr(std::min(equal_pos + 2, line.size()));
+        input_string = line.substr(equal_pos + 1, comment_pos - equal_pos - 1);
+        std::erase_if(input_string, [](unsigned char c) { return std::isspace(c); });
 
         bool controllerInputdetected = false;
         for (const std::string& input : ControllerInputs) {
             // Needed to avoid detecting backspace while detecting back
-            if (input_string.contains(input) && !input_string.contains("backspace")) {
+            if (input_string.contains(input) && !input_string.contains("backspace") &&
+                !input_string.contains("backslash") && !input_string.contains("sidebuttonback")) {
                 controllerInputdetected = true;
                 break;
             }
         }
 
+        // The load gives an output's slots to its lines in file order, skipping unmapped ones. The
+        // emulator binds every line, so a line left without a slot is kept.
         if (controllerInputdetected ||
-            std::find(outputs.begin(), outputs.end(), output_string) == outputs.end()) {
+            std::find(outputs.begin(), outputs.end(), output_string) == outputs.end() ||
+            (free_slots.contains(output_string) && input_string != "unmapped" &&
+             --free_slots[output_string] < 0)) {
             lines.push_back(line);
         }
     }
@@ -359,6 +456,11 @@ QString(tr("Cannot bind any unique input more than once. Duplicate inputs mapped
         output_file << line << '\n';
     }
     output_file.close();
+
+    if (deck_gyro_hotkey_pending) {
+        WriteDeckGyroHotkey();
+        deck_gyro_hotkey_pending = false;
+    }
 
     EmulatorSettings.Load();
     EmulatorSettings.SetUseUnifiedInputConfig(!ui->PerGameCheckBox->isChecked());
@@ -409,16 +511,69 @@ void KBMSettings::SetDefault() {
     ui->LHalfButton->setText("unmapped");
     ui->RHalfButton->setText("unmapped");
 
+    ui->TouchpadUpButton->setText("unmapped");
+    ui->TouchpadDownButton->setText("unmapped");
+    ui->TouchpadTwoFingerButton->setText("unmapped");
+    ui->TouchpadSwipeUpButton->setText("unmapped");
+    ui->TouchpadSwipeDownButton->setText("unmapped");
+    ui->TouchpadSwipeLeftButton->setText("unmapped");
+    ui->TouchpadSwipeRightButton->setText("unmapped");
+    ui->MouseGyroRollButton->setText("unmapped");
+
     ui->MouseJoystickBox->setCurrentText("none");
     ui->DeadzoneOffsetSlider->setValue(50);
     ui->SpeedMultiplierSlider->setValue(10);
     ui->SpeedOffsetSlider->setValue(125);
+    ui->GlobalSensitivitySlider->setValue(100);
+    ui->HorizontalSensitivitySlider->setValue(100);
+    ui->VerticalSensitivitySlider->setValue(100);
+    ui->MouseDefaultModeBox->setCurrentIndex(0);
+    ui->TouchpadSwipeEnabledCheckBox->setChecked(false);
+    ui->TouchpadSwipeThresholdSpinBox->setValue(15);
+    sensitivity_text.clear();
+    swipe_threshold_text.clear();
+    deck_gyro_hotkey_pending = false;
+}
+
+// Replaces every hotkey_toggle_mouse_to_gyro line in global.ini with one L5 binding.
+void KBMSettings::WriteDeckGyroHotkey() {
+    const auto hotkey_file = Input::GetFoolproofInputConfigFile("global");
+    const std::string binding = "hotkey_toggle_mouse_to_gyro = lpaddle_low";
+    std::vector<std::string> lines;
+    bool written = false;
+    std::ifstream input_file(hotkey_file);
+    for (std::string line; std::getline(input_file, line);) {
+        std::string output = line.substr(0, std::min(line.find('='), line.find('#')));
+        std::erase_if(output, [](unsigned char c) { return std::isspace(c); });
+        if (output != "hotkey_toggle_mouse_to_gyro") {
+            lines.push_back(line);
+        } else if (!written) {
+            lines.push_back(binding);
+            written = true;
+        }
+    }
+    input_file.close();
+    if (!written)
+        lines.push_back(binding);
+
+    std::ofstream output_file(hotkey_file);
+    for (const auto& line : lines) {
+        output_file << line << '\n';
+    }
 }
 
 void KBMSettings::SetUIValuestoMappings(std::string config_id) {
     for (auto& entry : ButtonsList) {
         entry.first->setText("unmapped");
     }
+    ui->GlobalSensitivitySlider->setValue(100);
+    ui->HorizontalSensitivitySlider->setValue(100);
+    ui->VerticalSensitivitySlider->setValue(100);
+    ui->MouseDefaultModeBox->setCurrentIndex(0);
+    ui->TouchpadSwipeEnabledCheckBox->setChecked(false);
+    ui->TouchpadSwipeThresholdSpinBox->setValue(15);
+    sensitivity_text.clear();
+    swipe_threshold_text.clear();
 
     const auto config_file = Input::GetFoolproofInputConfigFile(config_id);
     std::ifstream file(config_file);
@@ -436,13 +591,16 @@ void KBMSettings::SetUIValuestoMappings(std::string config_id) {
         if (equal_pos == std::string::npos)
             continue;
 
-        std::string output_string = line.substr(0, equal_pos - 1);
-        std::string input_string = line.substr(std::min(equal_pos + 2, line.size()));
+        std::string output_string = line.substr(0, equal_pos);
+        std::string input_string = line.substr(equal_pos + 1);
+        std::erase_if(output_string, [](unsigned char c) { return std::isspace(c); });
+        std::erase_if(input_string, [](unsigned char c) { return std::isspace(c); });
 
         bool controllerInputdetected = false;
         for (const std::string& input : ControllerInputs) {
             // Needed to avoid detecting backspace while detecting back
-            if (input_string.contains(input) && !input_string.contains("backspace")) {
+            if (input_string.contains(input) && !input_string.contains("backspace") &&
+                !input_string.contains("backslash") && !input_string.contains("sidebuttonback")) {
                 controllerInputdetected = true;
                 break;
             }
@@ -464,7 +622,7 @@ void KBMSettings::SetUIValuestoMappings(std::string config_id) {
                     std::setlocale(LC_NUMERIC, "C");
                     std::string DOstring = line.substr(equal_pos + 1, comma_pos - (equal_pos + 1));
                     float DOffsetValue = std::stof(DOstring) * 100.f;
-                    int DOffsetInt = static_cast<int>(DOffsetValue);
+                    int DOffsetInt = qRound(DOffsetValue);
                     ui->DeadzoneOffsetSlider->setValue(DOffsetInt);
                     QString LabelValue = QString::number(DOffsetInt / 100.0, 'f', 2);
                     ui->DeadzoneOffsetLabel->setText(LabelValue);
@@ -480,7 +638,7 @@ void KBMSettings::SetUIValuestoMappings(std::string config_id) {
 
                         std::string SOstring = SMSOstring.substr(comma_pos2 + 1);
                         float SOffsetValue = std::stof(SOstring) * 1000.0;
-                        int SOffsetInt = static_cast<int>(SOffsetValue);
+                        int SOffsetInt = qRound(SOffsetValue);
                         ui->SpeedOffsetSlider->setValue(SOffsetInt);
                         LabelValue = QString::number(SOffsetInt / 1000.0, 'f', 3);
                         ui->SpeedOffsetLabel->setText(LabelValue);
@@ -490,6 +648,39 @@ void KBMSettings::SetUIValuestoMappings(std::string config_id) {
                 }
             } else if (output_string == "mouse_to_joystick") {
                 ui->MouseJoystickBox->setCurrentText(QString::fromStdString(input_string));
+            } else if (output_string == "mouse_sensitivity") {
+                std::stringstream ss(input_string);
+                char comma;
+                float global, horizontal, vertical;
+                ss >> global >> comma >> horizontal >> comma >> vertical;
+                if (!ss.fail()) {
+                    ui->GlobalSensitivitySlider->setValue(qRound(global * 100));
+                    ui->HorizontalSensitivitySlider->setValue(qRound(horizontal * 100));
+                    ui->VerticalSensitivitySlider->setValue(qRound(vertical * 100));
+                    sensitivity_text = input_string;
+                }
+            } else if (output_string == "mouse_default_mode") {
+                if (input_string == "touchpad_swipe") {
+                    ui->TouchpadSwipeEnabledCheckBox->setChecked(true);
+                } else {
+                    // Like the emulator, off, none and unknown values select Off.
+                    const int index =
+                        ui->MouseDefaultModeBox->findData(QString::fromStdString(input_string));
+                    ui->MouseDefaultModeBox->setCurrentIndex(std::max(index, 0));
+                    if (input_string == "off" || input_string == "none")
+                        ui->TouchpadSwipeEnabledCheckBox->setChecked(false);
+                }
+            } else if (output_string == "touchpad_swipe_enabled") {
+                ui->TouchpadSwipeEnabledCheckBox->setChecked(input_string == "true" ||
+                                                             input_string == "1");
+            } else if (output_string == "touchpad_swipe_threshold") {
+                std::stringstream ss(input_string);
+                float threshold;
+                ss >> threshold;
+                if (!ss.fail() && threshold > 0) {
+                    ui->TouchpadSwipeThresholdSpinBox->setValue(qRound(threshold));
+                    swipe_threshold_text = input_string;
+                }
             }
         }
     }
