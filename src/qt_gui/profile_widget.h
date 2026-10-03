@@ -20,6 +20,9 @@ public:
     /// Shows the name and the picture of the user on controller port 1.
     void Refresh();
 
+protected:
+    bool eventFilter(QObject* obj, QEvent* event) override;
+
 private:
     void OnAvatarClicked();
 

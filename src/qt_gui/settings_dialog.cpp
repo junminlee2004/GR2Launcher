@@ -160,14 +160,14 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
         // General tab: the FPS counter has no per-game value
         ui->showFpsCounterCheckBox->setVisible(false);
 
-        // User tab: the shadNet account belongs to a user, not to a game
-        ui->formLayout->setRowVisible(ui->shadnetNpidLineEdit, false);
-        ui->formLayout->setRowVisible(ui->shadnetPasswordLineEdit, false);
-
     } else {
         // Experimental tab
         ui->tabWidgetSettings->setTabVisible(8, false);
         ui->chooseHomeTabComboBox->removeItem(9);
+
+        // User tab: the shadNet account is set in a game's settings only
+        ui->formLayout->setRowVisible(ui->shadnetNpidLineEdit, false);
+        ui->formLayout->setRowVisible(ui->shadnetPasswordLineEdit, false);
     }
 
 #ifndef _WIN32
@@ -1441,10 +1441,9 @@ void SettingsDialog::SetDefaultValues() {
 void SettingsDialog::SaveSettings() {
     if (is_game_specific) {
         EmulatorSettings.Save(gs_serial);
-    } else {
-        EmulatorSettings.Save();
-        // An edited account turns shadNet on for player 1 when complete and off otherwise. An
-        // unedited one keeps the switch set in Manage Users.
+        // The emulator signs in with player 1's account, so the fields write it. An edited account
+        // turns shadNet on for player 1 when complete and off otherwise. An unedited one keeps the
+        // switch set in Manage Users.
         User* player = UserManagement.GetUserByPlayerIndex(1);
         if (player &&
             (ui->shadnetNpidLineEdit->isModified() || ui->shadnetPasswordLineEdit->isModified())) {
@@ -1454,6 +1453,8 @@ void SettingsDialog::SaveSettings() {
                 !player->shadnet_npid.empty() && !player->shadnet_password.empty();
             UserManagement.Save();
         }
+    } else {
+        EmulatorSettings.Save();
     }
     Gr2Online::WriteServer(
         {ui->gr2HostLineEdit->text().trimmed().toStdString(), ui->gr2PortLineEdit->text().toInt()},

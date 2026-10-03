@@ -5,6 +5,7 @@
 #include <string>
 #include <system_error>
 #include <QDir>
+#include <QEvent>
 #include <QFileDialog>
 #include <QImageReader>
 #include <QLabel>
@@ -43,7 +44,18 @@ ProfileWidget::ProfileWidget(QWidget* parent) : QWidget(parent) {
     layout->addWidget(m_avatar_button, 0, Qt::AlignHCenter);
     layout->addWidget(m_name_label, 0, Qt::AlignHCenter);
 
+    if (parent) {
+        parent->window()->installEventFilter(this);
+    }
     Refresh();
+}
+
+bool ProfileWidget::eventFilter(QObject* obj, QEvent* event) {
+    // A game's settings dialog edits the account and closes back into this window.
+    if (event->type() == QEvent::WindowActivate) {
+        Refresh();
+    }
+    return QWidget::eventFilter(obj, event);
 }
 
 void ProfileWidget::Refresh() {
