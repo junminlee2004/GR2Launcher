@@ -283,7 +283,16 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
         } else if (button == ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)) {
             SetDefaultValues();
             if (is_game_specific) {
+                // The game gets the compiled defaults; the per-game save keeps only those that
+                // differ from the global settings.
                 EmulatorSettings.ClearGameSpecificOverrides();
+                EmulatorSettings.SetGroupValues("General", GeneralSettings{}, true);
+                EmulatorSettings.SetGroupValues("Log", LogSettings{}, true);
+                EmulatorSettings.SetGroupValues("Debug", DebugSettings{}, true);
+                EmulatorSettings.SetGroupValues("Input", InputSettings{}, true);
+                EmulatorSettings.SetGroupValues("Audio", AudioSettings{}, true);
+                EmulatorSettings.SetGroupValues("GPU", GPUSettings{}, true);
+                EmulatorSettings.SetGroupValues("Vulkan", VulkanSettings{}, true);
             } else {
                 EmulatorSettings.SetDefaultValues();
             }
