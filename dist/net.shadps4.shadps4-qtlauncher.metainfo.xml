@@ -60,7 +60,7 @@
     <internet translate="no">offline-only</internet>
   </requires>
   <provides>
-    <binary translate="no">shadPS4QtLauncher</binary>
+    <binary translate="no">GR2Launcher</binary>
   </provides>
   <keywords>
     <keyword>emulator</keyword>

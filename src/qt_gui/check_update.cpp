@@ -466,7 +466,7 @@ void CheckUpdate::Install() {
         "Remove-Item -Force -LiteralPath '%3\\update.ps1'\n"
         "Remove-Item -Force -LiteralPath '%3\\temp_download_update.zip'\n"
         "Remove-Item -Recurse -Force '%2'\n"
-        "Start-Process -FilePath '%3\\shadPS4QtLauncher.exe' "
+        "Start-Process -FilePath '%3\\GR2Launcher.exe' "
         "-WorkingDirectory ([WildcardPattern]::Escape('%3'))\n");
     arguments << "-ExecutionPolicy"
               << "Bypass"
@@ -567,8 +567,8 @@ void CheckUpdate::Install() {
         "sleep 2\n"
         "tar -xzf \"%2/GR2Launcher-macos-qt.tar.gz\" -C \"%3\"\n"
         "sleep 2\n"
-        "chmod +x \"%3/shadPS4QtLauncher.app/Contents/MacOS/shadPS4QtLauncher\"\n"
-        "open \"%3/shadPS4QtLauncher.app\"\n"
+        "chmod +x \"%3/GR2Launcher.app/Contents/MacOS/GR2Launcher\"\n"
+        "open \"%3/GR2Launcher.app\"\n"
         "rm -r \"%2\"\n");
 
     arguments << scriptFileName;

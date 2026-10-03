@@ -1,9 +1,9 @@
 [Desktop Entry]
 Name=GR2Launcher
-Exec=shadPS4QtLauncher
+Exec=GR2Launcher
 Terminal=false
 Type=Application
 Icon=GR2Launcher
 Comment=Gravity Rush 2 launcher for the shadPS4 emulator
 Categories=Game;Emulator;
-StartupWMClass=shadPS4QtLauncher
+StartupWMClass=GR2Launcher

@@ -181,7 +181,7 @@ set_source_files_properties(src/shadps4.rc PROPERTIES COMPILE_DEFINITIONS "APP_V
 message("-- end git things, remote: ${GIT_REMOTE_NAME}, branch: ${GIT_BRANCH}, link: ${GIT_REMOTE_URL}")
 
 string(TOLOWER "${GIT_REMOTE_URL}" GIT_REMOTE_URL_LOWER)
-if(NOT GIT_REMOTE_URL_LOWER MATCHES "shadps4-emu/shadps4-qtlauncher" OR NOT GIT_BRANCH STREQUAL "main")
+if(NOT GIT_REMOTE_URL_LOWER MATCHES "junminlee2004/gr2launcher" OR NOT GIT_BRANCH STREQUAL "main")
     message(STATUS "not main, disabling auto update")
     set(ENABLE_UPDATER OFF)
 endif()
@@ -477,6 +477,7 @@ cmrc_add_resource_library(embedded-resources
 target_link_libraries(shadPS4QtLauncher PRIVATE res::embedded)
 
 set_target_properties(shadPS4QtLauncher PROPERTIES
+    OUTPUT_NAME GR2Launcher
     WIN32_EXECUTABLE ON
     MACOSX_BUNDLE ON
     MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/dist/MacOSBundleInfo.plist.in"
