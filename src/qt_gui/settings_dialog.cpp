@@ -273,6 +273,11 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
 
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QWidget::close);
 
+    steam_deck_button =
+        ui->buttonBox->addButton(tr("Steam Deck Preset"), QDialogButtonBox::ActionRole);
+    steam_deck_button->setObjectName("steamDeckPresetButton");
+    steam_deck_button->installEventFilter(this);
+
     connect(ui->buttonBox, &QDialogButtonBox::clicked, this, [this](QAbstractButton* button) {
         if (button == ui->buttonBox->button(QDialogButtonBox::Save)) {
             is_game_saving = true;
@@ -282,7 +287,8 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
         } else if (button == ui->buttonBox->button(QDialogButtonBox::Apply)) {
             UpdateSettings(is_game_specific);
             SaveSettings();
-        } else if (button == ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)) {
+        } else if (button == ui->buttonBox->button(QDialogButtonBox::RestoreDefaults) ||
+                   button == steam_deck_button) {
             SetDefaultValues();
             if (is_game_specific) {
                 // The game gets the compiled defaults; the per-game save keeps only those that
@@ -297,6 +303,15 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
                 EmulatorSettings.SetGroupValues("Vulkan", VulkanSettings{}, true);
             } else {
                 EmulatorSettings.SetDefaultValues();
+            }
+            // The Steam Deck preset is the defaults with no vsync, a window that gamescope scales,
+            // and the gyro axes of a device held upright.
+            if (button == steam_deck_button) {
+                EmulatorSettings.SetPresentMode("Immediate", is_game_specific);
+                EmulatorSettings.SetFullScreen(false, is_game_specific);
+                EmulatorSettings.SetFullScreenMode("Windowed", is_game_specific);
+                EmulatorSettings.SetGyroSwapYawRoll(true, is_game_specific);
+                EmulatorSettings.SetGyroInvertYaw(true, is_game_specific);
             }
             SaveSettings();
             LoadValuesFromConfig();
@@ -1004,6 +1019,8 @@ void SettingsDialog::updateNoteTextEdit(const QString& elementName) {
         text = tr("Emulator Language:\\nSets the language of the emulator's user interface.");
     } else if (elementName == "showSplashCheckBox") {
         text = tr("Show Splash Screen:\\nShows the game's splash screen (a special image) while the game is starting.");
+    } else if (elementName == "steamDeckPresetButton") {
+        text = tr("Steam Deck Preset:\\nRestores the defaults, then sets present mode Immediate (No Vsync), windowed mode, Swap Gyro Yaw/Roll and Invert Gyro Yaw.\\nSaves at once to the config being edited (global or this game's).");
     } else if (elementName == "showFpsCounterCheckBox") {
         text = tr("Show FPS Counter:\\nShows the emulator's FPS counter when a game starts.");
     } else if (elementName == "discordRPCCheckbox") {

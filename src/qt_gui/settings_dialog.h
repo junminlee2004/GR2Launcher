@@ -64,6 +64,7 @@ private:
     bool is_game_running = false;
     bool is_game_specific = false;
     bool is_game_saving = false;
+    QPushButton* steam_deck_button = nullptr;
 
     std::unique_ptr<Ui::SettingsDialog> ui;
     std::shared_ptr<gui_settings> m_gui_settings;
