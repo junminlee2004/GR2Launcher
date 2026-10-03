@@ -30,4 +30,4 @@ cp -a "$GITHUB_WORKSPACE/build/translations" AppDir/usr/bin
 ./linuxdeploy-x86_64.AppImage --appdir AppDir -d "$GITHUB_WORKSPACE"/dist/GR2Launcher.desktop  -e "$GITHUB_WORKSPACE"/build/shadPS4QtLauncher -i "$GITHUB_WORKSPACE"/src/images/GR2Launcher.png --plugin qt
 rm AppDir/usr/plugins/multimedia/libgstreamermediaplugin.so
 ./linuxdeploy-x86_64.AppImage --appdir AppDir --output appimage
-mv GR2Launcher-x86_64.AppImage shadPS4QtLauncher-qt.AppImage
+mv GR2Launcher-x86_64.AppImage GR2Launcher.AppImage
