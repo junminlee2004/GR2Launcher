@@ -777,7 +777,11 @@ void SettingsDialog::LoadValuesFromConfig() {
                                 EmulatorSettings.GetConsoleLanguage())) %
         languageIndexes.size());
 
-    ui->readbacksModeComboBox->setCurrentIndex(EmulatorSettings.GetReadbacksMode());
+    // The fourth entry, Precise (Offloaded), is Precise readbacks with readback_offload.
+    const u32 readbacks_mode = EmulatorSettings.GetReadbacksMode();
+    const bool readback_offload =
+        readbacks_mode == GpuReadbacksMode::Precise && EmulatorSettings.IsReadbackOffload();
+    ui->readbacksModeComboBox->setCurrentIndex(readback_offload ? 3 : readbacks_mode);
     ui->readbackLinearImagesComboBox->setCurrentIndex(
         !EmulatorSettings.IsReadbackLinearImagesEnabled() ? 0
         : EmulatorSettings.IsReadbackLinearImagesAsync()  ? 2
@@ -1194,7 +1198,7 @@ void SettingsDialog::updateNoteTextEdit(const QString& elementName) {
     } else if (elementName == "shadnetCheckBox") {
         text = tr("shadNet:\\nCompatibility is very limited at the moment.\\nYou can register at https://www.shadps4.net/shadnet/register/.");
     } else if (elementName == "readbacksGroupBox") {
-        text = tr("Readbacks:\\nEnable GPU memory readbacks and writebacks.\\nThis is required for proper behavior in some games.\\nMight cause stability and/or performance issues.");
+        text = tr("Readbacks:\\nEnable GPU memory readbacks and writebacks.\\nThis is required for proper behavior in some games.\\nMight cause stability and/or performance issues.\\nPrecise (Offloaded): Precise readbacks where the game thread that needs the data waits for the GPU instead of the GPU thread. Very low compatibility: it works only in specific games, such as inFAMOUS First Light and inFAMOUS Second Son.");
     } else if (elementName == "readbackLinearImagesGroupBox") {
         text = tr("Readback Linear Images:\\nDownloads GPU modified linear images to guest memory.\\nMight fix issues in some games.\\nOff: Linear images are not read back.\\nDefault: A fence waits for the GPU before the pixels are written.\\nAsync: Each image is copied to a staging buffer, and a background thread writes it once the GPU finishes, so the game sees the pixels up to a frame late. Suits values a game reads every frame, like exposure and lighting.");
     } else if (elementName == "dmemGroupBox") {
@@ -1226,7 +1230,11 @@ bool SettingsDialog::eventFilter(QObject* obj, QEvent* event) {
 }
 
 void SettingsDialog::UpdateSettings(bool is_specific) {
-    EmulatorSettings.SetReadbacksMode(ui->readbacksModeComboBox->currentIndex(), is_specific);
+    const int readbacks_mode = ui->readbacksModeComboBox->currentIndex();
+    const bool readback_offload = readbacks_mode == 3;
+    EmulatorSettings.SetReadbacksMode(readback_offload ? GpuReadbacksMode::Precise : readbacks_mode,
+                                      is_specific);
+    EmulatorSettings.SetReadbackOffload(readback_offload, is_specific);
     const int linear_images = ui->readbackLinearImagesComboBox->currentIndex();
     EmulatorSettings.SetReadbackLinearImagesEnabled(linear_images != 0, is_specific);
     // Off keeps the choice between Default and Async.

@@ -2678,6 +2678,11 @@
                       <string>Precise</string>
                      </property>
                     </item>
+                    <item>
+                     <property name="text">
+                      <string>Precise (Offloaded)</string>
+                     </property>
+                    </item>
                    </widget>
                   </item>
                  </layout>

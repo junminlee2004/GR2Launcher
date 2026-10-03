@@ -368,6 +368,7 @@ std::vector<TuningPage::Group> TuningPage::Table() {
           {"null_gpu"},
           {"copy_gpu_buffers"},
           {"readbacks_mode"},
+          {"readback_offload"},
           {"readback_linear_images_enabled", tr("Readback Linear Images")},
           {"readback_linear_images_async"},
           {"direct_memory_access_enabled"},
