@@ -28,11 +28,10 @@
 #include "ui_version_dialog.h"
 #include "version_dialog.h"
 
-// Every GR2fork-EXODUS release has a tag and a name starting with RELEASE_PREFIX, which keeps the
-// branch's earlier name. LATEST_LABEL is the download row and the installed entry that track the
-// newest of them.
+// Every GR2fork-EXODUS release has a tag and a name starting with RELEASE_PREFIX. LATEST_LABEL
+// is the download row and the installed entry that track the newest of them.
 constexpr auto EMULATOR_REPO = "junminlee2004/GR2fork";
-constexpr auto RELEASE_PREFIX = "Pre-release-ISSfork-sparse-";
+constexpr auto RELEASE_PREFIX = "Pre-release-GR2fork-EXODUS-";
 constexpr auto LATEST_LABEL = "Pre-release (GR2fork-EXODUS)";
 
 VersionDialog::VersionDialog(std::shared_ptr<gui_settings> gui_settings, QWidget* parent)
