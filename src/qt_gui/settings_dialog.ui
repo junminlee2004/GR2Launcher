@@ -2437,6 +2437,20 @@
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QCheckBox" name="shaderCaheCheckBox">
+                 <property name="text">
+                  <string>Enable Shader Cache</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="shaderCacheArchiveCheckBox">
+                 <property name="text">
+                  <string>Compress the Shader Cache files into a zip file</string>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>
@@ -2722,20 +2736,6 @@
                 <widget class="QCheckBox" name="neoCheckBox">
                  <property name="text">
                   <string>Enable PS4 Neo Mode</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="shaderCaheCheckBox">
-                 <property name="text">
-                  <string>Enable Shader Cache</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="shaderCacheArchiveCheckBox">
-                 <property name="text">
-                  <string>Compress the Shader Cache files into a zip file</string>
                  </property>
                 </widget>
                </item>

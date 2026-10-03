@@ -170,9 +170,6 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
         ui->chooseHomeTabComboBox->removeItem(9);
     }
 
-    // to do: unhide when implemented
-    ui->homeFolderGroupBox->setVisible(false);
-
 #ifndef _WIN32
     ui->redZoneGroupBox->setVisible(false);
 #endif
@@ -1481,6 +1478,7 @@ void SettingsDialog::RefreshAudioDevices() {
     ui->micComboBox->addItem(micMap.key("None"), "None");
     ui->micComboBox->addItem(micMap.key("Default Device"), "Default Device");
     ui->GenAudioComboBox->addItem(tr("Default Device"), "Default Device");
+    ui->DsAudioComboBox->addItem(tr("None"), "None");
     ui->DsAudioComboBox->addItem(tr("Default Device"), "Default Device");
 
     if (backend == "SDL") {
