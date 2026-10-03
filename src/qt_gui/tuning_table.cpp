@@ -287,17 +287,6 @@ std::vector<TuningPage::Group> TuningPage::Table() {
              {"bind_line_prefetch", tr("Bind Line Prefetch"),
               tr("Prefetches, during the first texture binding pass, the three image lines the "
                  "second pass reads first.")},
-             {"sampler_memo_lockfree", tr("Lock-Free Sampler Memo"),
-              tr("Skips the sampler map mutex: the sampler lookup and the sampler garbage "
-                 "collection both run on the GPU thread only.")},
-             {"findimg_touch_lockfree", tr("Lock-Free Image Touch"),
-              tr("An image memo hit stamps its access tick without the texture mutex; the LRU "
-                 "touch stays under it and runs once per image per garbage collection tick.")},
-             {"findimg_touch_batch",
-              tr("Batched Image Touches"),
-              tr("An image memo hit records its LRU touch in a GPU thread array, and one locked "
-                 "pass per submit applies them. Needs the Lock-Free Image Touch."),
-              {{"findimg_touch_lockfree", 1, 1}}},
              {"findimg_trust_gen", tr("Trust Texture Generation"),
               tr("An image memo hit with an equal texture generation trusts the entry and skips "
                  "the uid check of the image record.")},
@@ -327,24 +316,19 @@ std::vector<TuningPage::Group> TuningPage::Table() {
                  "the probe compares that entry before the hashed way scan.")},
              {"image_fast_state", tr("Image Fast State"),
               tr("Collapses the clean steady state of per-binding texture updates to one atomic "
-                 "load instead of taking the texture cache mutex.")},
+                 "load instead of the touch, track and refresh pass.")},
              {"image_update_direct",
               tr("Direct Image Updates"),
               tr("Runs the per-image fast-state check directly for sampled bindings instead of "
                  "the per-binding dedup probe. Needs Image Fast State."),
               {{"image_fast_state", 1, 1}}},
-             {"texture_lru_log", tr("Texture LRU Log"),
-              tr("Keeps the image LRU as an append-only touch log with tombstones instead of a "
-                 "linked list relinked on the first touch per submit.")},
-             {"texture_lru_lazy_touch",
-              tr("Lazy LRU Touches"),
+             {"texture_lru_lazy_touch", tr("Lazy LRU Touches"),
               tr("Image touches only stamp the tick of the image; the LRU list is relinked when "
-                 "the garbage collector meets an entry touched since its list tick. Applies to "
-                 "the list only, so it needs the Texture LRU Log off."),
-              {{"texture_lru_log", 0, 0}}},
+                 "the garbage collector meets an entry touched since its list tick.")},
              {"texture_invalidate_filter", tr("Texture Invalidate Filter"),
               tr("Answers a guest write fault against a lock-free coverage bitmap of the "
-                 "registered images before taking the texture cache mutex.")},
+                 "registered images before the page table walk, so a fault in memory no image "
+                 "covers skips the walk.")},
          }},
         {tr("Buffer Cache and Locks"),
          false,
