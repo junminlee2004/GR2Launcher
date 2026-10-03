@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2026 shadPS4 Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <algorithm>
 #include <QDir>
 #include <QDragEnterEvent>
 #include <QDropEvent>
@@ -743,12 +744,14 @@ void VersionDialog::SaveDownloadCache(const QStringList& versions) {
     }
 }
 
+// The single row tracks the newest pre-release. Installing it again replaces the installed one,
+// and the update check compares against that one installed entry.
 void VersionDialog::PopulateDownloadTree(const QStringList& versions) {
     ui->downloadTreeWidget->clear();
-    ui->downloadTreeWidget->addTopLevelItem(new QTreeWidgetItem({LATEST_LABEL}));
-    for (const QString& name : versions) {
-        if (name.startsWith(RELEASE_PREFIX))
-            ui->downloadTreeWidget->addTopLevelItem(new QTreeWidgetItem({name}));
+    if (std::ranges::any_of(versions, [](const QString& name) {
+            return name == LATEST_LABEL || name.startsWith(RELEASE_PREFIX);
+        })) {
+        ui->downloadTreeWidget->addTopLevelItem(new QTreeWidgetItem({LATEST_LABEL}));
     }
 
     InstallSelectedVersion();
