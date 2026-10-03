@@ -42,5 +42,6 @@
 	<file>images/game_settings.png</file>
 	<file>images/key.png</file>
 	<file>images/users.png</file>
+        <file>images/avatar_default.png</file>
     </qresource>
 </RCC>

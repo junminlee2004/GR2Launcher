@@ -369,6 +369,8 @@ set(QT_GUI src/qt_gui/about_dialog.cpp
            src/qt_gui/hex_plain_text_edit.h
            src/qt_gui/user_manager_dialog.cpp
            src/qt_gui/user_manager_dialog.h
+           src/qt_gui/profile_widget.cpp
+           src/qt_gui/profile_widget.h
            src/qt_gui/table_item_delegate.cpp
            src/qt_gui/table_item_delegate.h
            ${RESOURCE_FILES}

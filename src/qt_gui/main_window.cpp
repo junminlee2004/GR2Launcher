@@ -29,6 +29,7 @@
 #include "ipc/ipc_client.h"
 #include "kbm_gui.h"
 #include "main_window.h"
+#include "profile_widget.h"
 #include "settings_dialog.h"
 #include "skylander_dialog.h"
 #include "user_manager_dialog.h"
@@ -305,6 +306,9 @@ void MainWindow::AddUiWidgets() {
     versionContainer->setHidden(true);
 #endif
     ui->toolBar->addWidget(versionContainer);
+    ui->toolBar->addWidget(createSpacer(this));
+    m_profile_widget = new ProfileWidget(this);
+    ui->toolBar->addWidget(m_profile_widget);
 }
 
 void MainWindow::UpdateToolbarButtons() {
@@ -554,6 +558,9 @@ void MainWindow::CreateConnects() {
                 });
 
         settingsDialog->exec();
+        // Drops unsaved changes, which the dialog keeps in memory when closed with Esc.
+        EmulatorSettings.Load();
+        m_profile_widget->Refresh();
     });
 
     connect(ui->settingsButton, &QPushButton::clicked, this, [this]() {
@@ -589,6 +596,9 @@ void MainWindow::CreateConnects() {
                 });
 
         settingsDialog->exec();
+        // Drops unsaved changes, which the dialog keeps in memory when closed with Esc.
+        EmulatorSettings.Load();
+        m_profile_widget->Refresh();
     });
 
     connect(ui->controllerButton, &QPushButton::clicked, this, [this]() {
@@ -632,6 +642,7 @@ void MainWindow::CreateConnects() {
     connect(ui->userManager, &QAction::triggered, this, [this]() {
         auto userDialog = new UserManagerDialog(this);
         userDialog->exec();
+        m_profile_widget->Refresh();
     });
 
     connect(ui->keyManager, &QAction::triggered, this, [this]() {

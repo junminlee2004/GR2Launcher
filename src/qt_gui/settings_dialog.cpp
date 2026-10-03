@@ -25,6 +25,7 @@
 #include "common/logging/log.h"
 #include "core/emulator_state.h"
 #include "core/gr2_online.h"
+#include "core/user_settings.h"
 #include "log_presets_dialog.h"
 #include "sdl_event_wrapper.h"
 #include "settings_dialog.h"
@@ -158,6 +159,10 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
 
         // General tab: the FPS counter has no per-game value
         ui->showFpsCounterCheckBox->setVisible(false);
+
+        // User tab: the shadNet account belongs to a user, not to a game
+        ui->formLayout->setRowVisible(ui->shadnetNpidLineEdit, false);
+        ui->formLayout->setRowVisible(ui->shadnetPasswordLineEdit, false);
 
     } else {
         // Experimental tab
@@ -575,6 +580,8 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
         ui->OpenCustomTrophyLocationButton->installEventFilter(this);
         ui->PortableUserFolderGroupBox->installEventFilter(this);
         ui->gr2OnlineGroupBox->installEventFilter(this);
+        ui->shadnetNpidLineEdit->installEventFilter(this);
+        ui->shadnetPasswordLineEdit->installEventFilter(this);
 
         // Input
         ui->hideCursorGroupBox->installEventFilter(this);
@@ -776,6 +783,14 @@ void SettingsDialog::LoadValuesFromConfig() {
         QString::fromStdString(EmulatorSettings.GetShadNetWebApiServer()));
     ui->signalingInfoLineEdit->setText(QString::fromStdString(EmulatorSettings.GetSignalingInfo()));
     ui->upnpCheckBox->setChecked(EmulatorSettings.IsUPnPEnabled());
+    // The emulator signs in the user on controller port 1 with this account.
+    const User* player = UserManagement.GetUserByPlayerIndex(1);
+    ui->shadnetNpidLineEdit->setEnabled(player != nullptr);
+    ui->shadnetPasswordLineEdit->setEnabled(player != nullptr);
+    if (player) {
+        ui->shadnetNpidLineEdit->setText(QString::fromStdString(player->shadnet_npid));
+        ui->shadnetPasswordLineEdit->setText(QString::fromStdString(player->shadnet_password));
+    }
     const auto gr2_server = Gr2Online::ReadServer(gs_serial);
     ui->gr2HostLineEdit->setText(QString::fromStdString(gr2_server.host));
     ui->gr2PortLineEdit->setText(gr2_server.port ? QString::number(gr2_server.port) : QString());
@@ -1044,6 +1059,8 @@ void SettingsDialog::updateNoteTextEdit(const QString& elementName) {
         text = tr("Open the custom trophy images/sounds folder:\\nYou can add custom images to the trophies and an audio.\\nAdd the files to custom_trophy with the following names:\\ntrophy.wav OR trophy.mp3, bronze.png, gold.png, platinum.png, silver.png\\nNote: The sound will only work in QT versions.");
     } else if (elementName == "gr2OnlineGroupBox") {
         text = tr("Gravity Rush 2 Online:\\nThe server Gravity Rush 2 sends its online requests to. Without a host, online play is off. The port is 8443 unless one is set; a host typed as host:port or as a URL is stored as a separate host and port on save.\\nIn game-specific settings an empty field uses the global value shown in grey.\\nOnline play also needs \"Network Connected\" set to true. The player name and token come from the shadNet sign-in of player 1.");
+    } else if (elementName == "shadnetNpidLineEdit" || elementName == "shadnetPasswordLineEdit") {
+        text = tr("Online ID and Password:\\nThe shadNet account of player 1, the user on controller port 1 in Settings > Manage Users. Gravity Rush 2 plays online under this Online ID, and its server keeps the profile picture under it.\\nEntering both turns shadNet on for this user, and clearing either turns it off. Signing in also needs \"Enable shadNet\" and the server below.\\nThe fields are disabled when no user is on controller port 1. The accounts of the other users are set in Settings > Manage Users > ShadNet.");
     }
 
     // Input
@@ -1412,6 +1429,17 @@ void SettingsDialog::SaveSettings() {
         EmulatorSettings.Save(gs_serial);
     } else {
         EmulatorSettings.Save();
+        // An edited account turns shadNet on for player 1 when complete and off otherwise. An
+        // unedited one keeps the switch set in Manage Users.
+        User* player = UserManagement.GetUserByPlayerIndex(1);
+        if (player &&
+            (ui->shadnetNpidLineEdit->isModified() || ui->shadnetPasswordLineEdit->isModified())) {
+            player->shadnet_npid = ui->shadnetNpidLineEdit->text().trimmed().toStdString();
+            player->shadnet_password = ui->shadnetPasswordLineEdit->text().toStdString();
+            player->shadnet_enabled =
+                !player->shadnet_npid.empty() && !player->shadnet_password.empty();
+            UserManagement.Save();
+        }
     }
     Gr2Online::WriteServer(
         {ui->gr2HostLineEdit->text().trimmed().toStdString(), ui->gr2PortLineEdit->text().toInt()},

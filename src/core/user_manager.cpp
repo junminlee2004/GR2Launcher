@@ -60,6 +60,7 @@ bool UserManager::RenameUser(s32 user_id, const std::string& new_name) {
                 return true; // no change
 
             user.user_name = new_name;
+            Save();
             return true;
         }
     }

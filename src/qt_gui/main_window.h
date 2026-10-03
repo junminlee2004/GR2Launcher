@@ -23,6 +23,8 @@
 #include "main_window_themes.h"
 #include "main_window_ui.h"
 
+class ProfileWidget;
+
 class MainWindow : public QMainWindow {
     Q_OBJECT
 signals:
@@ -94,6 +96,7 @@ private:
     QActionGroup* m_list_mode_act_group = nullptr;
     QActionGroup* m_theme_act_group = nullptr;
     QActionGroup* m_recent_files_group = nullptr;
+    ProfileWidget* m_profile_widget = nullptr;
     // Dockable widget frames
     WindowThemes m_window_themes;
     GameListUtils m_game_list_utils;
