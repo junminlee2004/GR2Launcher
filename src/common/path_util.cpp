@@ -288,4 +288,29 @@ std::filesystem::path PathFromQString(const QString& path) {
 #endif
 }
 
+std::string ToStoredPath(const std::string& path) {
+    const fs::path value{std::u8string(path.begin(), path.end())};
+    const fs::path base = fs::current_path();
+    if (value.empty() || value.is_relative() ||
+        GetUserPath(PathType::LauncherDir) != base / PORTABLE_LAUNCHER_DIR) {
+        return path;
+    }
+    std::error_code ec;
+    const fs::path relative = fs::relative(value, base, ec);
+    if (ec || relative.empty() || *relative.begin() == "..") {
+        return path;
+    }
+    const std::u8string result = relative.generic_u8string();
+    return {result.begin(), result.end()};
+}
+
+std::string FromStoredPath(const std::string& path) {
+    const fs::path value{std::u8string(path.begin(), path.end())};
+    if (value.empty() || value.is_absolute()) {
+        return path;
+    }
+    const std::u8string result = (fs::current_path() / value).generic_u8string();
+    return {result.begin(), result.end()};
+}
+
 } // namespace Common::FS

@@ -20,10 +20,10 @@ const QString version_manager = "version_manager";
 const gui_value gen_checkForUpdates = gui_value(general_settings, "checkForUpdates", false);
 const gui_value gen_showChangeLog = gui_value(general_settings, "showChangeLog", false);
 const gui_value gen_recentFiles =
-    gui_value(main_window, "recentFiles", QVariant::fromValue(QList<QString>()));
+    gui_value(main_window, "recentFiles", QVariant::fromValue(QList<QString>()), true);
 const gui_value gen_guiLanguage = gui_value(general_settings, "guiLanguage", "en_US");
 const gui_value gen_elfDirs =
-    gui_value(main_window, "elfDirs", QVariant::fromValue(QList<QString>()));
+    gui_value(main_window, "elfDirs", QVariant::fromValue(QList<QString>()), true);
 const gui_value gen_theme = gui_value(general_settings, "theme", 0);
 const gui_value gen_shadPath = gui_value(general_settings, "shadPath", "");
 const gui_value gen_checkCompatibilityAtStartup =
@@ -69,8 +69,8 @@ const gui_value favorites_list =
     gui_value(favorites, "favoritesList", QVariant::fromValue(QList<QString>()));
 
 // version manager
-const gui_value vm_versionPath = gui_value(version_manager, "versionPath", "");
-const gui_value vm_versionSelected = gui_value(version_manager, "versionSelected", "");
+const gui_value vm_versionPath = gui_value(version_manager, "versionPath", "", true);
+const gui_value vm_versionSelected = gui_value(version_manager, "versionSelected", "", true);
 const gui_value vm_showChangeLog = gui_value(version_manager, "showChangeLog", "");
 const gui_value vm_checkOnStartup = gui_value(version_manager, "checkOnStartup", "");
 

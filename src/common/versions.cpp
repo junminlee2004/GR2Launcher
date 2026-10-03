@@ -56,7 +56,7 @@ std::vector<Version> GetVersionList(std::filesystem::path const& path) {
 
         Version v{
             .name = entry.value("name", std::string("no name")),
-            .path = entry.value("path", std::string("")),
+            .path = Common::FS::FromStoredPath(entry.value("path", std::string(""))),
             .date = entry.value("date", std::string("never")),
             .codename = entry.value("codename", std::string("")),
             .type = static_cast<VersionType>(
@@ -83,7 +83,7 @@ void SaveVersionList(std::vector<Version> const& versions, std::filesystem::path
 
     for (const auto& v : versions) {
         root.push_back({{"name", v.name},
-                        {"path", v.path},
+                        {"path", Common::FS::ToStoredPath(v.path)},
                         {"date", v.date},
                         {"codename", v.codename},
                         {"type", static_cast<int>(v.type)}});

@@ -45,12 +45,31 @@ QVariant settings::GetValue(const QString& key, const QString& name, const QVari
     return m_settings ? m_settings->value(key + "/" + name, def) : def;
 }
 
+namespace {
+// Converts a path value or each entry of a path list; any other value is returned as it is.
+QVariant ConvertPaths(const QVariant& value, std::string (*convert)(const std::string&)) {
+    if (value.typeId() == QMetaType::QStringList) {
+        QStringList list;
+        for (const QString& item : value.toStringList()) {
+            list.append(QString::fromStdString(convert(item.toStdString())));
+        }
+        return list;
+    }
+    if (value.typeId() == QMetaType::QString) {
+        return QString::fromStdString(convert(value.toString().toStdString()));
+    }
+    return value;
+}
+} // Anonymous namespace
+
 QVariant settings::GetValue(const gui_value& entry) const {
-    return GetValue(entry.key, entry.name, entry.def);
+    const QVariant value = GetValue(entry.key, entry.name, entry.def);
+    return entry.path ? ConvertPaths(value, Common::FS::FromStoredPath) : value;
 }
 
 void settings::SetValue(const gui_value& entry, const QVariant& value, bool sync) const {
-    SetValue(entry.key, entry.name, value, sync);
+    SetValue(entry.key, entry.name,
+             entry.path ? ConvertPaths(value, Common::FS::ToStoredPath) : value, sync);
 }
 
 void settings::SetValue(const QString& key, const QVariant& value, bool sync) const {

@@ -12,10 +12,13 @@ struct gui_value {
     QString key;
     QString name;
     QVariant def;
+    // The value is a path or a list of paths, stored with Common::FS::ToStoredPath.
+    bool path = false;
 
     gui_value() {}
 
-    gui_value(const QString& k, const QString& n, const QVariant& d) : key(k), name(n), def(d) {}
+    gui_value(const QString& k, const QString& n, const QVariant& d, bool p = false)
+        : key(k), name(n), def(d), path(p) {}
 
     bool operator==(const gui_value& rhs) const noexcept {
         return key == rhs.key && name == rhs.name && def == rhs.def;

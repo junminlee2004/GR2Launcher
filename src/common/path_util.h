@@ -128,6 +128,27 @@ void PathToQString(QString& result, const std::filesystem::path& path);
 [[nodiscard]] std::filesystem::path PathFromQString(const QString& path);
 
 /**
+ * Converts a path for the launcher's own files (qt_ui.ini, versions.json). While the launcher keeps
+ * its data in the portable launcher folder of its working directory, a path inside that directory
+ * is written relative to it, so the folder can be moved. Any other path is returned as it is.
+ *
+ * @param path UTF-8 encoded path
+ *
+ * @returns UTF-8 encoded path to store.
+ */
+[[nodiscard]] std::string ToStoredPath(const std::string& path);
+
+/**
+ * Resolves a path read from the launcher's own files against the working directory. An empty or
+ * absolute path is returned as it is.
+ *
+ * @param path UTF-8 encoded stored path
+ *
+ * @returns UTF-8 encoded path.
+ */
+[[nodiscard]] std::string FromStoredPath(const std::string& path);
+
+/**
  * Recursively searches for a game directory by its ID.
  * Limits search depth to prevent excessive filesystem traversal.
  *
