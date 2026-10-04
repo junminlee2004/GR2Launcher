@@ -149,6 +149,17 @@ void PathToQString(QString& result, const std::filesystem::path& path);
 [[nodiscard]] std::string FromStoredPath(const std::string& path);
 
 /**
+ * Tells whether a path lies inside the launcher's data folder: the portable launcher folder of the
+ * working directory, or the platform data folder when there is none. Symbolic links are resolved
+ * first, so a link inside the folder to a file outside it does not count.
+ *
+ * @param path The path to check
+ *
+ * @returns true if the path is inside the launcher folder.
+ */
+[[nodiscard]] bool IsInLauncherDir(const std::filesystem::path& path);
+
+/**
  * Recursively searches for a game directory by its ID.
  * Limits search depth to prevent excessive filesystem traversal.
  *

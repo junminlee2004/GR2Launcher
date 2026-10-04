@@ -1437,23 +1437,12 @@ void MainWindow::StartEmulator(std::filesystem::path path, QStringList args) {
     }
 
     QString selectedVersion = m_gui_settings->GetValue(gui::vm_versionSelected).toString();
-    if (selectedVersion.isEmpty()) {
-        QMessageBox::warning(this, tr("No Version Selected"),
-                             // clang-format off
-tr("No emulator version was selected.\nThe Version Manager menu will then open.\nSelect an emulator version from the right panel."));
-        // clang-format on
-        auto versionDialog = new VersionDialog(m_gui_settings, this);
-        connect(versionDialog, &QDialog::finished, this, [this](int) { LoadVersionComboBox(); });
-        versionDialog->exec();
+    if (!VersionManager::IsLaunchable(Common::FS::PathFromQString(selectedVersion))) {
+        QMessageBox::critical(nullptr, "GR2Launcher", tr("No executable"));
         return;
     }
 
     QFileInfo fileInfo(selectedVersion);
-    if (!fileInfo.exists()) {
-        QMessageBox::critical(nullptr, "GR2Launcher",
-                              QString(tr("Could not find the emulator executable")));
-        return;
-    }
 
     QStringList final_args{"--game", QString::fromStdWString(path.wstring())};
 
@@ -1532,9 +1521,8 @@ void MainWindow::StartEmulatorExecutable(std::filesystem::path emuPath, QString 
     }
 
     QFileInfo fileInfo(emuPath);
-    if (!fileInfo.exists()) {
-        QMessageBox::critical(nullptr, "GR2Launcher",
-                              QString(tr("Could not find the emulator executable")));
+    if (!VersionManager::IsLaunchable(emuPath)) {
+        QMessageBox::critical(nullptr, "GR2Launcher", tr("No executable"));
         return;
     }
 
@@ -1564,6 +1552,10 @@ void MainWindow::RunGame() {
 
 void MainWindow::RestartEmulator() {
     QString exe = m_gui_settings->GetValue(gui::vm_versionSelected).toString();
+    if (!VersionManager::IsLaunchable(Common::FS::PathFromQString(exe))) {
+        QMessageBox::critical(nullptr, "GR2Launcher", tr("No executable"));
+        return;
+    }
     QStringList args{"--game", QString::fromStdWString(last_game_path.wstring())};
 
     if (m_ipc_client->parsedArgs.size() > 0) {
@@ -1586,6 +1578,10 @@ void MainWindow::LoadVersionComboBox() {
 
     QString savedVersionPath = m_gui_settings->GetValue(gui::vm_versionSelected).toString();
     auto versions = VersionManager::GetVersionList();
+    // Only versions inside the launcher folder can be run.
+    std::erase_if(versions, [](const auto& v) {
+        return !Common::FS::IsInLauncherDir(std::u8string(v.path.begin(), v.path.end()));
+    });
 
     std::sort(versions.begin(), versions.end(), [](const auto& a, const auto& b) {
         auto getOrder = [](int type) {
@@ -1643,12 +1639,11 @@ void MainWindow::LoadVersionComboBox() {
                                      QString::fromStdString(v.path));
     }
 
+    // A selection that cannot be run shows as empty rather than as the first version.
     int selectedIndex = ui->versionComboBox->findData(savedVersionPath);
-    if (selectedIndex >= 0) {
-        ui->versionComboBox->setCurrentIndex(selectedIndex);
-    } else {
-        ui->versionComboBox->setCurrentIndex(0);
-    }
+    ui->versionComboBox->setCurrentIndex(
+        VersionManager::IsLaunchable(Common::FS::PathFromQString(savedVersionPath)) ? selectedIndex
+                                                                                    : -1);
 
     connect(ui->versionComboBox, QOverload<int>::of(&QComboBox::activated), this,
             [this](int index) {

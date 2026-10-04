@@ -33,4 +33,8 @@ void RemoveVersion(Version const& v, std::filesystem::path const& path = "");
 void RemoveVersion(std::string const& v, std::filesystem::path const& path = "");
 void UpdatePrerelease(Version const& v, std::filesystem::path const& path = "");
 
+// True when exe is the executable of a version in the list, lies inside the launcher folder and
+// exists. The launcher runs no other executable.
+bool IsLaunchable(std::filesystem::path const& exe);
+
 } // namespace VersionManager

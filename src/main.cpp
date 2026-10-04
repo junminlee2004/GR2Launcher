@@ -5,6 +5,7 @@
 #include "system_error"
 #include "unordered_map"
 
+#include <QMessageBox>
 #include "common/key_manager.h"
 #include "common/logging/log.h"
 #include "common/versions.h"
@@ -181,8 +182,9 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
-        if (!std::filesystem::exists(emulator_path)) {
-            std::cerr << "Error: specified emulator name or path is not found.\n";
+        if (!VersionManager::IsLaunchable(emulator_path)) {
+            std::cerr << "Error: No executable.\n";
+            QMessageBox::critical(nullptr, "GR2Launcher", QObject::tr("No executable"));
             return 1;
         }
         if (!show_gui) {

@@ -135,4 +135,26 @@ void UpdatePrerelease(Version const& v, std::filesystem::path const& path) {
     SaveVersionList(versions, path);
 }
 
+bool IsLaunchable(std::filesystem::path const& exe) {
+    std::error_code ec;
+    if (exe.empty() || !std::filesystem::exists(exe, ec) || !Common::FS::IsInLauncherDir(exe)) {
+        return false;
+    }
+    const auto target = std::filesystem::weakly_canonical(exe, ec);
+    if (ec) {
+        return false;
+    }
+    for (const auto& v : GetVersionList()) {
+        const std::filesystem::path path{std::u8string(v.path.begin(), v.path.end())};
+        if (path.empty()) {
+            continue;
+        }
+        const auto candidate = std::filesystem::weakly_canonical(path, ec);
+        if (!ec && candidate == target) {
+            return true;
+        }
+    }
+    return false;
+}
+
 } // namespace VersionManager

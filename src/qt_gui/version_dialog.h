@@ -48,6 +48,7 @@ private:
     void installPreReleaseByTag(const QString& tagName);
     void showDownloadDialog(const QString& tagName, const QString& downloadUrl);
     void AddCustomExecutable(const QString& exePath);
+    void ShowOutsideLauncherDir();
 
 protected:
     void resizeEvent(QResizeEvent* event) override;

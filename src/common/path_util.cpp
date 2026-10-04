@@ -313,4 +313,18 @@ std::string FromStoredPath(const std::string& path) {
     return {result.begin(), result.end()};
 }
 
+bool IsInLauncherDir(const fs::path& path) {
+    std::error_code ec;
+    const fs::path base = fs::weakly_canonical(GetUserPath(PathType::LauncherDir), ec);
+    if (ec || path.empty()) {
+        return false;
+    }
+    const fs::path target = fs::weakly_canonical(path, ec);
+    if (ec) {
+        return false;
+    }
+    const fs::path relative = target.lexically_relative(base);
+    return !relative.empty() && *relative.begin() != ".." && relative != ".";
+}
+
 } // namespace Common::FS

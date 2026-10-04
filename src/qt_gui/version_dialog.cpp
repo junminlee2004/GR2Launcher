@@ -54,7 +54,10 @@ VersionDialog::VersionDialog(std::shared_ptr<gui_settings> gui_settings, QWidget
 
     networkManager = new QNetworkAccessManager(this);
 
-    if (m_gui_settings->GetValue(gui::vm_versionPath).toString() == "") {
+    // Versions are only run from inside the launcher folder, so a folder elsewhere is replaced too.
+    const QString saved_version_path = m_gui_settings->GetValue(gui::vm_versionPath).toString();
+    if (saved_version_path.isEmpty() ||
+        !Common::FS::IsInLauncherDir(Common::FS::PathFromQString(saved_version_path))) {
         QString versionDir = QString::fromStdString(
             Common::FS::GetUserPath(Common::FS::PathType::VersionDir).string());
         QDir dir(versionDir);
@@ -84,6 +87,10 @@ VersionDialog::VersionDialog(std::shared_ptr<gui_settings> gui_settings, QWidget
             initial_path);
 
         auto folder_path = Common::FS::PathFromQString(shad_folder_path_string);
+        if (!folder_path.empty() && !Common::FS::IsInLauncherDir(folder_path)) {
+            ShowOutsideLauncherDir();
+            return;
+        }
         if (!folder_path.empty()) {
             ui->currentVersionPath->setText(shad_folder_path_string);
             m_gui_settings->SetValue(gui::vm_versionPath, shad_folder_path_string);
@@ -283,6 +290,11 @@ void VersionDialog::AddCustomExecutable(const QString& exePath) {
     if (exePath.isEmpty())
         return;
 
+    if (!Common::FS::IsInLauncherDir(Common::FS::PathFromQString(exePath))) {
+        ShowOutsideLauncherDir();
+        return;
+    }
+
     bool ok;
     QString version_name = QInputDialog::getText(
         this, tr("Version name"), tr("Enter the name of this version as it appears in the list."),
@@ -315,6 +327,15 @@ void VersionDialog::AddCustomExecutable(const QString& exePath) {
     m_gui_settings->SetValue(gui::vm_versionSelected, QString::fromStdString(new_version.path));
     QMessageBox::information(this, tr("Success"), tr("Version added successfully."));
     LoadInstalledList();
+}
+
+void VersionDialog::ShowOutsideLauncherDir() {
+    QString launcher_dir;
+    Common::FS::PathToQString(launcher_dir,
+                              Common::FS::GetUserPath(Common::FS::PathType::LauncherDir));
+    QMessageBox::warning(this, tr("Error"),
+                         tr("Emulator versions must be inside the launcher folder") +
+                             QString(":\n%1").arg(launcher_dir));
 }
 
 void VersionDialog::DownloadListVersion() {
@@ -1180,9 +1201,10 @@ void VersionDialog::showDownloadDialog(const QString& tagName, const QString& do
                 };
                 VersionManager::UpdatePrerelease(new_version);
 
-                // Only auto-select if no version was previously selected.
+                // Only auto-select if no version that can be run was previously selected.
                 // Preserve the user's existing selection (e.g. a custom build).
-                if (m_gui_settings->GetValue(gui::vm_versionSelected).toString().isEmpty()) {
+                if (!VersionManager::IsLaunchable(Common::FS::PathFromQString(
+                        m_gui_settings->GetValue(gui::vm_versionSelected).toString()))) {
                     m_gui_settings->SetValue(gui::vm_versionSelected, exe);
                 }
 

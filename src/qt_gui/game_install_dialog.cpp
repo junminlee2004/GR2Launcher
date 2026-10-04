@@ -113,7 +113,9 @@ QWidget* GameInstallDialog::SetupVersionDirectory() {
 
     m_versionDirectory = new QLineEdit();
     QString version_dir;
-    if (m_gui_settings->GetValue(gui::vm_versionPath).toString().isEmpty()) {
+    const QString saved_version_dir = m_gui_settings->GetValue(gui::vm_versionPath).toString();
+    if (saved_version_dir.isEmpty() ||
+        !Common::FS::IsInLauncherDir(Common::FS::PathFromQString(saved_version_dir))) {
         QString defaultVersionDir = QString::fromStdString(
             Common::FS::GetUserPath(Common::FS::PathType::VersionDir).string());
         m_versionDirectory->setText(defaultVersionDir);
@@ -174,6 +176,16 @@ void GameInstallDialog::Save() {
     if (versionDirectory.isEmpty() || !QDir::isAbsolutePath(versionDirectory)) {
         QMessageBox::critical(this, tr("Error"),
                               "The value for location to install emulator versions is not valid.");
+        return;
+    }
+
+    if (!Common::FS::IsInLauncherDir(Common::FS::PathFromQString(versionDirectory))) {
+        QString launcher_dir;
+        Common::FS::PathToQString(launcher_dir,
+                                  Common::FS::GetUserPath(Common::FS::PathType::LauncherDir));
+        QMessageBox::critical(this, tr("Error"),
+                              tr("Emulator versions must be inside the launcher folder") +
+                                  QString(":\n%1").arg(launcher_dir));
         return;
     }
 
