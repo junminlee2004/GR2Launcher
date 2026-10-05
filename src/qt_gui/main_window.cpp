@@ -1,6 +1,7 @@
-// SPDX-FileCopyrightText: Copyright 2025 shadPS4 Emulator Project
+// SPDX-FileCopyrightText: Copyright 2025-2026 shadPS4 Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <QComboBox>
 #include <QDockWidget>
 #include <QKeyEvent>
 #include <QPlainTextEdit>
@@ -32,6 +33,7 @@
 #include "profile_widget.h"
 #include "settings_dialog.h"
 #include "skylander_dialog.h"
+#include "trophy_viewer.h"
 #include "user_manager_dialog.h"
 
 MainWindow::MainWindow(QWidget* parent, bool log_to_terminal)
@@ -277,6 +279,7 @@ void MainWindow::AddUiWidgets() {
     searchSliderLayout->setContentsMargins(0, 0, 6, 6);
     searchSliderLayout->setSpacing(2);
     ui->mw_searchbar->setFixedWidth(150);
+    ui->mw_searchbar->setClearButtonEnabled(true);
 
     searchSliderLayout->addWidget(ui->sizeSliderContainer);
     searchSliderLayout->addWidget(ui->mw_searchbar);
@@ -389,7 +392,7 @@ void MainWindow::CreateDockWindows(bool newDock) {
         ui->sizeSlider->setSliderPosition(slider_pos); // set slider pos at start;
         isTableList = true;
         connect(m_game_list_frame.data(), &GameListFrame::RequestRefreshList, this,
-                &MainWindow::RefreshGameTable);
+                &MainWindow::RefreshGameTableForSerial);
     } else if (table_mode == 1) { // Grid
         m_game_list_frame->hide();
         m_elf_viewer->hide();
@@ -405,7 +408,7 @@ void MainWindow::CreateDockWindows(bool newDock) {
         ui->sizeSlider->setSliderPosition(slider_pos); // set slider pos at start;
         isTableList = false;
         connect(m_game_grid_frame.data(), &GameGridFrame::RequestRefreshGrid, this,
-                &MainWindow::RefreshGameTable);
+                &MainWindow::RefreshGameTableForSerial);
     } else {
         m_game_list_frame->hide();
         m_game_grid_frame->hide();
@@ -479,8 +482,8 @@ void MainWindow::CreateConnects() {
     connect(this, &MainWindow::WindowResized, this, &MainWindow::HandleResize);
     connect(ui->mw_searchbar, &QLineEdit::textChanged, this, &MainWindow::SearchGameTable);
     connect(ui->exitAct, &QAction::triggered, this, &QWidget::close);
-    connect(ui->refreshGameListAct, &QAction::triggered, this, &MainWindow::RefreshGameTable);
-    connect(ui->refreshButton, &QPushButton::clicked, this, &MainWindow::RefreshGameTable);
+    connect(ui->refreshGameListAct, &QAction::triggered, this, &MainWindow::ForceRefreshGameTable);
+    connect(ui->refreshButton, &QPushButton::clicked, this, &MainWindow::ForceRefreshGameTable);
     connect(ui->showGameListAct, &QAction::triggered, this, &MainWindow::ShowGameList);
     connect(ui->toggleLabelsAct, &QAction::toggled, this, &MainWindow::toggleLabelsUnderIcons);
     connect(ui->fullscreenButton, &QPushButton::clicked, this, &MainWindow::toggleFullscreen);
@@ -1101,10 +1104,22 @@ void MainWindow::ShowGameList() {
 };
 
 void MainWindow::RefreshGameTable() {
+    ReloadGameTable(false);
+}
+
+void MainWindow::ForceRefreshGameTable() {
+    ReloadGameTable(true);
+}
+
+void MainWindow::RefreshGameTableForSerial(const QString& serial) {
+    ReloadGameTable(false, serial);
+}
+
+void MainWindow::ReloadGameTable(bool force_size_refresh, const QString& force_size_serial) {
     // m_game_info->m_games.clear();
-    m_game_info->GetGameInfo(this);
+    m_game_info->GetGameInfo(this, force_size_refresh, force_size_serial.toStdString());
     m_game_list_frame->clearContents();
-    m_game_list_frame->PopulateGameList();
+    m_game_list_frame->PopulateGameList(false);
     m_game_grid_frame->clearContents();
     m_game_grid_frame->PopulateGameGrid(m_game_info->m_games, false);
     statusBar->clearMessage();

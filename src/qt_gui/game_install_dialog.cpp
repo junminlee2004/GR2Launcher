@@ -150,7 +150,9 @@ void GameInstallDialog::Save() {
     // Check games directory.
     auto gamesDirectory = m_gamesDirectory->text();
     auto addonsDirectory = m_addonsDirectory->text();
+#ifndef HIDE_VERSION_MANAGER
     auto versionDirectory = m_versionDirectory->text();
+#endif
 
     if (gamesDirectory.isEmpty() || !QDir(gamesDirectory).exists() ||
         !QDir::isAbsolutePath(gamesDirectory)) {
@@ -173,6 +175,7 @@ void GameInstallDialog::Save() {
         }
     }
 
+#ifndef HIDE_VERSION_MANAGER
     if (versionDirectory.isEmpty() || !QDir::isAbsolutePath(versionDirectory)) {
         QMessageBox::critical(this, tr("Error"),
                               "The value for location to install emulator versions is not valid.");
@@ -197,12 +200,15 @@ void GameInstallDialog::Save() {
             return;
         }
     }
+#endif
 
     // Save the directories
     EmulatorSettings.Load();
     EmulatorSettings.AddGameInstallDir(Common::FS::PathFromQString(gamesDirectory));
     EmulatorSettings.SetAddonInstallDir(Common::FS::PathFromQString(addonsDirectory));
+#ifndef HIDE_VERSION_MANAGER
     m_gui_settings->SetValue(gui::vm_versionPath, versionDirectory);
+#endif
 
     const auto config_dir = Common::FS::GetUserPath(Common::FS::PathType::UserDir);
     EmulatorSettings.Save();
