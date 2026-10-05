@@ -96,6 +96,11 @@ bool MainWindow::Init() {
     LoadGameLists();
 
 #ifdef ENABLE_UPDATER
+    // Older launchers saved the startup check as off by default, so it is turned on once.
+    if (!m_gui_settings->GetValue(gui::gen_checkForUpdatesTurnedOn).toBool()) {
+        m_gui_settings->SetValue(gui::gen_checkForUpdates, true);
+        m_gui_settings->SetValue(gui::gen_checkForUpdatesTurnedOn, true);
+    }
     // Check for update
     CheckUpdateMain(true);
 #endif

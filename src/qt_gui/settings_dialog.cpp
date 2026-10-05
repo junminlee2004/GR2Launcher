@@ -1436,7 +1436,7 @@ void SettingsDialog::SetDefaultValues() {
         m_gui_settings->SetValue(gui::gl_backgroundImageOpacity, 50);
         m_gui_settings->SetValue(gui::gl_playBackgroundMusic, false);
         m_gui_settings->SetValue(gui::gl_backgroundMusicVolume, 50);
-        m_gui_settings->SetValue(gui::gen_checkForUpdates, false);
+        m_gui_settings->SetValue(gui::gen_checkForUpdates, true);
         m_gui_settings->SetValue(gui::gen_showChangeLog, false);
         m_gui_settings->SetValue(gui::gen_guiLanguage, "en_US");
         m_gui_settings->SetValue(gui::glc_showLoadGameSizeEnabled, true);
