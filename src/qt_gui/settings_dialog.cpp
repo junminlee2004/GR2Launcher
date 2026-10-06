@@ -295,6 +295,7 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
                 // differ from the global settings.
                 EmulatorSettings.ClearGameSpecificOverrides();
                 EmulatorSettings.SetGroupValues("General", GeneralSettings{}, true);
+                EmulatorSettings.SetGroupValues("Network", NetworkSettings{}, true);
                 EmulatorSettings.SetGroupValues("Log", LogSettings{}, true);
                 EmulatorSettings.SetGroupValues("Debug", DebugSettings{}, true);
                 EmulatorSettings.SetGroupValues("Input", InputSettings{}, true);
