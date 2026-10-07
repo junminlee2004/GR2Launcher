@@ -1458,7 +1458,7 @@ void MainWindow::StartEmulator(std::filesystem::path path, QStringList args) {
 
     QString selectedVersion = m_gui_settings->GetValue(gui::vm_versionSelected).toString();
     if (!VersionManager::IsLaunchable(Common::FS::PathFromQString(selectedVersion))) {
-        QMessageBox::critical(nullptr, "GR2Launcher", tr("No executable"));
+        OfferLatestPreRelease();
         return;
     }
 
@@ -1568,6 +1568,29 @@ void MainWindow::RunGame() {
     }
 
     m_ipc_client->startGame();
+}
+
+// With no version that can be run, offers to download the newest pre-release; otherwise only the
+// selection is wrong.
+void MainWindow::OfferLatestPreRelease() {
+    const auto versions = VersionManager::GetVersionList();
+    if (std::ranges::any_of(versions, [](const VersionManager::Version& v) {
+            return VersionManager::IsLaunchable(std::u8string(v.path.begin(), v.path.end()));
+        })) {
+        QMessageBox::critical(nullptr, "GR2Launcher", tr("No executable"));
+        return;
+    }
+    if (QMessageBox::question(this, "GR2Launcher",
+                              tr("No executable. Download the latest pre-release?"),
+                              QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok) {
+        return;
+    }
+    auto versionDialog = new VersionDialog(m_gui_settings, this);
+    connect(versionDialog, &VersionDialog::PreReleaseInstalled, this, [this, versionDialog]() {
+        LoadVersionComboBox();
+        versionDialog->deleteLater();
+    });
+    versionDialog->InstallLatestPreRelease();
 }
 
 void MainWindow::RestartEmulator() {

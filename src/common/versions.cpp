@@ -131,6 +131,8 @@ void UpdatePrerelease(Version const& v, std::filesystem::path const& path) {
         auto const id = it->id;
         *it = v;
         it->id = id;
+    } else {
+        versions.push_back(v);
     }
     SaveVersionList(versions, path);
 }

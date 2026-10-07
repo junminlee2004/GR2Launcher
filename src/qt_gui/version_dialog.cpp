@@ -1023,6 +1023,29 @@ void VersionDialog::requestChangelog(const QString& localHash, const QString& la
         });
 }
 
+// Downloads the newest GR2fork-EXODUS pre-release into the pre-release entry. The install selects
+// it when nothing that can be run is selected.
+void VersionDialog::InstallLatestPreRelease() {
+    QNetworkRequest request(QString("https://api.github.com/repos/%1/releases").arg(EMULATOR_REPO));
+    QNetworkReply* reply = networkManager->get(request);
+    connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+        reply->deleteLater();
+        if (reply->error() != QNetworkReply::NoError) {
+            QMessageBox::warning(this, tr("Error"), reply->errorString());
+            return;
+        }
+        const QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+        for (const QJsonValue& value : doc.array()) {
+            const QString tag = value.toObject()["tag_name"].toString();
+            if (tag.startsWith(RELEASE_PREFIX)) {
+                installPreReleaseByTag(tag);
+                return;
+            }
+        }
+        QMessageBox::warning(this, tr("Error"), tr("No pre-releases found."));
+    });
+}
+
 void VersionDialog::installPreReleaseByTag(const QString& tagName) {
     QString apiUrl =
         QString("https://api.github.com/repos/%1/releases/tags/%2").arg(EMULATOR_REPO, tagName);
@@ -1212,6 +1235,7 @@ void VersionDialog::showDownloadDialog(const QString& tagName, const QString& do
                                          tr("Pre-release updated successfully") + ":\n" + tagName);
 
                 LoadInstalledList();
+                emit PreReleaseInstalled();
             });
         } else {
             QMessageBox::warning(this, tr("Error"),

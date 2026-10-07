@@ -18,12 +18,14 @@ class VersionDialog : public QDialog {
     Q_OBJECT
 signals:
     void WindowResized(QResizeEvent* event);
+    void PreReleaseInstalled();
 
 public:
     explicit VersionDialog(std::shared_ptr<gui_settings> gui_settings, QWidget* parent = nullptr);
     ~VersionDialog();
     void onItemChanged(QTreeWidgetItem* item, int column);
     void checkUpdatePre(const bool showMessage);
+    void InstallLatestPreRelease();
     void DownloadListVersion();
     void InstallSelectedVersion();
     void addExecutableFromDrop(const QString& exePath);

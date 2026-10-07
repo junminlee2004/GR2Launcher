@@ -88,6 +88,7 @@ private:
     void PlayBackgroundMusic();
     QIcon RecolorIcon(const QIcon& icon, bool isWhite);
     void RestartEmulator();
+    void OfferLatestPreRelease();
 
     bool isIconBlack = false;
     bool isTableList = true;
