@@ -1,12 +1,19 @@
 // SPDX-FileCopyrightText: Copyright 2025-2026 shadPS4 Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <array>
+#include <string_view>
+#include <QCheckBox>
 #include <QComboBox>
+#include <QDialogButtonBox>
 #include <QDockWidget>
 #include <QKeyEvent>
+#include <QLabel>
 #include <QPlainTextEdit>
 #include <QProgressDialog>
 #include <QStatusBar>
+#include <QTimer>
+#include <QVBoxLayout>
 
 #include "about_dialog.h"
 #include "cheats_patches.h"
@@ -110,6 +117,8 @@ bool MainWindow::Init() {
         auto versionDialog = new VersionDialog(m_gui_settings, this);
         versionDialog->checkUpdatePre(false);
     }
+
+    QTimer::singleShot(0, this, [this] { CheckSysModules(); });
 
     auto end = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
@@ -1591,6 +1600,99 @@ void MainWindow::OfferLatestPreRelease() {
         versionDialog->deleteLater();
     });
     versionDialog->InstallLatestPreRelease();
+}
+
+// The firmware modules shadPS4 can load, as listed under "Firmware files" in the emulator's README.
+static constexpr auto FirmwareModules = std::to_array<std::string_view>({
+    "libSceAt9Enc.sprx",
+    "libSceAudiodec.sprx",
+    "libSceAudiodecCpu.sprx",
+    "libSceAudiodecCpuDdp.sprx",
+    "libSceAudiodecCpuDtsHdLbr.sprx",
+    "libSceAudiodecCpuHevag.sprx",
+    "libSceAudiodecCpuM4aac.sprx",
+    "libSceAvPlayer.sprx",
+    "libSceAvPlayerStreaming.sprx",
+    "libSceBeisobmf.sprx",
+    "libSceBemp2sys.sprx",
+    "libSceCesCs.sprx",
+    "libSceFont.sprx",
+    "libSceFontFt.sprx",
+    "libSceFreeTypeOl.sprx",
+    "libSceFreeTypeOptOl.sprx",
+    "libSceFreeTypeOt.sprx",
+    "libSceJpegDec.sprx",
+    "libSceJpegEnc.sprx",
+    "libSceJson.sprx",
+    "libSceJson2.sprx",
+    "libSceLibcInternal.sprx",
+    "libSceNgs2.sprx",
+    "libScePngEnc.sprx",
+    "libScePsmKitSystem.sprx",
+    "libSceRtc.sprx",
+    "libSceRudp.sprx",
+    "libSceSystemGesture.sprx",
+    "libSceUlt.sprx",
+    "libSceWkFontConfig.sprx",
+    "libSceXml.sprx",
+    "libSceDepth.sprx",
+    "libScePadTracker.sprx",
+    "libSceMoveTracker.sprx",
+});
+
+void MainWindow::CheckSysModules() {
+    if (m_gui_settings->GetValue(gui::gen_hideMissingSysModules).toBool()) {
+        return;
+    }
+    const auto dir = EmulatorSettings.GetSysModulesDir();
+    QStringList missing;
+    for (const std::string_view name : FirmwareModules) {
+        std::error_code ec;
+        if (!std::filesystem::exists(dir / name, ec)) {
+            missing.append(QString::fromLatin1(name.data(), static_cast<qsizetype>(name.size())));
+        }
+    }
+    if (missing.isEmpty()) {
+        return;
+    }
+    QString dir_text;
+    Common::FS::PathToQString(dir_text, dir);
+
+    QDialog dialog(this);
+    dialog.setWindowTitle(tr("Missing System Modules"));
+    auto* layout = new QVBoxLayout(&dialog);
+    layout->addWidget(new QLabel(tr("You are missing the following system modules (%1 of %2):")
+                                     .arg(missing.size())
+                                     .arg(FirmwareModules.size())));
+    auto* list = new QPlainTextEdit(missing.join('\n'));
+    list->setReadOnly(true);
+    list->setMaximumHeight(160);
+    layout->addWidget(list);
+    auto* explanation = new QLabel(
+        tr("<p>These are PlayStation 4 firmware libraries. The emulator loads them in place of its "
+           "own versions, and games need them for audio, video, fonts and more: without them a "
+           "game can be silent, miss text or crash. They belong to Sony, so they cannot be shipped "
+           "with the emulator and must be copied from a PS4 you own.</p>"
+           "<p>To copy them from your jailbroken PS4 with an FTP client such as FileZilla:</p>"
+           "<ol><li>Start the FTP server on the PS4 (GoldHEN has one built in; turn it on in its "
+           "settings).</li>"
+           "<li>In FileZilla, connect to the IP address of the PS4 on port 2121.</li>"
+           "<li>Open <b>/system/common/lib</b> and download the files listed above.</li>"
+           "<li>Put them in <b>%1</b></li></ol>")
+            .arg(dir_text.toHtmlEscaped()));
+    explanation->setWordWrap(true);
+    explanation->setTextFormat(Qt::RichText);
+    explanation->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    layout->addWidget(explanation);
+    auto* hide = new QCheckBox(tr("Do not show again"));
+    layout->addWidget(hide);
+    auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok);
+    connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    layout->addWidget(buttons);
+    dialog.exec();
+    if (hide->isChecked()) {
+        m_gui_settings->SetValue(gui::gen_hideMissingSysModules, true);
+    }
 }
 
 void MainWindow::RestartEmulator() {

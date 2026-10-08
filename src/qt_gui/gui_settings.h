@@ -22,6 +22,8 @@ const gui_value gen_checkForUpdates = gui_value(general_settings, "checkForUpdat
 // default.
 const gui_value gen_checkForUpdatesTurnedOn =
     gui_value(general_settings, "checkForUpdatesTurnedOn", false);
+const gui_value gen_hideMissingSysModules =
+    gui_value(general_settings, "hideMissingSysModules", false);
 const gui_value gen_showChangeLog = gui_value(general_settings, "showChangeLog", false);
 const gui_value gen_recentFiles =
     gui_value(main_window, "recentFiles", QVariant::fromValue(QList<QString>()), true);

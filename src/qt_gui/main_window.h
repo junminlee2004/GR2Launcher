@@ -89,6 +89,7 @@ private:
     QIcon RecolorIcon(const QIcon& icon, bool isWhite);
     void RestartEmulator();
     void OfferLatestPreRelease();
+    void CheckSysModules();
 
     bool isIconBlack = false;
     bool isTableList = true;
