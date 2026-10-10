@@ -150,8 +150,8 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
 
     if (is_game_specific) {
         // Paths tab
-        ui->tabWidgetSettings->setTabVisible(5, false);
-        ui->chooseHomeTabComboBox->removeItem(5);
+        ui->tabWidgetSettings->setTabVisible(6, false);
+        ui->chooseHomeTabComboBox->removeItem(6);
 
         // Frontend tab
         ui->tabWidgetSettings->setTabVisible(1, false);
@@ -162,12 +162,11 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
 
     } else {
         // Experimental tab
-        ui->tabWidgetSettings->setTabVisible(8, false);
-        ui->chooseHomeTabComboBox->removeItem(9);
+        ui->tabWidgetSettings->setTabVisible(9, false);
+        ui->chooseHomeTabComboBox->removeItem(10);
 
         // User tab: the shadNet account is set in a game's settings only
-        ui->formLayout->setRowVisible(ui->shadnetNpidLineEdit, false);
-        ui->formLayout->setRowVisible(ui->shadnetPasswordLineEdit, false);
+        ui->shadnetGroupBox->setVisible(false);
     }
 
 #ifndef _WIN32
@@ -186,15 +185,11 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
     presentModeMap = {{tr("Mailbox (Vsync)"), "Mailbox"},
                       {tr("Fifo (Vsync)"), "Fifo"},
                       {tr("Immediate (No Vsync)"), "Immediate"}};
-    chooseHomeTabMap = {{tr("General"), "General"},
-                        {tr("Frontend"), "Frontend"},
-                        {tr("Graphics"), "Graphics"},
-                        {tr("User"), "User"},
-                        {tr("Input"), "Input"},
-                        {tr("Paths"), "Paths"},
-                        {tr("Log"), "Log"},
-                        {tr("Debug"), "Debug"},
-                        {tr("Experimental"), "Experimental"},
+    chooseHomeTabMap = {{tr("General"), "General"},   {tr("Frontend"), "Frontend"},
+                        {tr("Graphics"), "Graphics"}, {tr("User"), "User"},
+                        {tr("Input"), "Input"},       {tr("Network"), "Network"},
+                        {tr("Paths"), "Paths"},       {tr("Log"), "Log"},
+                        {tr("Debug"), "Debug"},       {tr("Experimental"), "Experimental"},
                         {tr("Tuning"), "Tuning"}};
     micMap = {{tr("None"), "None"}, {tr("Default Device"), "Default Device"}};
     audioBackendMap = {{0, "SDL"}, {1, "OpenAL"}};
@@ -535,7 +530,7 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
 
     // Experimental
     {
-        connect(ui->shaderCaheCheckBox, &QCheckBox::checkStateChanged, this,
+        connect(ui->shaderCacheCheckBox, &QCheckBox::checkStateChanged, this,
                 [this](Qt::CheckState state) {
                     state ? ui->shaderCacheArchiveCheckBox->setVisible(true)
                           : ui->shaderCacheArchiveCheckBox->setVisible(false);
@@ -665,7 +660,7 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
         ui->devkitCheckBox->installEventFilter(this);
         ui->neoCheckBox->installEventFilter(this);
         ui->networkConnectedCheckBox->installEventFilter(this);
-        ui->shaderCaheCheckBox->installEventFilter(this);
+        ui->shaderCacheCheckBox->installEventFilter(this);
         ui->shaderCacheArchiveCheckBox->installEventFilter(this);
         ui->shadnetCheckBox->installEventFilter(this);
         ui->dmemGroupBox->installEventFilter(this);
@@ -719,23 +714,10 @@ void SettingsDialog::LoadValuesFromConfig() {
     const QVector<int> languageIndexes = {21, 23, 14, 6, 18, 1, 12, 22, 2, 4,  25, 24, 29, 5,  0, 9,
                                           15, 16, 17, 7, 26, 8, 11, 20, 3, 13, 27, 10, 19, 30, 28};
 
-    // Entries with no game-specific settings
+    /////// Entries with no game-specific settings
     if (!is_game_specific) {
-        const auto home_path = EmulatorSettings.GetHomeDir();
-        QString home_path_string;
-        Common::FS::PathToQString(home_path_string, home_path);
-        ui->homeFolderPath->setText(home_path_string);
 
-        const auto dlc_folder_path = EmulatorSettings.GetAddonInstallDir();
-        QString dlc_folder_path_string;
-        Common::FS::PathToQString(dlc_folder_path_string, dlc_folder_path);
-        ui->currentDLCFolder->setText(dlc_folder_path_string);
-
-        const auto sysmodules_path = EmulatorSettings.GetSysModulesDir();
-        QString sysmodules_path_string;
-        Common::FS::PathToQString(sysmodules_path_string, sysmodules_path);
-        ui->sysmodulesPath->setText(sysmodules_path_string);
-
+        // Frontend tab
         ui->emulatorLanguageComboBox->setCurrentIndex(
             languages[m_gui_settings->GetValue(gui::gen_guiLanguage).toString().toStdString()]);
 
@@ -752,7 +734,6 @@ void SettingsDialog::LoadValuesFromConfig() {
         ui->checkCompatibilityOnStartupCheckBox->setChecked(
             m_gui_settings->GetValue(gui::gen_checkCompatibilityAtStartup).toBool());
 
-        ui->removeFolderButton->setEnabled(!ui->gameFoldersListWidget->selectedItems().isEmpty());
         ui->backgroundImageOpacitySlider->setValue(
             m_gui_settings->GetValue(gui::gl_backgroundImageOpacity).toInt());
         ui->showBackgroundImageCheckBox->setChecked(
@@ -768,38 +749,95 @@ void SettingsDialog::LoadValuesFromConfig() {
             m_gui_settings->GetValue(gui::gen_showChangeLog).toBool());
 #endif
 
+        // Paths tab
+        const auto home_path = EmulatorSettings.GetHomeDir();
+        QString home_path_string;
+        Common::FS::PathToQString(home_path_string, home_path);
+        ui->homeFolderPath->setText(home_path_string);
+
+        const auto dlc_folder_path = EmulatorSettings.GetAddonInstallDir();
+        QString dlc_folder_path_string;
+        Common::FS::PathToQString(dlc_folder_path_string, dlc_folder_path);
+        ui->currentDLCFolder->setText(dlc_folder_path_string);
+
+        const auto sysmodules_path = EmulatorSettings.GetSysModulesDir();
+        QString sysmodules_path_string;
+        Common::FS::PathToQString(sysmodules_path_string, sysmodules_path);
+        ui->sysmodulesPath->setText(sysmodules_path_string);
+
+        ui->removeFolderButton->setEnabled(!ui->gameFoldersListWidget->selectedItems().isEmpty());
+
         SyncRealTimeWidgetstoConfig();
     }
 
-    // Entries with game-specific settings, *load these from toml file, not from Config::get*
+    /////// Entries with game-specific settings
+
+    // General tab
     ui->consoleLanguageComboBox->setCurrentIndex(
         std::distance(languageIndexes.begin(),
                       std::find(languageIndexes.begin(), languageIndexes.end(),
                                 EmulatorSettings.GetConsoleLanguage())) %
         languageIndexes.size());
+    ui->showSplashCheckBox->setChecked(EmulatorSettings.IsShowSplash());
+    ui->redZoneCheckBox->setChecked(EmulatorSettings.IsRedZonePatchingEnabled());
 
-    // The fourth entry, Precise (Offloaded), is Precise readbacks with readback_offload.
-    const u32 readbacks_mode = EmulatorSettings.GetReadbacksMode();
-    const bool readback_offload =
-        readbacks_mode == GpuReadbacksMode::Precise && EmulatorSettings.IsReadbackOffload();
-    ui->readbacksModeComboBox->setCurrentIndex(readback_offload ? 3 : readbacks_mode);
-    ui->readbackLinearImagesComboBox->setCurrentIndex(
-        !EmulatorSettings.IsReadbackLinearImagesEnabled() ? 0
-        : EmulatorSettings.IsReadbackLinearImagesAsync()  ? 2
-                                                          : 1);
-    ui->dmaCheckBox->setChecked(EmulatorSettings.IsDirectMemoryAccessEnabled());
-    ui->userfaultfdCheckBox->setChecked(EmulatorSettings.IsUserfaultfdTracking());
-    ui->neoCheckBox->setChecked(EmulatorSettings.IsNeo());
-    ui->devkitCheckBox->setChecked(EmulatorSettings.IsDevKit());
-    ui->networkConnectedCheckBox->setChecked(EmulatorSettings.IsConnectedToNetwork());
-    ui->shaderCaheCheckBox->setChecked(EmulatorSettings.IsPipelineCacheEnabled());
-    ui->shaderCacheArchiveCheckBox->setChecked(EmulatorSettings.IsPipelineCacheArchived());
-    ui->shadnetCheckBox->setChecked(EmulatorSettings.IsShadNetEnabled());
-    ui->serverLineEdit->setText(QString::fromStdString(EmulatorSettings.GetShadNetServer()));
-    ui->servWebApiLineEdit->setText(
-        QString::fromStdString(EmulatorSettings.GetShadNetWebApiServer()));
-    ui->signalingInfoLineEdit->setText(QString::fromStdString(EmulatorSettings.GetSignalingInfo()));
-    ui->upnpCheckBox->setChecked(EmulatorSettings.IsUPnPEnabled());
+    ui->horizontalVolumeSlider->setValue(EmulatorSettings.GetVolumeSlider());
+    ui->volumeText->setText(QString::number(ui->horizontalVolumeSlider->sliderPosition()) + "%");
+
+    ui->audioBackendComboBox->setCurrentIndex(EmulatorSettings.GetAudioBackend());
+    const QString backend = ui->audioBackendComboBox->currentText();
+    if (backend == "SDL") {
+        ui->GenAudioComboBox->setCurrentText(
+            QString::fromStdString(EmulatorSettings.GetSDLMainOutputDevice()));
+        ui->DsAudioComboBox->setCurrentText(
+            QString::fromStdString(EmulatorSettings.GetSDLPadSpkOutputDevice()));
+        ui->micComboBox->setCurrentText(QString::fromStdString(EmulatorSettings.GetSDLMicDevice()));
+    } else if (backend == "OpenAL") {
+        ui->GenAudioComboBox->setCurrentText(
+            QString::fromStdString(EmulatorSettings.GetOpenALMainOutputDevice()));
+        ui->DsAudioComboBox->setCurrentText(
+            QString::fromStdString(EmulatorSettings.GetOpenALPadSpkOutputDevice()));
+        ui->micComboBox->setCurrentText(
+            QString::fromStdString(EmulatorSettings.GetOpenALMicDevice()));
+    }
+
+    // Graphics tab
+
+    // First options is auto selection -1, so gpuId on the GUI will always have to subtract 1
+    // when setting and add 1 when getting to select the correct gpu in Qt
+    ui->graphicsAdapterBox->setCurrentIndex(EmulatorSettings.GetGpuId() + 1);
+
+    std::string fullScreenMode =
+        EmulatorSettings.IsFullScreen() ? EmulatorSettings.GetFullScreenMode() : "Windowed";
+    QString translatedText_FullscreenMode =
+        screenModeMap.key(QString::fromStdString(fullScreenMode));
+    ui->displayModeComboBox->setCurrentText(translatedText_FullscreenMode);
+
+    std::string presentMode = EmulatorSettings.GetPresentMode();
+    QString translatedText_PresentMode = presentModeMap.key(QString::fromStdString(presentMode));
+    ui->presentModeComboBox->setCurrentText(translatedText_PresentMode);
+
+    ui->nullGpuCheckBox->setChecked(EmulatorSettings.IsNullGPU());
+    ui->widthSpinBox->setValue(EmulatorSettings.GetWindowWidth());
+    ui->heightSpinBox->setValue(EmulatorSettings.GetWindowHeight());
+    ui->enableHDRCheckBox->setChecked(EmulatorSettings.IsHdrAllowed());
+
+    ui->FSRCheckBox->setChecked(EmulatorSettings.IsFsrEnabled());
+    ui->RCASCheckBox->setChecked(EmulatorSettings.IsRcasEnabled());
+    ui->RCASSlider->setValue(EmulatorSettings.GetRcasAttenuation());
+    ui->RCASValue->setText(QString::number(ui->RCASSlider->value() / 1000.0, 'f', 3));
+
+    // User tab
+    ui->disableTrophycheckBox->setChecked(EmulatorSettings.IsTrophyPopupDisabled());
+    ui->popUpDurationSpinBox->setValue(EmulatorSettings.GetTrophyNotificationDuration());
+
+    std::string sideTrophy = EmulatorSettings.GetTrophyNotificationSide();
+    QString side = QString::fromStdString(sideTrophy);
+    ui->radioButton_Left->setChecked(side == "left");
+    ui->radioButton_Right->setChecked(side == "right");
+    ui->radioButton_Top->setChecked(side == "top");
+    ui->radioButton_Bottom->setChecked(side == "bottom");
+
     // The emulator signs in the user on controller port 1 with this account.
     const User* player = UserManagement.GetUserByPlayerIndex(1);
     ui->shadnetNpidLineEdit->setEnabled(player != nullptr);
@@ -819,30 +857,8 @@ void SettingsDialog::LoadValuesFromConfig() {
             ui->gr2PortLineEdit->setPlaceholderText(QString::number(global_server.port));
         }
     }
-    ui->vblankSpinBox->setValue(EmulatorSettings.GetVblankFrequency());
-    ui->dmemSpinBox->setValue(EmulatorSettings.GetExtraDmemInMBytes());
-    ui->fmemSpinBox->setValue(EmulatorSettings.GetExtraFmemInMBytes());
-    ui->redZoneComboBox->setCurrentIndex(EmulatorSettings.IsRedZonePatchingEnabled());
 
-    // First options is auto selection -1, so gpuId on the GUI will always have to subtract 1
-    // when setting and add 1 when getting to select the correct gpu in Qt
-    ui->graphicsAdapterBox->setCurrentIndex(EmulatorSettings.GetGpuId() + 1);
-    ui->widthSpinBox->setValue(EmulatorSettings.GetWindowWidth());
-    ui->heightSpinBox->setValue(EmulatorSettings.GetWindowHeight());
-    ui->dumpShadersCheckBox->setChecked(EmulatorSettings.IsDumpShaders());
-    ui->nullGpuCheckBox->setChecked(EmulatorSettings.IsNullGPU());
-    ui->enableHDRCheckBox->setChecked(EmulatorSettings.IsHdrAllowed());
-    ui->FSRCheckBox->setChecked(EmulatorSettings.IsFsrEnabled());
-    ui->RCASCheckBox->setChecked(EmulatorSettings.IsRcasEnabled());
-    ui->RCASSlider->setValue(EmulatorSettings.GetRcasAttenuation());
-    ui->RCASValue->setText(QString::number(ui->RCASSlider->value() / 1000.0, 'f', 3));
-
-    ui->disableTrophycheckBox->setChecked(EmulatorSettings.IsTrophyPopupDisabled());
-    ui->popUpDurationSpinBox->setValue(EmulatorSettings.GetTrophyNotificationDuration());
-    ui->showSplashCheckBox->setChecked(EmulatorSettings.IsShowSplash());
-    ui->hideCursorComboBox->setCurrentIndex(EmulatorSettings.GetCursorState());
-    OnCursorStateChanged(EmulatorSettings.GetCursorState());
-    ui->idleTimeoutSpinBox->setValue(EmulatorSettings.GetCursorHideTimeout());
+    // Input tab
     ui->motionControlsCheckBox->setChecked(EmulatorSettings.IsMotionControlsEnabled());
     ui->gyroSwapYawRollCheckBox->setChecked(EmulatorSettings.IsGyroSwapYawRoll());
     ui->gyroInvertYawCheckBox->setChecked(EmulatorSettings.IsGyroInvertYaw());
@@ -853,27 +869,23 @@ void SettingsDialog::LoadValuesFromConfig() {
     ui->usbComboBox->setCurrentIndex(EmulatorSettings.GetUsbDeviceBackend());
     ui->cameraComboBox->setCurrentIndex(EmulatorSettings.GetCameraId() + 1);
 
-    std::string sideTrophy = EmulatorSettings.GetTrophyNotificationSide();
-    QString side = QString::fromStdString(sideTrophy);
-    ui->radioButton_Left->setChecked(side == "left");
-    ui->radioButton_Right->setChecked(side == "right");
-    ui->radioButton_Top->setChecked(side == "top");
-    ui->radioButton_Bottom->setChecked(side == "bottom");
+    ui->hideCursorComboBox->setCurrentIndex(EmulatorSettings.GetCursorState());
+    OnCursorStateChanged(EmulatorSettings.GetCursorState());
+    ui->idleTimeoutSpinBox->setValue(EmulatorSettings.GetCursorHideTimeout());
 
-    ui->horizontalVolumeSlider->setValue(EmulatorSettings.GetVolumeSlider());
-    ui->volumeText->setText(QString::number(ui->horizontalVolumeSlider->sliderPosition()) + "%");
+    // Network tab
+    ui->networkConnectedCheckBox->setChecked(EmulatorSettings.IsConnectedToNetwork());
+    ui->shadnetCheckBox->setChecked(EmulatorSettings.IsShadNetEnabled());
+    ui->disableHttpsCheckBox->setChecked(EmulatorSettings.IsForcedHttpsDisabled());
+    ui->upnpCheckBox->setChecked(EmulatorSettings.IsUPnPEnabled());
 
-    std::string fullScreenMode =
-        EmulatorSettings.IsFullScreen() ? EmulatorSettings.GetFullScreenMode() : "Windowed";
-    QString translatedText_FullscreenMode =
-        screenModeMap.key(QString::fromStdString(fullScreenMode));
-    ui->displayModeComboBox->setCurrentText(translatedText_FullscreenMode);
+    ui->serverLineEdit->setText(QString::fromStdString(EmulatorSettings.GetShadNetServer()));
+    ui->servWebApiLineEdit->setText(
+        QString::fromStdString(EmulatorSettings.GetShadNetWebApiServer()));
+    ui->p2pPortSpinBox->setValue(EmulatorSettings.GetP2PPort());
+    ui->signalingInfoLineEdit->setText(QString::fromStdString(EmulatorSettings.GetSignalingInfo()));
 
-    std::string presentMode = EmulatorSettings.GetPresentMode();
-    QString translatedText_PresentMode = presentModeMap.key(QString::fromStdString(presentMode));
-    ui->presentModeComboBox->setCurrentText(translatedText_PresentMode);
-
-    // Log
+    // Log tab
     ui->logAppendCheckBox->setChecked(EmulatorSettings.IsLogAppend());
     ui->logEnableCheckBox->setChecked(EmulatorSettings.IsLogEnable());
     ui->logFilterLineEdit->setText(QString::fromStdString(EmulatorSettings.GetLogFilter()));
@@ -893,42 +905,52 @@ void SettingsDialog::LoadValuesFromConfig() {
     ui->logTypeGroupBox->setVisible(false);
 #endif
 
+    // Debug tab
+    ui->dumpShadersCheckBox->setChecked(EmulatorSettings.IsDumpShaders());
     ui->debugDump->setChecked(EmulatorSettings.IsDebugDump());
+    ui->rdocCheckBox->setChecked(EmulatorSettings.IsRenderdocEnabled());
+    ui->copyGPUBuffersCheckBox->setChecked(EmulatorSettings.IsCopyGpuBuffers());
+
     ui->vkValidationCheckBox->setChecked(EmulatorSettings.IsVkValidationEnabled());
     ui->vkSyncValidationCheckBox->setChecked(EmulatorSettings.IsVkValidationSyncEnabled());
     ui->vkCoreValidationCheckBox->setChecked(EmulatorSettings.IsVkValidationCoreEnabled());
     ui->vkGpuValidationCheckBox->setChecked(EmulatorSettings.IsVkValidationGpuEnabled());
     ui->vkValidationCheckBox->isChecked() ? ui->vkLayersGroupBox->setVisible(true)
                                           : ui->vkLayersGroupBox->setVisible(false);
-    ui->shaderCaheCheckBox->isChecked() ? ui->shaderCacheArchiveCheckBox->setVisible(true)
-                                        : ui->shaderCacheArchiveCheckBox->setVisible(false);
 
-    ui->rdocCheckBox->setChecked(EmulatorSettings.IsRenderdocEnabled());
+    ui->collectShaderCheckBox->setChecked(EmulatorSettings.IsShaderCollect());
     ui->crashDiagnosticsCheckBox->setChecked(EmulatorSettings.IsVkCrashDiagnosticEnabled());
     ui->guestMarkersCheckBox->setChecked(EmulatorSettings.IsVkGuestMarkersEnabled());
     ui->hostMarkersCheckBox->setChecked(EmulatorSettings.IsVkHostMarkersEnabled());
-    ui->copyGPUBuffersCheckBox->setChecked(EmulatorSettings.IsCopyGpuBuffers());
-    ui->collectShaderCheckBox->setChecked(EmulatorSettings.IsShaderCollect());
+
+    // Experimental tab
+    // The fourth entry, Precise (Offloaded), is Precise readbacks with readback_offload.
+    const u32 readbacks_mode = EmulatorSettings.GetReadbacksMode();
+    const bool readback_offload =
+        readbacks_mode == GpuReadbacksMode::Precise && EmulatorSettings.IsReadbackOffload();
+    ui->readbacksModeComboBox->setCurrentIndex(readback_offload ? 3 : readbacks_mode);
+    ui->readbackLinearImagesComboBox->setCurrentIndex(
+        !EmulatorSettings.IsReadbackLinearImagesEnabled() ? 0
+        : EmulatorSettings.IsReadbackLinearImagesAsync()  ? 2
+                                                          : 1);
+    ui->dmaCheckBox->setChecked(EmulatorSettings.IsDirectMemoryAccessEnabled());
+    ui->userfaultfdCheckBox->setChecked(EmulatorSettings.IsUserfaultfdTracking());
+    ui->neoCheckBox->setChecked(EmulatorSettings.IsNeo());
+    ui->devkitCheckBox->setChecked(EmulatorSettings.IsDevKit());
+
+    ui->shaderCacheCheckBox->setChecked(EmulatorSettings.IsPipelineCacheEnabled());
+    ui->shaderCacheArchiveCheckBox->setChecked(EmulatorSettings.IsPipelineCacheArchived());
+    ui->vblankSpinBox->setValue(EmulatorSettings.GetVblankFrequency());
+    ui->dmemSpinBox->setValue(EmulatorSettings.GetExtraDmemInMBytes());
+    ui->fmemSpinBox->setValue(EmulatorSettings.GetExtraFmemInMBytes());
+
+    ui->shaderCacheCheckBox->isChecked() ? ui->shaderCacheArchiveCheckBox->setVisible(true)
+                                         : ui->shaderCacheArchiveCheckBox->setVisible(false);
+
+    // Tuning tab
     ui->tuningPage->Load();
 
-    ui->audioBackendComboBox->setCurrentIndex(EmulatorSettings.GetAudioBackend());
-    const QString backend = ui->audioBackendComboBox->currentText();
-
-    if (backend == "SDL") {
-        ui->GenAudioComboBox->setCurrentText(
-            QString::fromStdString(EmulatorSettings.GetSDLMainOutputDevice()));
-        ui->DsAudioComboBox->setCurrentText(
-            QString::fromStdString(EmulatorSettings.GetSDLPadSpkOutputDevice()));
-        ui->micComboBox->setCurrentText(QString::fromStdString(EmulatorSettings.GetSDLMicDevice()));
-    } else if (backend == "OpenAL") {
-        ui->GenAudioComboBox->setCurrentText(
-            QString::fromStdString(EmulatorSettings.GetOpenALMainOutputDevice()));
-        ui->DsAudioComboBox->setCurrentText(
-            QString::fromStdString(EmulatorSettings.GetOpenALPadSpkOutputDevice()));
-        ui->micComboBox->setCurrentText(
-            QString::fromStdString(EmulatorSettings.GetOpenALMicDevice()));
-    }
-
+    // Frontend settings
     QString chooseHomeTab = m_gui_settings->GetValue(gui::gen_homeTab).toString();
     QString translatedText = chooseHomeTabMap.key(chooseHomeTab);
     if (translatedText.isEmpty()) {
@@ -936,9 +958,9 @@ void SettingsDialog::LoadValuesFromConfig() {
     }
     ui->chooseHomeTabComboBox->setCurrentText(translatedText);
 
-    QStringList tabNames = {tr("General"),      tr("Frontend"), tr("Graphics"), tr("User"),
-                            tr("Input"),        tr("Paths"),    tr("Log"),      tr("Debug"),
-                            tr("Experimental"), tr("Tuning")};
+    QStringList tabNames = {tr("General"), tr("Frontend"),     tr("Graphics"), tr("User"),
+                            tr("Input"),   tr("Network"),      tr("Paths"),    tr("Log"),
+                            tr("Debug"),   tr("Experimental"), tr("Tuning")};
     int indexTab = tabNames.indexOf(translatedText);
     if (indexTab == -1 || !ui->tabWidgetSettings->isTabVisible(indexTab) || is_newly_created)
         indexTab = 0;
@@ -1079,7 +1101,7 @@ void SettingsDialog::updateNoteTextEdit(const QString& elementName) {
     } else if (elementName == "gr2OnlineGroupBox") {
         text = tr("Gravity Rush 2 Online:\\nThe server Gravity Rush 2 sends its online requests to. Without a host, online play is off. The port is 8443 unless one is set; a host typed as host:port or as a URL is stored as a separate host and port on save.\\nIn game-specific settings an empty field uses the global value shown in grey.\\nOnline play also needs \"Network Connected\" set to true. The player name and token come from the shadNet sign-in of player 1.");
     } else if (elementName == "shadnetNpidLineEdit" || elementName == "shadnetPasswordLineEdit") {
-        text = tr("Online ID and Password:\\nThe shadNet account of player 1, the user on controller port 1 in Settings > Manage Users. Gravity Rush 2 plays online under this Online ID, and its server keeps the profile picture under it.\\nEntering both turns shadNet on for this user, and clearing either turns it off. Signing in also needs \"Enable shadNet\" and the server below.\\nThe fields are disabled when no user is on controller port 1. The accounts of the other users are set in Settings > Manage Users > ShadNet.");
+        text = tr("Online ID and Password:\\nThe shadNet account of player 1, the user on controller port 1 in Settings > Manage Users. Gravity Rush 2 plays online under this Online ID, and its server keeps the profile picture under it.\\nEntering both turns shadNet on for this user, and clearing either turns it off. Signing in also needs \"Enable shadNet\" and the server in the Network tab.\\nThe fields are disabled when no user is on controller port 1. The accounts of the other users are set in Settings > Manage Users > ShadNet.");
     }
 
     // Input
@@ -1192,7 +1214,7 @@ void SettingsDialog::updateNoteTextEdit(const QString& elementName) {
         text = tr("Enable Devkit Console Mode:\\nAdds support for Devkit console memory size.");
     } else if (elementName == "networkConnectedCheckBox") {
         text = tr("Set Network Connected to True:\\nForces games to detect an active network connection. Actual online capabilities are not yet supported.");
-    } else if (elementName == "shaderCaheCheckBox") {
+    } else if (elementName == "shaderCacheCheckBox") {
         text = tr("Enable Shader Cache:\\nStoring compiled shaders to avoid recompilations, reduce stuttering.");
     } else if (elementName == "shaderCacheArchiveCheckBox") {
         text = tr("Compress the Shader Cache files into a zip file:\\nThe shader cache files are stored within a single zip file instead of multiple separate files.");
@@ -1231,112 +1253,14 @@ bool SettingsDialog::eventFilter(QObject* obj, QEvent* event) {
 }
 
 void SettingsDialog::UpdateSettings(bool is_specific) {
-    const int readbacks_mode = ui->readbacksModeComboBox->currentIndex();
-    const bool readback_offload = readbacks_mode == 3;
-    EmulatorSettings.SetReadbacksMode(readback_offload ? GpuReadbacksMode::Precise : readbacks_mode,
-                                      is_specific);
-    EmulatorSettings.SetReadbackOffload(readback_offload, is_specific);
-    const int linear_images = ui->readbackLinearImagesComboBox->currentIndex();
-    EmulatorSettings.SetReadbackLinearImagesEnabled(linear_images != 0, is_specific);
-    // Off keeps the choice between Default and Async.
-    if (linear_images != 0) {
-        EmulatorSettings.SetReadbackLinearImagesAsync(linear_images == 2, is_specific);
-    }
-    EmulatorSettings.SetDirectMemoryAccessEnabled(ui->dmaCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetUserfaultfdTracking(ui->userfaultfdCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetDevKit(ui->devkitCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetNeo(ui->neoCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetConnectedToNetwork(ui->networkConnectedCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetPipelineCacheEnabled(ui->shaderCaheCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetPipelineCacheArchived(ui->shaderCacheArchiveCheckBox->isChecked(),
-                                              is_specific);
-    EmulatorSettings.SetShadNetEnabled(ui->shadnetCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetShadNetServer(ui->serverLineEdit->text().toStdString(), is_specific);
-    EmulatorSettings.SetSignalingInfo(ui->signalingInfoLineEdit->text().toStdString(), is_specific);
-    EmulatorSettings.SetShadNetWebApiServer(ui->servWebApiLineEdit->text().toStdString(),
-                                            is_specific);
-    EmulatorSettings.SetUPnPEnabled(ui->upnpCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetVblankFrequency(ui->vblankSpinBox->value(), is_specific);
-    EmulatorSettings.SetExtraDmemInMBytes(ui->dmemSpinBox->value(), is_specific);
-    EmulatorSettings.SetExtraFmemInMBytes(ui->fmemSpinBox->value(), is_specific);
-    EmulatorSettings.SetRedZonePatchingEnabled(ui->redZoneComboBox->currentIndex() == 1,
-                                               is_specific);
+    ////// Entries with game-specific settings
 
-    EmulatorSettings.SetFullScreen(
-        screenModeMap.value(ui->displayModeComboBox->currentText()) != "Windowed", is_specific);
-    EmulatorSettings.SetFullScreenMode(
-        screenModeMap.value(ui->displayModeComboBox->currentText()).toStdString(), is_specific);
-    EmulatorSettings.SetPresentMode(
-        presentModeMap.value(ui->presentModeComboBox->currentText()).toStdString(), is_specific);
-    EmulatorSettings.SetMotionControlsEnabled(ui->motionControlsCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetGyroSwapYawRoll(ui->gyroSwapYawRollCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetGyroInvertYaw(ui->gyroInvertYawCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetGyroInvertX(ui->gyroInvertXCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetGyroInvertRoll(ui->gyroInvertRollCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetBackgroundControllerInput(ui->backgroundControllerCheckBox->isChecked(),
-                                                  is_specific);
-    EmulatorSettings.SetKeyboardUsedAsKeyboard(ui->keyboardAsKeyboardCheckBox->isChecked(),
-                                               is_specific);
-    EmulatorSettings.SetTrophyPopupDisabled(ui->disableTrophycheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetTrophyNotificationDuration(ui->popUpDurationSpinBox->value(), is_specific);
-
-    if (ui->radioButton_Top->isChecked()) {
-        EmulatorSettings.SetTrophyNotificationSide("top", is_specific);
-    } else if (ui->radioButton_Left->isChecked()) {
-        EmulatorSettings.SetTrophyNotificationSide("left", is_specific);
-    } else if (ui->radioButton_Right->isChecked()) {
-        EmulatorSettings.SetTrophyNotificationSide("right", is_specific);
-    } else if (ui->radioButton_Bottom->isChecked()) {
-        EmulatorSettings.SetTrophyNotificationSide("bottom", is_specific);
-    }
-
-    // Log
-    EmulatorSettings.SetLogAppend(ui->logAppendCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetLogEnable(ui->logEnableCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetLogFilter(ui->logFilterLineEdit->text().toStdString(), is_specific);
-    EmulatorSettings.SetLogMaxSkipDuration(ui->logMaxSkipDurationLineEdit->value(), is_specific);
-    EmulatorSettings.SetLogSeparate(ui->logSeparateCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetLogSizeLimit(ui->logSizeLimitLineEdit->value(), is_specific);
-    EmulatorSettings.SetLogSkipDuplicate(ui->logSkipDuplicateCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetLogSync(ui->logSyncCheckBox->isChecked(), is_specific);
-#ifdef _WIN32
-    EmulatorSettings.SetLogType(logTypeMap.value(ui->logTypeComboBox->currentText()).toStdString(),
-                                is_specific);
-#endif
-
-    EmulatorSettings.SetHdrAllowed(ui->enableHDRCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetCursorState(ui->hideCursorComboBox->currentIndex(), is_specific);
-    EmulatorSettings.SetCursorHideTimeout(ui->idleTimeoutSpinBox->value(), is_specific);
-    EmulatorSettings.SetGpuId(ui->graphicsAdapterBox->currentIndex() - 1, is_specific);
-    EmulatorSettings.SetUsbDeviceBackend(ui->usbComboBox->currentIndex(), is_specific);
-    EmulatorSettings.SetCameraId(ui->cameraComboBox->currentIndex() - 1, is_specific);
-    EmulatorSettings.SetVolumeSlider(ui->horizontalVolumeSlider->value(), is_specific);
+    // General tab
     EmulatorSettings.SetConsoleLanguage(
         languageIndexes[ui->consoleLanguageComboBox->currentIndex()], is_specific);
-    EmulatorSettings.SetWindowWidth(ui->widthSpinBox->value(), is_specific);
-    EmulatorSettings.SetWindowHeight(ui->heightSpinBox->value(), is_specific);
-    EmulatorSettings.SetDumpShaders(ui->dumpShadersCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetNullGPU(ui->nullGpuCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetFsrEnabled(ui->FSRCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetRcasEnabled(ui->RCASCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetRcasAttenuation(ui->RCASSlider->value(), is_specific);
+    EmulatorSettings.SetRedZonePatchingEnabled(ui->redZoneCheckBox->isChecked(), is_specific);
     EmulatorSettings.SetShowSplash(ui->showSplashCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetDebugDump(ui->debugDump->isChecked(), is_specific);
-    EmulatorSettings.SetVkValidationEnabled(ui->vkValidationCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetVkValidationSyncEnabled(ui->vkSyncValidationCheckBox->isChecked(),
-                                                is_specific);
-    EmulatorSettings.SetVkValidationCoreEnabled(ui->vkCoreValidationCheckBox->isChecked(),
-                                                is_specific);
-    EmulatorSettings.SetVkValidationGpuEnabled(ui->vkGpuValidationCheckBox->isChecked(),
-                                               is_specific);
-    EmulatorSettings.SetRenderdocEnabled(ui->rdocCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetVkHostMarkersEnabled(ui->hostMarkersCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetVkGuestMarkersEnabled(ui->guestMarkersCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetVkCrashDiagnosticEnabled(ui->crashDiagnosticsCheckBox->isChecked(),
-                                                 is_specific);
-    EmulatorSettings.SetShaderCollect(ui->collectShaderCheckBox->isChecked(), is_specific);
-    EmulatorSettings.SetCopyGpuBuffers(ui->copyGPUBuffersCheckBox->isChecked(), is_specific);
-    ui->tuningPage->Save(is_specific);
+    EmulatorSettings.SetVolumeSlider(ui->horizontalVolumeSlider->value(), is_specific);
 
     const std::string backend = ui->audioBackendComboBox->currentText().toStdString();
     EmulatorSettings.SetAudioBackend(ui->audioBackendComboBox->currentIndex(), is_specific);
@@ -1356,21 +1280,130 @@ void SettingsDialog::UpdateSettings(bool is_specific) {
                                             is_specific);
     }
 
-    // Entries with no game-specific settings
+    // Graphics tab
+    EmulatorSettings.SetGpuId(ui->graphicsAdapterBox->currentIndex() - 1, is_specific);
+    EmulatorSettings.SetNullGPU(ui->nullGpuCheckBox->isChecked(), is_specific);
+
+    EmulatorSettings.SetFullScreen(
+        screenModeMap.value(ui->displayModeComboBox->currentText()) != "Windowed", is_specific);
+    EmulatorSettings.SetFullScreenMode(
+        screenModeMap.value(ui->displayModeComboBox->currentText()).toStdString(), is_specific);
+    EmulatorSettings.SetPresentMode(
+        presentModeMap.value(ui->presentModeComboBox->currentText()).toStdString(), is_specific);
+
+    EmulatorSettings.SetWindowWidth(ui->widthSpinBox->value(), is_specific);
+    EmulatorSettings.SetWindowHeight(ui->heightSpinBox->value(), is_specific);
+    EmulatorSettings.SetHdrAllowed(ui->enableHDRCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetFsrEnabled(ui->FSRCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetRcasEnabled(ui->RCASCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetRcasAttenuation(ui->RCASSlider->value(), is_specific);
+
+    // User tab
+    EmulatorSettings.SetTrophyPopupDisabled(ui->disableTrophycheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetTrophyNotificationDuration(ui->popUpDurationSpinBox->value(), is_specific);
+
+    if (ui->radioButton_Top->isChecked()) {
+        EmulatorSettings.SetTrophyNotificationSide("top", is_specific);
+    } else if (ui->radioButton_Left->isChecked()) {
+        EmulatorSettings.SetTrophyNotificationSide("left", is_specific);
+    } else if (ui->radioButton_Right->isChecked()) {
+        EmulatorSettings.SetTrophyNotificationSide("right", is_specific);
+    } else if (ui->radioButton_Bottom->isChecked()) {
+        EmulatorSettings.SetTrophyNotificationSide("bottom", is_specific);
+    }
+
+    // Input tab
+    EmulatorSettings.SetMotionControlsEnabled(ui->motionControlsCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetGyroSwapYawRoll(ui->gyroSwapYawRollCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetGyroInvertYaw(ui->gyroInvertYawCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetGyroInvertX(ui->gyroInvertXCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetGyroInvertRoll(ui->gyroInvertRollCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetBackgroundControllerInput(ui->backgroundControllerCheckBox->isChecked(),
+                                                  is_specific);
+    EmulatorSettings.SetKeyboardUsedAsKeyboard(ui->keyboardAsKeyboardCheckBox->isChecked(),
+                                               is_specific);
+
+    EmulatorSettings.SetCursorState(ui->hideCursorComboBox->currentIndex(), is_specific);
+    EmulatorSettings.SetCursorHideTimeout(ui->idleTimeoutSpinBox->value(), is_specific);
+    EmulatorSettings.SetUsbDeviceBackend(ui->usbComboBox->currentIndex(), is_specific);
+    EmulatorSettings.SetCameraId(ui->cameraComboBox->currentIndex() - 1, is_specific);
+
+    // Network tab
+    EmulatorSettings.SetConnectedToNetwork(ui->networkConnectedCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetShadNetEnabled(ui->shadnetCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetUPnPEnabled(ui->upnpCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetForcedHttpsDisabled(ui->disableHttpsCheckBox->isChecked(), is_specific);
+
+    EmulatorSettings.SetShadNetServer(ui->serverLineEdit->text().toStdString(), is_specific);
+    EmulatorSettings.SetSignalingInfo(ui->signalingInfoLineEdit->text().toStdString(), is_specific);
+    EmulatorSettings.SetP2PPort(ui->p2pPortSpinBox->value(), is_specific);
+    EmulatorSettings.SetShadNetWebApiServer(ui->servWebApiLineEdit->text().toStdString(),
+                                            is_specific);
+
+    // Log tab
+    EmulatorSettings.SetLogAppend(ui->logAppendCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetLogEnable(ui->logEnableCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetLogFilter(ui->logFilterLineEdit->text().toStdString(), is_specific);
+    EmulatorSettings.SetLogMaxSkipDuration(ui->logMaxSkipDurationLineEdit->value(), is_specific);
+    EmulatorSettings.SetLogSeparate(ui->logSeparateCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetLogSizeLimit(ui->logSizeLimitLineEdit->value(), is_specific);
+    EmulatorSettings.SetLogSkipDuplicate(ui->logSkipDuplicateCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetLogSync(ui->logSyncCheckBox->isChecked(), is_specific);
+#ifdef _WIN32
+    EmulatorSettings.SetLogType(logTypeMap.value(ui->logTypeComboBox->currentText()).toStdString(),
+                                is_specific);
+#endif
+
+    // Debug tab
+    EmulatorSettings.SetDumpShaders(ui->dumpShadersCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetDebugDump(ui->debugDump->isChecked(), is_specific);
+    EmulatorSettings.SetRenderdocEnabled(ui->rdocCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetCopyGpuBuffers(ui->copyGPUBuffersCheckBox->isChecked(), is_specific);
+
+    EmulatorSettings.SetVkValidationEnabled(ui->vkValidationCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetVkValidationSyncEnabled(ui->vkSyncValidationCheckBox->isChecked(),
+                                                is_specific);
+    EmulatorSettings.SetVkValidationCoreEnabled(ui->vkCoreValidationCheckBox->isChecked(),
+                                                is_specific);
+    EmulatorSettings.SetVkValidationGpuEnabled(ui->vkGpuValidationCheckBox->isChecked(),
+                                               is_specific);
+
+    EmulatorSettings.SetShaderCollect(ui->collectShaderCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetVkCrashDiagnosticEnabled(ui->crashDiagnosticsCheckBox->isChecked(),
+                                                 is_specific);
+    EmulatorSettings.SetVkHostMarkersEnabled(ui->hostMarkersCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetVkGuestMarkersEnabled(ui->guestMarkersCheckBox->isChecked(), is_specific);
+
+    // Experimental tab
+    const int readbacks_mode = ui->readbacksModeComboBox->currentIndex();
+    const bool readback_offload = readbacks_mode == 3;
+    EmulatorSettings.SetReadbacksMode(readback_offload ? GpuReadbacksMode::Precise : readbacks_mode,
+                                      is_specific);
+    EmulatorSettings.SetReadbackOffload(readback_offload, is_specific);
+    const int linear_images = ui->readbackLinearImagesComboBox->currentIndex();
+    EmulatorSettings.SetReadbackLinearImagesEnabled(linear_images != 0, is_specific);
+    // Off keeps the choice between Default and Async.
+    if (linear_images != 0) {
+        EmulatorSettings.SetReadbackLinearImagesAsync(linear_images == 2, is_specific);
+    }
+    EmulatorSettings.SetDirectMemoryAccessEnabled(ui->dmaCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetUserfaultfdTracking(ui->userfaultfdCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetDevKit(ui->devkitCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetNeo(ui->neoCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetPipelineCacheEnabled(ui->shaderCacheCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetPipelineCacheArchived(ui->shaderCacheArchiveCheckBox->isChecked(),
+                                              is_specific);
+
+    EmulatorSettings.SetVblankFrequency(ui->vblankSpinBox->value(), is_specific);
+    EmulatorSettings.SetExtraDmemInMBytes(ui->dmemSpinBox->value(), is_specific);
+    EmulatorSettings.SetExtraFmemInMBytes(ui->fmemSpinBox->value(), is_specific);
+
+    // Tuning tab
+    ui->tuningPage->Save(is_specific);
+
+    ////// Entries with no game-specific settings
     if (!is_game_specific) {
-        std::vector<GameInstallDir> dirs_with_states;
-        for (int i = 0; i < ui->gameFoldersListWidget->count(); i++) {
-            QListWidgetItem* item = ui->gameFoldersListWidget->item(i);
-            QString path_string = item->text();
-            auto path = Common::FS::PathFromQString(path_string);
-            bool enabled = (item->checkState() == Qt::Checked);
-
-            dirs_with_states.push_back({path, enabled});
-        }
-        EmulatorSettings.SetAllGameInstallDirs(dirs_with_states);
-
-        BackgroundMusicPlayer::getInstance().setVolume(ui->BGMVolumeSlider->value());
-
+        // Frontend tab
         EmulatorSettings.SetDiscordRPCEnabled(ui->discordRPCCheckbox->isChecked());
         EmulatorSettings.SetShowFpsCounter(ui->showFpsCounterCheckBox->isChecked());
         m_gui_settings->SetValue(gui::glc_showCompatibility,
@@ -1388,6 +1421,20 @@ void SettingsDialog::UpdateSettings(bool is_specific) {
         emit BackgroundOpacityChanged(ui->backgroundImageOpacitySlider->value());
         m_gui_settings->SetValue(gui::gen_homeTab,
                                  chooseHomeTabMap.value(ui->chooseHomeTabComboBox->currentText()));
+
+        BackgroundMusicPlayer::getInstance().setVolume(ui->BGMVolumeSlider->value());
+
+        // Paths tab
+        std::vector<GameInstallDir> dirs_with_states;
+        for (int i = 0; i < ui->gameFoldersListWidget->count(); i++) {
+            QListWidgetItem* item = ui->gameFoldersListWidget->item(i);
+            QString path_string = item->text();
+            auto path = Common::FS::PathFromQString(path_string);
+            bool enabled = (item->checkState() == Qt::Checked);
+
+            dirs_with_states.push_back({path, enabled});
+        }
+        EmulatorSettings.SetAllGameInstallDirs(dirs_with_states);
     }
 }
 
