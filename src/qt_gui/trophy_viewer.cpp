@@ -71,6 +71,22 @@ static std::filesystem::path GetTrophyXmlPath(const std::filesystem::path& xml_d
     return xml_dir / "TROP.XML";
 }
 
+// Trophy XML that was decrypted for the wrong trophy set is not text
+static bool IsXmlFile(const std::filesystem::path& path) {
+    std::ifstream file(path, std::ios::binary);
+    char c{};
+    while (file.get(c)) {
+        if (c == '<') {
+            return true;
+        }
+        // Skip a byte order mark and white space
+        if (std::string_view{"\xEF\xBB\xBF \t\r\n"}.find(c) == std::string_view::npos) {
+            return false;
+        }
+    }
+    return false;
+}
+
 namespace fs = std::filesystem;
 
 CMRC_DECLARE(res);
@@ -389,22 +405,28 @@ void TrophyViewer::PopulateTrophyWidget(QString title, QString user) {
 
     int index = 0;
     for (const auto& npCommId : npCommIds) {
+        // The position in npbind.dat is the number of the trophy file, also after a failure
+        const int trpIndex = index++;
         auto trophyFilesPath =
             Common::FS::GetUserPath(Common::FS::PathType::UserDir) / "trophy" / npCommId;
         QString trophyDirQt;
         Common::FS::PathToQString(trophyDirQt, trophyFilesPath);
 
         QDir dir(trophyDirQt);
+        // A set that was extracted from the wrong trophy file is extracted again
+        if (!npCommId.empty() && dir.exists() &&
+            !IsXmlFile(trophyFilesPath / "Xml" / "TROPCONF.XML")) {
+            std::error_code discard;
+            std::filesystem::remove_all(trophyFilesPath, discard);
+        }
         if (!dir.exists()) {
-            if (!trp.Extract(Common::FS::PathFromQString(gameTrpPath_), index, npCommId,
+            if (!trp.Extract(Common::FS::PathFromQString(gameTrpPath_), trpIndex, npCommId,
                              trophyFilesPath, true)) {
                 LOG_ERROR(Loader, "Couldn't extract trophies");
 
                 continue;
             }
         }
-
-        index++;
 
         const std::string filename = npCommId + ".xml";
         std::string userId = "1000";
@@ -415,7 +437,7 @@ void TrophyViewer::PopulateTrophyWidget(QString title, QString user) {
         }
 
         auto user_trophy_file = EmulatorSettings.GetHomeDir() / userId / "trophy" / filename;
-        if (!std::filesystem::exists(user_trophy_file)) {
+        if (!IsXmlFile(user_trophy_file)) {
 
             if (!std::filesystem::exists(user_trophy_file.parent_path())) {
                 std::filesystem::create_directories(user_trophy_file.parent_path());
@@ -423,7 +445,7 @@ void TrophyViewer::PopulateTrophyWidget(QString title, QString user) {
 
             std::error_code discard;
             std::filesystem::copy_file(trophyFilesPath / "Xml" / "TROPCONF.XML", user_trophy_file,
-                                       discard);
+                                       std::filesystem::copy_options::overwrite_existing, discard);
         }
 
         QFileInfoList dirList = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
@@ -540,6 +562,14 @@ void TrophyViewer::PopulateTrophyWidget(QString title, QString user) {
                     }
                 }
             }
+        }
+
+        // Every row is made from an icon and filled from these lists
+        const auto numTrophies = static_cast<qsizetype>(icons.size());
+        if (trpId.size() < numTrophies || trophyNames.size() < numTrophies ||
+            trophyDetails.size() < numTrophies) {
+            LOG_ERROR(Loader, "Trophy data of {} does not match its icons", npCommId);
+            continue;
         }
 
         QTableWidget* tableWidget = new QTableWidget(this);
