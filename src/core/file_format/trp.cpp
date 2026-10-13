@@ -6,6 +6,7 @@
 #include "common/logging/log.h"
 #include "common/path_util.h"
 #include "core/file_format/trp.h"
+#include "core/file_sys/game_backend.h"
 
 static void DecryptEFSM(std::span<const u8, 16> trophyKey, std::span<const u8, 16> NPcommID,
                         std::span<const u8, 16> efsmIv, std::span<const u8> ciphertext,
@@ -42,57 +43,57 @@ static void hexToBytes(const char* hex, unsigned char* dst) {
     }
 }
 
+// Returns host paths of the .trp files of a game, which is a folder or a .zar archive
+static std::vector<std::filesystem::path> ListTrpFiles(const std::filesystem::path& gameRoot) {
+    std::vector<std::filesystem::path> trpFiles;
+    const auto backend = Core::FileSys::OpenGameBackend(gameRoot);
+    if (!backend) {
+        return trpFiles;
+    }
+    for (const auto& entry : backend->ListDir("sce_sys/trophy")) {
+        if (entry.is_directory || !entry.name.ends_with(".trp")) {
+            continue;
+        }
+        if (const auto path =
+                Core::FileSys::ResolveGameFilePath(gameRoot, "sce_sys/trophy/" + entry.name)) {
+            trpFiles.push_back(*path);
+        }
+    }
+    return trpFiles;
+}
+
 bool TRP::Extract(const std::filesystem::path& trophyPath, int index, std::string npCommId,
                   const std::filesystem::path& outputPath, bool mergeBasePath) {
-    std::filesystem::path trophyDir = trophyPath / "sce_sys/trophy";
-    if (!std::filesystem::exists(trophyDir) && !mergeBasePath) {
-        LOG_WARNING(Common_Filesystem, "Trophy directory doesn't exist: {}", trophyDir.string());
-        return false;
-    }
+    const std::filesystem::path trophyDir = trophyPath / "sce_sys/trophy";
 
-    // Collect all .trp files in the directory
-    std::vector<std::filesystem::path> trpFiles;
-    if (mergeBasePath &&
-        (trophyPath.string().ends_with("-patch") || trophyPath.string().ends_with("-UPDATE"))) {
-        std::map<int, std::filesystem::path> trophyFileMap;
-        std::filesystem::path trophyBaseDir;
-
-        if (std::filesystem::exists(trophyDir)) {
-            for (const auto& entry : std::filesystem::directory_iterator(trophyDir)) {
-                if (entry.is_regular_file() && entry.path().extension() == ".trp") {
-                    // standard filename: trophyXX.trp
-                    int fileIndex = std::stoi(entry.path().filename().string().substr(6, 2));
-                    trophyFileMap.insert({fileIndex, entry.path()});
+    // An update only has the trophy files it changes, so its base game supplies the rest. A game
+    // packed as a .zar archive is passed by its base archive, so its update is looked up here.
+    std::vector<std::filesystem::path> roots{trophyPath};
+    if (mergeBasePath) {
+        const std::string stem = Core::FileSys::StripZArchiveExtension(trophyPath).string();
+        if (stem.ends_with("-patch")) {
+            roots.push_back(stem.substr(0, stem.length() - 6));
+        } else if (stem.ends_with("-UPDATE")) {
+            roots.push_back(stem.substr(0, stem.length() - 7));
+        } else {
+            for (const auto& suffix : {"-UPDATE", "-patch"}) {
+                if (const auto update = Core::FileSys::ResolveGameRoot(stem + suffix)) {
+                    roots.insert(roots.begin(), *update);
+                    break;
                 }
             }
         }
+    }
 
-        if (trophyPath.string().ends_with("-patch")) {
-            trophyBaseDir = trophyPath.string().erase(trophyPath.string().length() - 6);
-        } else if (trophyPath.string().ends_with("-UPDATE")) {
-            trophyBaseDir = trophyPath.string().erase(trophyPath.string().length() - 7);
-        }
-
-        trophyBaseDir = trophyBaseDir / "sce_sys/trophy";
-        if (std::filesystem::exists(trophyBaseDir)) {
-            for (const auto& entry : std::filesystem::directory_iterator(trophyBaseDir)) {
-                if (entry.is_regular_file() && entry.path().extension() == ".trp") {
-                    // standard filename: trophyXX.trp
-                    bool skip = false;
-                    int fileIndex = std::stoi(entry.path().filename().string().substr(6, 2));
-
-                    // file already mapped
-                    for (auto const& [key, value] : trophyFileMap) {
-                        if (key == fileIndex) {
-                            skip = true;
-                            break;
-                        }
-                    }
-
-                    if (!skip) {
-                        trophyFileMap.insert({fileIndex, entry.path()});
-                    }
-                }
+    // Collect all .trp files
+    std::vector<std::filesystem::path> trpFiles;
+    if (roots.size() > 1) {
+        std::map<int, std::filesystem::path> trophyFileMap;
+        for (const auto& root : roots) {
+            for (const auto& file : ListTrpFiles(root)) {
+                // standard filename: trophyXX.trp, a file already mapped by the update is kept
+                int fileIndex = std::stoi(file.filename().string().substr(6, 2));
+                trophyFileMap.insert({fileIndex, file});
             }
         }
 
@@ -100,11 +101,7 @@ bool TRP::Extract(const std::filesystem::path& trophyPath, int index, std::strin
             trpFiles.push_back(value);
         }
     } else {
-        for (const auto& entry : std::filesystem::directory_iterator(trophyDir)) {
-            if (entry.is_regular_file() && entry.path().extension() == ".trp") {
-                trpFiles.push_back(entry.path());
-            }
-        }
+        trpFiles = ListTrpFiles(trophyPath);
 
         // Sort files to ensure consistent ordering
         std::sort(trpFiles.begin(), trpFiles.end());
