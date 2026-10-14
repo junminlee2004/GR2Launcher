@@ -2098,6 +2098,110 @@
                </widget>
               </item>
               <item>
+               <widget class="QFrame" name="gyroHoldFrame">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Shadow::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="gyroHoldFrameLayout">
+                 <item>
+                  <widget class="QLabel" name="gyroHoldLabel">
+                   <property name="toolTip">
+                    <string>While held, the mouse drives the gyro whatever the mouse mode is.</string>
+                   </property>
+                   <property name="text">
+                    <string>Mouse Gyro (hold)</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="MouseGyroHoldButton">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="MouseGyroHoldButton2">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="MouseGyroHoldButton3">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="shakeFrame">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Shadow::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="shakeFrameLayout">
+                 <item>
+                  <widget class="QLabel" name="shakeLabel">
+                   <property name="toolTip">
+                    <string>While held, shakes the controller, for at least one second. For controllers without motion sensors.</string>
+                   </property>
+                   <property name="text">
+                    <string>Shake (hold)</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="MotionShakeButton">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="MotionShakeButton2">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRightClickButton" name="MotionShakeButton3">
+                   <property name="focusPolicy">
+                    <enum>Qt::FocusPolicy::NoFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>unmapped</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
                <layout class="QHBoxLayout" name="mouseSettingsLayout">
                 <item>
                  <widget class="QGroupBox" name="MouseParamsBox">

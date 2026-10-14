@@ -2090,7 +2090,7 @@
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_17" stretch="1,0,0">
+        <layout class="QHBoxLayout" name="horizontalLayout_17" stretch="1,0,0,0,0">
          <item>
           <widget class="QGroupBox" name="gb_swipe_combo">
            <property name="title">
@@ -2219,6 +2219,50 @@
            <layout class="QVBoxLayout" name="gb_gyro_roll_layout">
             <item>
              <widget class="QRightClickButton" name="MouseGyroRollButton">
+              <property name="text">
+               <string>unmapped</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="gb_gyro_hold">
+           <property name="toolTip">
+            <string>While held, the mouse drives the gyro whatever the mouse mode is.</string>
+           </property>
+           <property name="title">
+            <string>Mouse Gyro (hold)</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+           <layout class="QVBoxLayout" name="gb_gyro_hold_layout">
+            <item>
+             <widget class="QRightClickButton" name="MouseGyroHoldButton">
+              <property name="text">
+               <string>unmapped</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="gb_shake">
+           <property name="toolTip">
+            <string>While held, shakes the controller, for at least one second. For controllers without motion sensors.</string>
+           </property>
+           <property name="title">
+            <string>Shake (hold)</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+           <layout class="QVBoxLayout" name="gb_shake_layout">
+            <item>
+             <widget class="QRightClickButton" name="MotionShakeButton">
               <property name="text">
                <string>unmapped</string>
               </property>

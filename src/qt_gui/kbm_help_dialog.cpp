@@ -274,6 +274,12 @@ Emulator hotkeys:
 'mouse_gyro_roll_mode':
     Controls whether moving the mouse sideways causes a panning or a rolling motion while mouse-to-gyro emulation is active.
 
+'mouse_gyro_hold':
+    While held, the mouse drives the gyro whatever the mouse mode is, and goes back to its mode on release. A joystick the mouse was driving is centered while the gyro is in use.
+
+'motion_shake', 'motion_tilt_left' and 'motion_tilt_right':
+    For controllers without motion sensors. While held, 'motion_shake' shakes the controller (for at least one second), and the tilt outputs turn it on its side until released. They override the real or mouse-emulated motion only while active.
+
 'mouse_sensitivity' = float, float, float
     Global, horizontal and vertical multipliers for mouse-to-joystick movement. All three values are required. Default: 1, 1, 1
 

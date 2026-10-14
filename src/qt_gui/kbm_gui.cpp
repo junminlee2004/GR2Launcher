@@ -156,6 +156,12 @@ KBMSettings::KBMSettings(std::shared_ptr<GameInfoClass> game_info_get,
         {ui->MouseGyroRollButton, "mouse_gyro_roll_mode"},
         {ui->MouseGyroRollButton2, "mouse_gyro_roll_mode"},
         {ui->MouseGyroRollButton3, "mouse_gyro_roll_mode"},
+        {ui->MouseGyroHoldButton, "mouse_gyro_hold"},
+        {ui->MouseGyroHoldButton2, "mouse_gyro_hold"},
+        {ui->MouseGyroHoldButton3, "mouse_gyro_hold"},
+        {ui->MotionShakeButton, "motion_shake"},
+        {ui->MotionShakeButton2, "motion_shake"},
+        {ui->MotionShakeButton3, "motion_shake"},
     };
 
     // Connected before the first load so the labels follow the loaded values.
@@ -519,6 +525,8 @@ void KBMSettings::SetDefault() {
     ui->TouchpadSwipeLeftButton->setText("unmapped");
     ui->TouchpadSwipeRightButton->setText("unmapped");
     ui->MouseGyroRollButton->setText("unmapped");
+    ui->MouseGyroHoldButton->setText("unmapped");
+    ui->MotionShakeButton->setText("unmapped");
 
     ui->MouseJoystickBox->setCurrentText("none");
     ui->DeadzoneOffsetSlider->setValue(50);

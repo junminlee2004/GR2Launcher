@@ -89,7 +89,7 @@ private:
         "axis_left_y", "pad_right", "triangle", "override_controller_color", "axis_right_x",
         "axis_right_y", "options", "analog_deadzone", "touchpad_up", "touchpad_down",
         "touchpad_two_finger", "touchpad_swipe_up", "touchpad_swipe_down", "touchpad_swipe_left",
-        "touchpad_swipe_right", "mouse_gyro_roll_mode",
+        "touchpad_swipe_right", "mouse_gyro_roll_mode", "mouse_gyro_hold", "motion_shake",
         // Swipe combo and swipe travel time lines, always rewritten.
         "touchpad_swipe_combo_enabled", "touchpad_swipe_combo_hold", "touchpad_swipe_combo_up",
         "touchpad_swipe_combo_down", "touchpad_swipe_combo_left", "touchpad_swipe_combo_right",

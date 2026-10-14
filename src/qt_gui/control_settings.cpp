@@ -56,7 +56,9 @@ ControlSettings::ControlSettings(std::shared_ptr<GameInfoClass> game_info_get,
                    ui->TouchpadSwipeDownButton,
                    ui->TouchpadSwipeLeftButton,
                    ui->TouchpadSwipeRightButton,
-                   ui->MouseGyroRollButton};
+                   ui->MouseGyroRollButton,
+                   ui->MouseGyroHoldButton,
+                   ui->MotionShakeButton};
 
     AxisList = {ui->LStickUpButton,    ui->LStickDownButton, ui->LStickLeftButton,
                 ui->LStickRightButton, ui->RStickUpButton,   ui->RStickDownButton,
@@ -339,6 +341,8 @@ void ControlSettings::SaveControllerConfig(bool CloseOnSave) {
     add_mapping(ui->TouchpadSwipeLeftButton->text(), "touchpad_swipe_left");
     add_mapping(ui->TouchpadSwipeRightButton->text(), "touchpad_swipe_right");
     add_mapping(ui->MouseGyroRollButton->text(), "mouse_gyro_roll_mode");
+    add_mapping(ui->MouseGyroHoldButton->text(), "mouse_gyro_hold");
+    add_mapping(ui->MotionShakeButton->text(), "motion_shake");
 
     lines.push_back("");
 
@@ -506,7 +510,8 @@ void ControlSettings::ResetTouchpadExtras() {
     for (QRightClickButton* button :
          {ui->TouchpadUpButton, ui->TouchpadDownButton, ui->TouchpadTwoFingerButton,
           ui->TouchpadSwipeUpButton, ui->TouchpadSwipeDownButton, ui->TouchpadSwipeLeftButton,
-          ui->TouchpadSwipeRightButton, ui->MouseGyroRollButton}) {
+          ui->TouchpadSwipeRightButton, ui->MouseGyroRollButton, ui->MouseGyroHoldButton,
+          ui->MotionShakeButton}) {
         button->setText("unmapped");
     }
     ui->SwipeComboEnableCheckBox->setChecked(false);
@@ -685,6 +690,10 @@ void ControlSettings::SetUIValuestoMappings() {
                 ui->TouchpadSwipeRightButton->setText(QString::fromStdString(input_string));
             } else if (output_string == "mouse_gyro_roll_mode") {
                 ui->MouseGyroRollButton->setText(QString::fromStdString(input_string));
+            } else if (output_string == "mouse_gyro_hold") {
+                ui->MouseGyroHoldButton->setText(QString::fromStdString(input_string));
+            } else if (output_string == "motion_shake") {
+                ui->MotionShakeButton->setText(QString::fromStdString(input_string));
             } else if (output_string == "axis_left_x") {
                 ui->LStickRightButton->setText(QString::fromStdString(input_string));
                 ui->LStickLeftButton->setText(QString::fromStdString(input_string));
