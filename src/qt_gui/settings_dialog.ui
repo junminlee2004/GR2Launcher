@@ -2073,16 +2073,6 @@
                </property>
               </widget>
              </item>
-             <item>
-              <widget class="QLabel" name="signalingInfoLabel">
-               <property name="text">
-                <string>Signaling Info</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="signalingInfoLineEdit"/>
-             </item>
             </layout>
            </widget>
           </item>

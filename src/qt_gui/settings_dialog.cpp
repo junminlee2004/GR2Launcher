@@ -883,7 +883,6 @@ void SettingsDialog::LoadValuesFromConfig() {
     ui->servWebApiLineEdit->setText(
         QString::fromStdString(EmulatorSettings.GetShadNetWebApiServer()));
     ui->p2pPortSpinBox->setValue(EmulatorSettings.GetP2PPort());
-    ui->signalingInfoLineEdit->setText(QString::fromStdString(EmulatorSettings.GetSignalingInfo()));
 
     // Log tab
     ui->logAppendCheckBox->setChecked(EmulatorSettings.IsLogAppend());
@@ -1335,7 +1334,6 @@ void SettingsDialog::UpdateSettings(bool is_specific) {
     EmulatorSettings.SetForcedHttpsDisabled(ui->disableHttpsCheckBox->isChecked(), is_specific);
 
     EmulatorSettings.SetShadNetServer(ui->serverLineEdit->text().toStdString(), is_specific);
-    EmulatorSettings.SetSignalingInfo(ui->signalingInfoLineEdit->text().toStdString(), is_specific);
     EmulatorSettings.SetP2PPort(ui->p2pPortSpinBox->value(), is_specific);
     EmulatorSettings.SetShadNetWebApiServer(ui->servWebApiLineEdit->text().toStdString(),
                                             is_specific);
