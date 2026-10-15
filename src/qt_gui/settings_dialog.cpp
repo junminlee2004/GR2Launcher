@@ -348,6 +348,11 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
                     m_gui_settings->SetValue(gui::gen_checkForUpdates, state == Qt::Checked);
                 });
 
+        connect(ui->updateEmulatorCheckBox, &QCheckBox::checkStateChanged, this,
+                [this](Qt::CheckState state) {
+                    m_gui_settings->SetValue(gui::gen_updateEmulator, state == Qt::Checked);
+                });
+
         connect(ui->changelogCheckBox, &QCheckBox::checkStateChanged, this,
                 [this](Qt::CheckState state) {
                     m_gui_settings->SetValue(gui::gen_showChangeLog, state == Qt::Checked);
@@ -745,6 +750,8 @@ void SettingsDialog::LoadValuesFromConfig() {
 
 #ifdef ENABLE_UPDATER
         ui->updateCheckBox->setChecked(m_gui_settings->GetValue(gui::gen_checkForUpdates).toBool());
+        ui->updateEmulatorCheckBox->setChecked(
+            m_gui_settings->GetValue(gui::gen_updateEmulator).toBool());
         ui->changelogCheckBox->setChecked(
             m_gui_settings->GetValue(gui::gen_showChangeLog).toBool());
 #endif
@@ -1053,7 +1060,7 @@ void SettingsDialog::updateNoteTextEdit(const QString& elementName) {
         text = tr("Enable Discord Rich Presence:\\nDisplays the emulator icon and relevant information on your Discord profile.");
     #ifdef ENABLE_UPDATER
     } else if (elementName == "updaterGroupBox") {
-        text = tr("GUI Updates:\\nRelease: Official versions released every month that may be very outdated, but are more reliable and tested.\\nNightly: Development versions that have all the latest features and fixes, but may contain bugs and are less stable.\\n\\n*This update applies only to the Qt user interface. To update the emulator core, please use the 'Version Manager' menu.");
+        text = tr("GUI Updates:\\nRelease: Official versions released every month that may be very outdated, but are more reliable and tested.\\nNightly: Development versions that have all the latest features and fixes, but may contain bugs and are less stable.\\n\\nAlso Update the Emulator: the update check also offers the newest GR2fork-EXODUS pre-release and installs it together with the launcher.");
 #endif
     } else if (elementName == "GUIBackgroundImageGroupBox") {
         text = tr("Background Image:\\nControl the opacity of the game background image.");
@@ -1411,6 +1418,7 @@ void SettingsDialog::UpdateSettings(bool is_specific) {
         m_gui_settings->SetValue(gui::gl_playBackgroundMusic, ui->playBGMCheckBox->isChecked());
         m_gui_settings->SetValue(gui::gl_backgroundMusicVolume, ui->BGMVolumeSlider->value());
         m_gui_settings->SetValue(gui::gen_checkForUpdates, ui->updateCheckBox->isChecked());
+        m_gui_settings->SetValue(gui::gen_updateEmulator, ui->updateEmulatorCheckBox->isChecked());
         m_gui_settings->SetValue(gui::gen_showChangeLog, ui->changelogCheckBox->isChecked());
         m_gui_settings->SetValue(gui::gl_showBackgroundImage,
                                  ui->showBackgroundImageCheckBox->isChecked());
@@ -1483,6 +1491,7 @@ void SettingsDialog::SetDefaultValues() {
         m_gui_settings->SetValue(gui::gl_playBackgroundMusic, false);
         m_gui_settings->SetValue(gui::gl_backgroundMusicVolume, 50);
         m_gui_settings->SetValue(gui::gen_checkForUpdates, true);
+        m_gui_settings->SetValue(gui::gen_updateEmulator, true);
         m_gui_settings->SetValue(gui::gen_showChangeLog, false);
         m_gui_settings->SetValue(gui::gen_guiLanguage, "en_US");
         m_gui_settings->SetValue(gui::glc_showLoadGameSizeEnabled, true);

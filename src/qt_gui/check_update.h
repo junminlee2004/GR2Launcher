@@ -4,6 +4,7 @@
 #ifndef CHECKUPDATE_H
 #define CHECKUPDATE_H
 
+#include <functional>
 #include <QCheckBox>
 #include <QDialog>
 #include <QNetworkAccessManager>
@@ -24,17 +25,22 @@ private slots:
     void Install();
 
 private:
-    void setupUI(const QString& downloadUrl, const QString& latestDate, const QString& latestRev,
-                 const QString& currentDate, const QString& currentRev);
+    void CheckEmulatorUpdate(const std::function<void()>& done);
+    void setupUI(bool launcherUpdate, const QString& downloadUrl, const QString& latestDate,
+                 const QString& latestRev, const QString& currentDate, const QString& currentRev);
 
     void requestChangelog(const QString& currentRev, const QString& latestRev,
                           const QString& downloadUrl, const QString& latestDate,
                           const QString& currentDate);
 
     QCheckBox* autoUpdateCheckBox;
+    QCheckBox* updateEmulatorCheckBox;
     QPushButton* yesButton;
     QPushButton* noButton;
     QString updateDownloadUrl;
+    QString emulatorTag;
+    QString emulatorLocalHash;
+    QString emulatorLatestHash;
 
     QNetworkAccessManager* networkManager;
     std::shared_ptr<gui_settings> m_gui_settings;

@@ -880,6 +880,13 @@
                 </widget>
                </item>
                <item>
+                <widget class="QCheckBox" name="updateEmulatorCheckBox">
+                 <property name="text">
+                  <string>Also Update the Emulator (Latest Pre-release)</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QCheckBox" name="changelogCheckBox">
                  <property name="text">
                   <string>Always Show Changelog</string>

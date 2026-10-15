@@ -29,12 +29,6 @@
 #include "ui_version_dialog.h"
 #include "version_dialog.h"
 
-// Every GR2fork-EXODUS release has a tag and a name starting with RELEASE_PREFIX. LATEST_LABEL
-// is the download row and the installed entry that track the newest of them.
-constexpr auto EMULATOR_REPO = "junminlee2004/GR2fork";
-constexpr auto RELEASE_PREFIX = "Pre-release-GR2fork-EXODUS-";
-constexpr auto LATEST_LABEL = "Pre-release (GR2fork-EXODUS)";
-
 VersionDialog::VersionDialog(std::shared_ptr<gui_settings> gui_settings, QWidget* parent)
     : QDialog(parent), ui(new Ui::VersionDialog), m_gui_settings(std::move(gui_settings)) {
     ui->setupUi(this);
@@ -784,21 +778,7 @@ void VersionDialog::checkUpdatePre(const bool showMessage) {
         return;
     }
 
-    auto versions = VersionManager::GetVersionList({});
-
-    QString localHash;
-    QString localFolderPath;
-    QString localTag;
-
-    for (const auto& v : versions) {
-        if (v.type == VersionManager::VersionType::Nightly) {
-            localHash = QString::fromStdString(v.codename);
-            localFolderPath = QString::fromStdString(v.path);
-            localTag = QString::fromStdString(v.name);
-            break;
-        }
-    }
-
+    const QString localHash = InstalledPreReleaseHash();
     if (localHash.isEmpty()) {
         auto* tree = ui->downloadTreeWidget;
         int topCount = tree->topLevelItemCount();
@@ -875,6 +855,15 @@ void VersionDialog::checkUpdatePre(const bool showMessage) {
 
         reply->deleteLater();
     });
+}
+
+QString VersionDialog::InstalledPreReleaseHash() {
+    for (const auto& v : VersionManager::GetVersionList({})) {
+        if (v.type == VersionManager::VersionType::Nightly) {
+            return QString::fromStdString(v.codename);
+        }
+    }
+    return {};
 }
 
 void VersionDialog::showPreReleaseUpdateDialog(const QString& localHash, const QString& latestHash,
@@ -1032,6 +1021,7 @@ void VersionDialog::InstallLatestPreRelease() {
         reply->deleteLater();
         if (reply->error() != QNetworkReply::NoError) {
             QMessageBox::warning(this, tr("Error"), reply->errorString());
+            emit PreReleaseInstallFailed();
             return;
         }
         const QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
@@ -1043,6 +1033,7 @@ void VersionDialog::InstallLatestPreRelease() {
             }
         }
         QMessageBox::warning(this, tr("Error"), tr("No pre-releases found."));
+        emit PreReleaseInstallFailed();
     });
 }
 
@@ -1058,6 +1049,7 @@ void VersionDialog::installPreReleaseByTag(const QString& tagName) {
         if (reply->error() != QNetworkReply::NoError) {
             QMessageBox::warning(this, tr("Error"), reply->errorString());
             reply->deleteLater();
+            emit PreReleaseInstallFailed();
             return;
         }
 
@@ -1086,6 +1078,7 @@ void VersionDialog::installPreReleaseByTag(const QString& tagName) {
             QMessageBox::warning(this, tr("Error"),
                                  tr("No download URL found for the specified asset."));
             reply->deleteLater();
+            emit PreReleaseInstallFailed();
             return;
         }
         showDownloadDialog(tagName, downloadUrl);
@@ -1128,6 +1121,7 @@ void VersionDialog::showDownloadDialog(const QString& tagName, const QString& do
             reply->deleteLater();
             dlg->close();
             dlg->deleteLater();
+            emit PreReleaseInstallFailed();
             return;
         }
 
@@ -1143,6 +1137,7 @@ void VersionDialog::showDownloadDialog(const QString& tagName, const QString& do
             QMessageBox::warning(this, tr("Error"),
                                  tr("Failed to save download file") + ":\n" + zipPath);
             reply->deleteLater();
+            emit PreReleaseInstallFailed();
             return;
         }
         zipFile.write(data);
@@ -1202,6 +1197,7 @@ void VersionDialog::showDownloadDialog(const QString& tagName, const QString& do
 
                 if (!QDir(destFolder).exists()) {
                     QMessageBox::critical(this, tr("Error"), tr("Extraction failure."));
+                    emit PreReleaseInstallFailed();
                     return;
                 }
 
@@ -1241,6 +1237,7 @@ void VersionDialog::showDownloadDialog(const QString& tagName, const QString& do
             QMessageBox::warning(this, tr("Error"),
                                  tr("Failed to create the update script file") + ":\n" +
                                      scriptFilePath);
+            emit PreReleaseInstallFailed();
         }
 
         reply->deleteLater();

@@ -113,7 +113,13 @@ bool MainWindow::Init() {
 #endif
 
     LoadVersionComboBox();
-    if (m_gui_settings->GetValue(gui::vm_checkOnStartup).toBool()) {
+    // The launcher's own startup check already offers the newest pre-release.
+    bool emulatorChecked = false;
+#ifdef ENABLE_UPDATER
+    emulatorChecked = m_gui_settings->GetValue(gui::gen_checkForUpdates).toBool() &&
+                      m_gui_settings->GetValue(gui::gen_updateEmulator).toBool();
+#endif
+    if (!emulatorChecked && m_gui_settings->GetValue(gui::vm_checkOnStartup).toBool()) {
         auto versionDialog = new VersionDialog(m_gui_settings, this);
         versionDialog->checkUpdatePre(false);
     }
@@ -642,6 +648,7 @@ void MainWindow::CreateConnects() {
     connect(ui->updaterAct, &QAction::triggered, this, [this]() {
         auto checkUpdate = new CheckUpdate(m_gui_settings, true);
         checkUpdate->exec();
+        LoadVersionComboBox();
     });
 #endif
 

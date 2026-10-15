@@ -26,6 +26,7 @@
 #include "check_update.h"
 #include "common/path_util.h"
 #include "common/scm_rev.h"
+#include "version_dialog.h"
 
 using namespace Common::FS;
 
@@ -142,23 +143,61 @@ tr("The Auto Updater allows up to 60 update checks per hour.\\nYou have reached 
         QDateTime dateTime = QDateTime::fromString(latestDate, Qt::ISODate);
         latestDate = dateTime.isValid() ? dateTime.toString("yyyy-MM-dd HH:mm:ss") : "Unknown date";
 
-        if (latestRev == currentRev) {
-            if (showMessage) {
-                QMessageBox::information(this, tr("Auto Updater"),
-                                         tr("Your version is already up to date!"));
+        const bool launcherUpdate = latestRev != currentRev;
+        const auto finish = [this, showMessage, launcherUpdate, downloadUrl, latestDate, latestRev,
+                             currentDate, currentRev]() {
+            if (!launcherUpdate && emulatorTag.isEmpty()) {
+                if (showMessage) {
+                    QMessageBox::information(this, tr("Auto Updater"),
+                                             tr("Your version is already up to date!"));
+                }
+                close();
+                return;
             }
-            close();
-            return;
+            setupUI(launcherUpdate, downloadUrl, latestDate, latestRev, currentDate, currentRev);
+        };
+        if (m_gui_settings->GetValue(gui::gen_updateEmulator).toBool()) {
+            CheckEmulatorUpdate(finish);
         } else {
-            setupUI(downloadUrl, latestDate, latestRev, currentDate, currentRev);
+            finish();
         }
         reply->deleteLater();
     });
 }
 
-void CheckUpdate::setupUI(const QString& downloadUrl, const QString& latestDate,
-                          const QString& latestRev, const QString& currentDate,
-                          const QString& currentRev) {
+// Sets emulatorTag when a GR2fork-EXODUS pre-release newer than the installed one exists.
+void CheckUpdate::CheckEmulatorUpdate(const std::function<void()>& done) {
+    const QString versionPath = m_gui_settings->GetValue(gui::vm_versionPath).toString();
+    emulatorLocalHash = VersionDialog::InstalledPreReleaseHash();
+    if (versionPath.isEmpty() || !QDir(versionPath).exists() || emulatorLocalHash.isEmpty()) {
+        done();
+        return;
+    }
+
+    QNetworkRequest request(QString("https://api.github.com/repos/%1/releases").arg(EMULATOR_REPO));
+    QNetworkReply* reply = networkManager->get(request);
+    connect(reply, &QNetworkReply::finished, this, [this, reply, done]() {
+        reply->deleteLater();
+        if (reply->error() == QNetworkReply::NoError) {
+            for (const QJsonValue& value : QJsonDocument::fromJson(reply->readAll()).array()) {
+                const QString tag = value.toObject()["tag_name"].toString();
+                if (tag.startsWith(RELEASE_PREFIX)) {
+                    const QString hash = tag.mid(tag.lastIndexOf('-') + 1);
+                    if (hash != emulatorLocalHash) {
+                        emulatorTag = tag;
+                        emulatorLatestHash = hash;
+                    }
+                    break;
+                }
+            }
+        }
+        done();
+    });
+}
+
+void CheckUpdate::setupUI(bool launcherUpdate, const QString& downloadUrl,
+                          const QString& latestDate, const QString& latestRev,
+                          const QString& currentDate, const QString& currentRev) {
     QVBoxLayout* layout = new QVBoxLayout(this);
     QHBoxLayout* titleLayout = new QHBoxLayout();
 
@@ -168,26 +207,41 @@ void CheckUpdate::setupUI(const QString& downloadUrl, const QString& latestDate,
     imageLabel->setScaledContents(true);
     imageLabel->setFixedSize(50, 50);
 
-    QLabel* titleLabel = new QLabel("<h1>" + tr("Update Available - GUI") + "</h1>", this);
+    QString title = tr("Update Available - GUI");
+    if (!emulatorTag.isEmpty()) {
+        title = launcherUpdate ? tr("Updates Available") : tr("Update Available - Emulator");
+    }
+    QLabel* titleLabel = new QLabel("<h1>" + title + "</h1>", this);
     titleLayout->addWidget(imageLabel);
     titleLayout->addWidget(titleLabel);
     layout->addLayout(titleLayout);
 
-    QString updateText = QString("<p>"
-                                 "<table><tr>"
-                                 "<td><b>" +
-                                 tr("Current Version") +
-                                 ":</b></td>"
-                                 "<td>%1</td>"
-                                 "<td>(%2)</td>"
-                                 "</tr><tr>"
-                                 "<td><b>" +
-                                 tr("Latest Version") +
-                                 ":</b></td>"
-                                 "<td>%3</td>"
-                                 "<td>(%4)</td>"
-                                 "</tr></table></p>")
-                             .arg(currentRev.left(7), currentDate, latestRev.left(7), latestDate);
+    QString updateText;
+    if (launcherUpdate) {
+        updateText = QString("<p>"
+                             "<table><tr>"
+                             "<td><b>" +
+                             tr("Current Version") +
+                             ":</b></td>"
+                             "<td>%1</td>"
+                             "<td>(%2)</td>"
+                             "</tr><tr>"
+                             "<td><b>" +
+                             tr("Latest Version") +
+                             ":</b></td>"
+                             "<td>%3</td>"
+                             "<td>(%4)</td>"
+                             "</tr></table></p>")
+                         .arg(currentRev.left(7), currentDate, latestRev.left(7), latestDate);
+    }
+    if (!emulatorTag.isEmpty()) {
+        updateText += QString("<p><table>"
+                              "<tr><td><b>%1:</b></td><td>%2</td></tr>"
+                              "<tr><td><b>%3:</b></td><td>%4</td></tr>"
+                              "</table></p>")
+                          .arg(tr("Current Emulator"), emulatorLocalHash.left(7),
+                               tr("Latest Emulator"), emulatorLatestHash.left(7));
+    }
 
     QLabel* updateLabel = new QLabel(updateText, this);
     layout->addWidget(updateLabel);
@@ -195,6 +249,9 @@ void CheckUpdate::setupUI(const QString& downloadUrl, const QString& latestDate,
     // Setup bottom layout with action buttons
     autoUpdateCheckBox = new QCheckBox(tr("Check for Updates at Startup"), this);
     layout->addWidget(autoUpdateCheckBox);
+    updateEmulatorCheckBox =
+        new QCheckBox(tr("Also Update the Emulator (Latest Pre-release)"), this);
+    layout->addWidget(updateEmulatorCheckBox);
 
     QHBoxLayout* updatePromptLayout = new QHBoxLayout();
     QLabel* updatePromptLabel = new QLabel(tr("Do you want to update?"), this);
@@ -212,11 +269,11 @@ void CheckUpdate::setupUI(const QString& downloadUrl, const QString& latestDate,
 
     layout->addLayout(updatePromptLayout);
 
-    // Don't show changelog button if:
-    // The current version is a pre-release and the version to be downloaded is a release.
+    // The changelog covers the launcher. It is not shown without a launcher update, or when the
+    // current version is a pre-release and the version to be downloaded is a release.
     bool current_isWIP = currentRev.endsWith("WIP", Qt::CaseInsensitive);
     bool latest_isWIP = latestRev.endsWith("WIP", Qt::CaseInsensitive);
-    if (current_isWIP && !latest_isWIP) {
+    if (!launcherUpdate || (current_isWIP && !latest_isWIP)) {
     } else {
         QTextBrowser* textField = new QTextBrowser(this);
         textField->setReadOnly(true);
@@ -254,10 +311,25 @@ void CheckUpdate::setupUI(const QString& downloadUrl, const QString& latestDate,
         }
     }
 
-    connect(yesButton, &QPushButton::clicked, this, [this, downloadUrl]() {
+    connect(yesButton, &QPushButton::clicked, this, [this, downloadUrl, launcherUpdate]() {
         yesButton->setEnabled(false);
         noButton->setEnabled(false);
-        DownloadUpdate(downloadUrl);
+        // The launcher update ends by restarting the launcher, so the emulator is installed first.
+        const auto updateLauncher = [this, downloadUrl, launcherUpdate]() {
+            if (launcherUpdate) {
+                DownloadUpdate(downloadUrl);
+            } else {
+                close();
+            }
+        };
+        if (emulatorTag.isEmpty() || !updateEmulatorCheckBox->isChecked()) {
+            updateLauncher();
+            return;
+        }
+        auto* versionDialog = new VersionDialog(m_gui_settings, this);
+        connect(versionDialog, &VersionDialog::PreReleaseInstalled, this, updateLauncher);
+        connect(versionDialog, &VersionDialog::PreReleaseInstallFailed, this, updateLauncher);
+        versionDialog->installPreReleaseByTag(emulatorTag);
     });
 
     connect(noButton, &QPushButton::clicked, this, [this]() { close(); });
@@ -267,6 +339,11 @@ void CheckUpdate::setupUI(const QString& downloadUrl, const QString& latestDate,
         const auto user_dir = Common::FS::GetUserPath(Common::FS::PathType::UserDir);
         m_gui_settings->SetValue(gui::gen_checkForUpdates, (state == Qt::Checked));
     });
+    updateEmulatorCheckBox->setChecked(m_gui_settings->GetValue(gui::gen_updateEmulator).toBool());
+    connect(updateEmulatorCheckBox, &QCheckBox::checkStateChanged, this,
+            [this](Qt::CheckState state) {
+                m_gui_settings->SetValue(gui::gen_updateEmulator, state == Qt::Checked);
+            });
 
     setLayout(layout);
 }

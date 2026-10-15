@@ -18,6 +18,8 @@ const QString version_manager = "version_manager";
 
 // general
 const gui_value gen_checkForUpdates = gui_value(general_settings, "checkForUpdates", true);
+const gui_value gen_updateEmulator =
+    gui_value(general_settings, "updateEmulatorWithLauncher", true);
 // Set once the startup update check has been turned on for a qt_ui.ini written when it was off by
 // default.
 const gui_value gen_checkForUpdatesTurnedOn =
