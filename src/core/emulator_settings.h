@@ -463,11 +463,6 @@ struct GPUSettings {
     // which costs it a quarter to a third of its speed. Hosts with fewer than 6 logical CPUs or
     // 4 physical cores are left alone.
     Setting<bool> gpu_thread_core_reserve{true};
-    // Windows only. Restrict the whole process to the first logical CPU of every physical core,
-    // the same thing as ticking only the even CPUs in Task Manager: no two emulator or guest
-    // threads can then share a core. Windows otherwise packs busy threads onto both hyperthreads
-    // of a few cores while others idle. Works together with gpu_thread_core_reserve.
-    Setting<bool> one_thread_per_core{false};
     // Rebuild the vertex input layout only when the pipeline, the instance step rates or an
     // attribute's format or stride changed, instead of on every draw.
     Setting<bool> vertex_layout_memo{true};
@@ -743,7 +738,6 @@ struct GPUSettings {
             GPU_OVERRIDE(gather_input_memo),
             GPU_OVERRIDE(tracker_lock_spin_rounds),
             GPU_OVERRIDE(gpu_thread_core_reserve),
-            GPU_OVERRIDE(one_thread_per_core),
             GPU_OVERRIDE(vertex_layout_memo),
             GPU_OVERRIDE(covered_range_skip),
             GPU_OVERRIDE(residency_bitmap),
@@ -838,7 +832,7 @@ struct GPUSettings {
     pending_pop_throttle, stream_copy_workers, dyn_state_memo, bind_write_plan, \
     findimg_memo_first, findimg_slot_hint, bind_image_lean, desc_delta_flat, \
     draw_glue_memo, image_fast_state, guest_copy_lock_batch, spec_fp_cache, \
-    runtime_info_stamp_gate, userfaultfd, gpu_thread_core_reserve, one_thread_per_core, \
+    runtime_info_stamp_gate, userfaultfd, gpu_thread_core_reserve, \
     vertex_layout_memo, covered_range_skip, residency_bitmap, \
     readback_linear_images_async, inline_fetch_shader, stream_barrier_skip, \
     clean_sync_peek, readback_offload
@@ -1176,7 +1170,6 @@ public:
     SETTING_FORWARD_BOOL(m_gpu, GatherInputMemo, gather_input_memo)
     SETTING_FORWARD(m_gpu, TrackerLockSpinRounds, tracker_lock_spin_rounds)
     SETTING_FORWARD_BOOL(m_gpu, GpuThreadCoreReserve, gpu_thread_core_reserve)
-    SETTING_FORWARD_BOOL(m_gpu, OneThreadPerCore, one_thread_per_core)
     SETTING_FORWARD_BOOL(m_gpu, VertexLayoutMemo, vertex_layout_memo)
     SETTING_FORWARD_BOOL(m_gpu, CoveredRangeSkip, covered_range_skip)
     SETTING_FORWARD_BOOL(m_gpu, ResidencyBitmap, residency_bitmap)

@@ -13,11 +13,6 @@ std::vector<TuningPage::Group> TuningPage::Table() {
         {tr("Thread Placement"),
          true,
          {
-             {"one_thread_per_core", tr("One Thread per Core (Windows)"),
-              tr("Windows only. Restricts the whole process to the first logical CPU of every "
-                 "physical core, the same as ticking only the even CPUs in Task Manager, so no two "
-                 "emulator or guest threads share a core. Works together with the core reserved "
-                 "for the GPU thread.")},
              {"gpu_thread_core_reserve", tr("Reserve a Core for the GPU Thread"),
               tr("Pins the GPU command thread to a physical core of its own, both hyperthreads, "
                  "and takes that core away from every other thread of the process, guest threads "
