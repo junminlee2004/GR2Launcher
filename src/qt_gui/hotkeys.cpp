@@ -176,8 +176,9 @@ void Hotkeys::SaveHotkeys(bool CloseOnSave) {
 
     auto add_mapping = [&](const QString& buttonText, const std::string& output_name) {
         outputs.push_back(output_name);
+        // Unmapped hotkeys are written too, the emulator restores the default of a missing one
+        lines.push_back(output_name + " = " + buttonText.toStdString());
         if (buttonText.toStdString() != "unmapped") {
-            lines.push_back(output_name + " = " + buttonText.toStdString());
             inputs.push_back(buttonText.toStdString());
         }
     };
@@ -226,14 +227,6 @@ void Hotkeys::SaveHotkeys(bool CloseOnSave) {
     add_mapping(ui->mouseGyroButton->text(), "hotkey_toggle_mouse_to_gyro");
     add_mapping(ui->mouseTouchpadButton->text(), "hotkey_toggle_mouse_to_touchpad");
     add_mapping(ui->mouseTouchpadSwipeButton->text(), "hotkey_toggle_mouse_to_touchpad_swipe");
-
-    // The emulator adds the default binding of a hotkey that has no line in global.ini.
-    for (const std::string& output : outputs) {
-        if (output != "hotkey_renderdoc_capture" &&
-            std::ranges::none_of(
-                lines, [&](const std::string& l) { return l.starts_with(output + " = "); }))
-            lines.push_back(output + " = unmapped");
-    }
 
     auto hotkey_file = Input::GetFoolproofInputConfigFile("global");
     std::fstream file(hotkey_file);
