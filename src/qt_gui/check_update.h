@@ -29,9 +29,10 @@ private:
     void setupUI(bool launcherUpdate, const QString& downloadUrl, const QString& latestDate,
                  const QString& latestRev, const QString& currentDate, const QString& currentRev);
 
-    void requestChangelog(const QString& currentRev, const QString& latestRev,
-                          const QString& downloadUrl, const QString& latestDate,
-                          const QString& currentDate);
+    // Lists the commits between two revisions of the launcher or, if emulator is true, of the
+    // emulator in the changelog.
+    void requestChangelog(bool emulator, const QString& currentRev, const QString& latestRev);
+    void showChangelog();
 
     QCheckBox* autoUpdateCheckBox;
     QCheckBox* updateEmulatorCheckBox;
@@ -41,6 +42,8 @@ private:
     QString emulatorTag;
     QString emulatorLocalHash;
     QString emulatorLatestHash;
+    QString launcherChanges;
+    QString emulatorChanges;
 
     QNetworkAccessManager* networkManager;
     std::shared_ptr<gui_settings> m_gui_settings;

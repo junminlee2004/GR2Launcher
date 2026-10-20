@@ -269,12 +269,13 @@ void CheckUpdate::setupUI(bool launcherUpdate, const QString& downloadUrl,
 
     layout->addLayout(updatePromptLayout);
 
-    // The changelog covers the launcher. It is not shown without a launcher update, or when the
-    // current version is a pre-release and the version to be downloaded is a release.
+    // The changelog lists the changes of the launcher update and of the emulator update. The
+    // launcher's are left out when the current version is a pre-release and the version to be
+    // downloaded is a release.
     bool current_isWIP = currentRev.endsWith("WIP", Qt::CaseInsensitive);
     bool latest_isWIP = latestRev.endsWith("WIP", Qt::CaseInsensitive);
-    if (!launcherUpdate || (current_isWIP && !latest_isWIP)) {
-    } else {
+    const bool launcherChangelog = launcherUpdate && !(current_isWIP && !latest_isWIP);
+    if (launcherChangelog || !emulatorTag.isEmpty()) {
         QTextBrowser* textField = new QTextBrowser(this);
         textField->setReadOnly(true);
         textField->setFixedWidth(500);
@@ -285,12 +286,21 @@ void CheckUpdate::setupUI(bool launcherUpdate, const QString& downloadUrl,
         QPushButton* toggleButton = new QPushButton(tr("Show Changelog"), this);
         layout->addWidget(toggleButton);
 
+        const auto requestChangelogs = [this, launcherChangelog, currentRev, latestRev]() {
+            launcherChanges.clear();
+            emulatorChanges.clear();
+            if (launcherChangelog) {
+                requestChangelog(false, currentRev, latestRev);
+            }
+            if (!emulatorTag.isEmpty()) {
+                requestChangelog(true, emulatorLocalHash, emulatorLatestHash);
+            }
+        };
+
         connect(toggleButton, &QPushButton::clicked,
-                [this, textField, toggleButton, currentRev, latestRev, downloadUrl, latestDate,
-                 currentDate]() {
+                [this, textField, toggleButton, requestChangelogs]() {
                     if (!textField->isVisible()) {
-                        requestChangelog(currentRev, latestRev, downloadUrl, latestDate,
-                                         currentDate);
+                        requestChangelogs();
                         textField->setVisible(true);
                         toggleButton->setText(tr("Hide Changelog"));
                         adjustSize();
@@ -303,7 +313,7 @@ void CheckUpdate::setupUI(bool launcherUpdate, const QString& downloadUrl,
                 });
 
         if (m_gui_settings->GetValue(gui::gen_showChangeLog).toBool()) {
-            requestChangelog(currentRev, latestRev, downloadUrl, latestDate, currentDate);
+            requestChangelogs();
             textField->setVisible(true);
             toggleButton->setText(tr("Hide Changelog"));
             adjustSize();
@@ -348,76 +358,86 @@ void CheckUpdate::setupUI(bool launcherUpdate, const QString& downloadUrl,
     setLayout(layout);
 }
 
-void CheckUpdate::requestChangelog(const QString& currentRev, const QString& latestRev,
-                                   const QString& downloadUrl, const QString& latestDate,
-                                   const QString& currentDate) {
-    QString compareUrlString =
-        QString("https://api.github.com/repos/junminlee2004/GR2Launcher/compare/%1...%2")
-            .arg(currentRev)
-            .arg(latestRev);
+void CheckUpdate::requestChangelog(bool emulator, const QString& currentRev,
+                                   const QString& latestRev) {
+    QString compareUrlString = QString("https://api.github.com/repos/%1/compare/%2...%3")
+                                   .arg(emulator ? EMULATOR_REPO : "junminlee2004/GR2Launcher")
+                                   .arg(currentRev)
+                                   .arg(latestRev);
 
     QUrl compareUrl(compareUrlString);
     QNetworkRequest compareRequest(compareUrl);
     QNetworkReply* compareReply = networkManager->get(compareRequest);
 
-    connect(compareReply, &QNetworkReply::finished, this,
-            [this, compareReply, downloadUrl, latestDate, latestRev, currentDate, currentRev]() {
-                if (compareReply->error() != QNetworkReply::NoError) {
-                    QMessageBox::warning(
-                        this, tr("Error"),
-                        QString(tr("Network error:") + "\n%1").arg(compareReply->errorString()));
-                    compareReply->deleteLater();
-                    return;
-                }
+    connect(compareReply, &QNetworkReply::finished, this, [this, compareReply, emulator]() {
+        if (compareReply->error() != QNetworkReply::NoError) {
+            QMessageBox::warning(
+                this, tr("Error"),
+                QString(tr("Network error:") + "\n%1").arg(compareReply->errorString()));
+            compareReply->deleteLater();
+            return;
+        }
 
-                QByteArray compareResponse = compareReply->readAll();
-                QJsonDocument compareJsonDoc(QJsonDocument::fromJson(compareResponse));
-                QJsonObject compareJsonObj = compareJsonDoc.object();
-                QJsonArray commits = compareJsonObj["commits"].toArray();
+        QByteArray compareResponse = compareReply->readAll();
+        QJsonDocument compareJsonDoc(QJsonDocument::fromJson(compareResponse));
+        QJsonObject compareJsonObj = compareJsonDoc.object();
+        QJsonArray commits = compareJsonObj["commits"].toArray();
 
-                QString changes;
-                for (const QJsonValue& commitValue : commits) {
-                    QJsonObject commitObj = commitValue.toObject();
-                    QString message = commitObj["commit"].toObject()["message"].toString();
+        QString changes;
+        for (const QJsonValue& commitValue : commits) {
+            QJsonObject commitObj = commitValue.toObject();
+            QString message = commitObj["commit"].toObject()["message"].toString();
 
-                    // Remove texts after first line break, if any, to make it cleaner
-                    int newlineIndex = message.indexOf('\n');
-                    if (newlineIndex != -1) {
-                        message = message.left(newlineIndex);
-                    }
-                    if (!changes.isEmpty()) {
-                        changes += "<br>";
-                    }
-                    changes += "&nbsp;&nbsp;&nbsp;&nbsp;• " + message;
-                }
+            // Remove texts after first line break, if any, to make it cleaner
+            int newlineIndex = message.indexOf('\n');
+            if (newlineIndex != -1) {
+                message = message.left(newlineIndex);
+            }
+            if (!changes.isEmpty()) {
+                changes += "<br>";
+            }
+            changes += "&nbsp;&nbsp;&nbsp;&nbsp;• " + message;
+        }
 
-                // Update the text field with the changelog
-                QTextBrowser* textField = findChild<QTextBrowser*>();
-                if (textField) {
-                    QRegularExpression re("\\(\\#(\\d+)\\)");
-                    QString newChanges;
-                    int lastIndex = 0;
-                    QRegularExpressionMatchIterator i = re.globalMatch(changes);
-                    while (i.hasNext()) {
-                        QRegularExpressionMatch match = i.next();
-                        newChanges += changes.mid(lastIndex, match.capturedStart() - lastIndex);
-                        QString num = match.captured(1);
-                        newChanges += QString("(<a "
-                                              "href=\"https://github.com/shadps4-emu/"
-                                              "shadps4-qtlauncher/pull/%1\">#%1</a>)")
-                                          .arg(num);
-                        lastIndex = match.capturedEnd();
-                    }
+        // The pull request numbers in the subjects are those of the upstream projects.
+        QRegularExpression re("\\(\\#(\\d+)\\)");
+        QString newChanges;
+        int lastIndex = 0;
+        QRegularExpressionMatchIterator i = re.globalMatch(changes);
+        while (i.hasNext()) {
+            QRegularExpressionMatch match = i.next();
+            newChanges += changes.mid(lastIndex, match.capturedStart() - lastIndex);
+            QString num = match.captured(1);
+            newChanges +=
+                QString("(<a href=\"https://github.com/%1/pull/%2\">#%2</a>)")
+                    .arg(emulator ? "shadps4-emu/shadPS4" : "shadps4-emu/shadps4-qtlauncher")
+                    .arg(num);
+            lastIndex = match.capturedEnd();
+        }
 
-                    newChanges += changes.mid(lastIndex);
-                    changes = newChanges;
+        newChanges += changes.mid(lastIndex);
+        QString& section = emulator ? emulatorChanges : launcherChanges;
+        section = newChanges;
+        showChangelog();
 
-                    textField->setOpenExternalLinks(true);
-                    textField->setHtml("<h2>" + tr("Changes") + ":</h2>" + changes);
-                }
+        compareReply->deleteLater();
+    });
+}
 
-                compareReply->deleteLater();
-            });
+void CheckUpdate::showChangelog() {
+    QTextBrowser* textField = findChild<QTextBrowser*>();
+    if (!textField) {
+        return;
+    }
+    QString html;
+    if (!launcherChanges.isEmpty()) {
+        html += "<h2>" + tr("GUI Changes") + ":</h2>" + launcherChanges;
+    }
+    if (!emulatorChanges.isEmpty()) {
+        html += "<h2>" + tr("Emulator Changes") + ":</h2>" + emulatorChanges;
+    }
+    textField->setOpenExternalLinks(true);
+    textField->setHtml(html);
 }
 
 void CheckUpdate::DownloadUpdate(const QString& url) {
