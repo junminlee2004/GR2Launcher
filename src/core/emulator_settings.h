@@ -462,7 +462,7 @@ struct GPUSettings {
     // 5 s. Without it the OS can park a busy thread on the command thread's sibling hyperthread,
     // which costs it a quarter to a third of its speed. Hosts with fewer than 6 logical CPUs or
     // 4 physical cores are left alone.
-    Setting<bool> gpu_thread_core_reserve{true};
+    Setting<bool> gpu_thread_core_reserve{false};
     // Rebuild the vertex input layout only when the pipeline, the instance step rates or an
     // attribute's format or stride changed, instead of on every draw.
     Setting<bool> vertex_layout_memo{true};
