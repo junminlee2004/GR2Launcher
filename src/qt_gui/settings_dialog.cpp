@@ -619,6 +619,7 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
         ui->gyroInvertYawCheckBox->installEventFilter(this);
         ui->gyroInvertXCheckBox->installEventFilter(this);
         ui->gyroInvertRollCheckBox->installEventFilter(this);
+        ui->vibrationCheckBox->installEventFilter(this);
         ui->keyboardAsKeyboardCheckBox->installEventFilter(this);
         ui->micComboBox->installEventFilter(this);
         ui->usbComboBox->installEventFilter(this);
@@ -892,6 +893,7 @@ void SettingsDialog::LoadValuesFromConfig() {
     ui->gyroInvertYawCheckBox->setChecked(EmulatorSettings.IsGyroInvertYaw());
     ui->gyroInvertXCheckBox->setChecked(EmulatorSettings.IsGyroInvertX());
     ui->gyroInvertRollCheckBox->setChecked(EmulatorSettings.IsGyroInvertRoll());
+    ui->vibrationCheckBox->setChecked(EmulatorSettings.IsVibrationEnabled());
     ui->backgroundControllerCheckBox->setChecked(EmulatorSettings.IsBackgroundControllerInput());
     ui->keyboardAsKeyboardCheckBox->setChecked(EmulatorSettings.IsKeyboardUsedAsKeyboard());
     ui->usbComboBox->setCurrentIndex(EmulatorSettings.GetUsbDeviceBackend());
@@ -1232,6 +1234,8 @@ void SettingsDialog::updateNoteTextEdit(const QString& elementName) {
         text = tr("Default tab when opening settings:\\nChoose which tab will open, the default is General.");
     } else if (elementName == "motionControlsCheckBox") {
         text = tr("Enable Motion Controls:\\nWhen enabled it will use the controller's motion control if supported.");
+    } else if (elementName == "vibrationCheckBox") {
+        text = tr("Enable Vibration:\\nWhen disabled, games cannot vibrate the controller.");
     } else if (elementName == "usbComboBox") {
         text = tr("USB Device:\\nReal USB Device: Use a real USB Device attached to the system.\\nSkylander Portal: Emulate a Skylander Portal of Power.\\nInfinity Base: Emulate a Disney Infinity Base.\\nDimensions Toypad: Emulate a Lego Dimensions Toypad.");
     }
@@ -1349,6 +1353,7 @@ void SettingsDialog::UpdateSettings(bool is_specific) {
     EmulatorSettings.SetGyroInvertYaw(ui->gyroInvertYawCheckBox->isChecked(), is_specific);
     EmulatorSettings.SetGyroInvertX(ui->gyroInvertXCheckBox->isChecked(), is_specific);
     EmulatorSettings.SetGyroInvertRoll(ui->gyroInvertRollCheckBox->isChecked(), is_specific);
+    EmulatorSettings.SetVibrationEnabled(ui->vibrationCheckBox->isChecked(), is_specific);
     EmulatorSettings.SetBackgroundControllerInput(ui->backgroundControllerCheckBox->isChecked(),
                                                   is_specific);
     EmulatorSettings.SetKeyboardUsedAsKeyboard(ui->keyboardAsKeyboardCheckBox->isChecked(),

@@ -1716,6 +1716,13 @@
                 </widget>
                </item>
                <item>
+                <widget class="QCheckBox" name="vibrationCheckBox">
+                 <property name="text">
+                  <string>Enable Vibration</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QCheckBox" name="backgroundControllerCheckBox">
                  <property name="text">
                   <string>Enable Background Controller Input</string>
