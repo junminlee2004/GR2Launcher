@@ -487,6 +487,10 @@ struct GPUSettings {
     // a queue of its own copies them; a GPU write marked in the window meanwhile keeps its pages
     // GPU modified.
     Setting<bool> readback_offload{false};
+    // Milliseconds the GPU command thread waits for a new graphics pipeline, which compiles on a
+    // worker thread. Past the wait the draws that need it are skipped until the compile is done:
+    // a lower value means shorter hitches and more pop-in. Clamped to 50000.
+    Setting<int> pipeline_sync_budget_ms{50};
     // Flush the open graphics batch early when it already holds this many draws and every batch
     // submitted so far has retired (the ring runs dry while the rest of the batch is recorded).
     // Rounded up to a multiple of 32, and ignored unless flush_draw_interval is set larger than
@@ -749,6 +753,7 @@ struct GPUSettings {
             GPU_OVERRIDE(stream_barrier_skip),
             GPU_OVERRIDE(clean_sync_peek),
             GPU_OVERRIDE(readback_offload),
+            GPU_OVERRIDE(pipeline_sync_budget_ms),
             GPU_OVERRIDE(ring_drain_flush_draws),
             GPU_OVERRIDE(pending_pop_throttle),
             GPU_OVERRIDE(stream_copy_workers),
@@ -841,7 +846,7 @@ struct GPUSettings {
     runtime_info_stamp_gate, userfaultfd, gpu_thread_core_reserve, \
     vertex_layout_memo, covered_range_skip, residency_bitmap, \
     readback_linear_images_async, inline_fetch_shader, stream_barrier_skip, \
-    clean_sync_peek, readback_offload, fast_shader_math
+    clean_sync_peek, readback_offload, fast_shader_math, pipeline_sync_budget_ms
 // clang-format on
 template <
     typename BasicJsonType,
@@ -1182,6 +1187,7 @@ public:
     SETTING_FORWARD_BOOL(m_gpu, StreamBarrierSkip, stream_barrier_skip)
     SETTING_FORWARD_BOOL(m_gpu, CleanSyncPeek, clean_sync_peek)
     SETTING_FORWARD_BOOL(m_gpu, ReadbackOffload, readback_offload)
+    SETTING_FORWARD(m_gpu, PipelineSyncBudgetMs, pipeline_sync_budget_ms)
     SETTING_FORWARD(m_gpu, RingDrainFlushDraws, ring_drain_flush_draws)
     SETTING_FORWARD(m_gpu, PendingPopThrottle, pending_pop_throttle)
     SETTING_FORWARD(m_gpu, StreamCopyWorkers, stream_copy_workers)
