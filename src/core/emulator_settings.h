@@ -465,7 +465,7 @@ struct GPUSettings {
     // 5 s. Without it the OS can park a busy thread on the command thread's sibling hyperthread,
     // which costs it a quarter to a third of its speed. Hosts with fewer than 6 logical CPUs or
     // 4 physical cores are left alone.
-    Setting<bool> gpu_thread_core_reserve{false};
+    Setting<bool> one_core_gpu_thread_pin{false};
     // Rebuild the vertex input layout only when the pipeline, the instance step rates or an
     // attribute's format or stride changed, instead of on every draw.
     Setting<bool> vertex_layout_memo{true};
@@ -746,7 +746,7 @@ struct GPUSettings {
             GPU_OVERRIDE(texture_lru_lazy_touch),
             GPU_OVERRIDE(gather_input_memo),
             GPU_OVERRIDE(tracker_lock_spin_rounds),
-            GPU_OVERRIDE(gpu_thread_core_reserve),
+            GPU_OVERRIDE(one_core_gpu_thread_pin),
             GPU_OVERRIDE(vertex_layout_memo),
             GPU_OVERRIDE(covered_range_skip),
             GPU_OVERRIDE(residency_bitmap),
@@ -843,10 +843,11 @@ struct GPUSettings {
     pending_pop_throttle, stream_copy_workers, dyn_state_memo, bind_write_plan, \
     findimg_memo_first, findimg_slot_hint, bind_image_lean, desc_delta_flat, \
     draw_glue_memo, image_fast_state, guest_copy_lock_batch, spec_fp_cache, \
-    runtime_info_stamp_gate, userfaultfd, gpu_thread_core_reserve, \
+    runtime_info_stamp_gate, userfaultfd, \
     vertex_layout_memo, covered_range_skip, residency_bitmap, \
     readback_linear_images_async, inline_fetch_shader, stream_barrier_skip, \
-    clean_sync_peek, readback_offload, fast_shader_math, pipeline_sync_budget_ms
+    clean_sync_peek, readback_offload, fast_shader_math, pipeline_sync_budget_ms, \
+    one_core_gpu_thread_pin
 // clang-format on
 template <
     typename BasicJsonType,
@@ -1180,7 +1181,7 @@ public:
     SETTING_FORWARD_BOOL(m_gpu, TextureLruLazyTouch, texture_lru_lazy_touch)
     SETTING_FORWARD_BOOL(m_gpu, GatherInputMemo, gather_input_memo)
     SETTING_FORWARD(m_gpu, TrackerLockSpinRounds, tracker_lock_spin_rounds)
-    SETTING_FORWARD_BOOL(m_gpu, GpuThreadCoreReserve, gpu_thread_core_reserve)
+    SETTING_FORWARD_BOOL(m_gpu, OneCoreGpuThreadPin, one_core_gpu_thread_pin)
     SETTING_FORWARD_BOOL(m_gpu, VertexLayoutMemo, vertex_layout_memo)
     SETTING_FORWARD_BOOL(m_gpu, CoveredRangeSkip, covered_range_skip)
     SETTING_FORWARD_BOOL(m_gpu, ResidencyBitmap, residency_bitmap)

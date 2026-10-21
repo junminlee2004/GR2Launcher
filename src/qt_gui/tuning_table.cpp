@@ -13,7 +13,7 @@ std::vector<TuningPage::Group> TuningPage::Table() {
         {tr("Thread Placement"),
          true,
          {
-             {"gpu_thread_core_reserve", tr("Reserve a Core for the GPU Thread"),
+             {"one_core_gpu_thread_pin", tr("One Core GPU Thread Pin"),
               tr("Pins the GPU command thread to a physical core of its own, both hyperthreads, "
                  "and takes that core away from every other thread of the process, guest threads "
                  "included. Hosts with fewer than 6 logical CPUs or 4 physical cores are left "
