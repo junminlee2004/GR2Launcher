@@ -334,6 +334,72 @@ jobs:
           fi
         done
   
+    - name: Bundle the latest GR2fork pre-release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # The self-updater copies its whole zip over the install, so the emulator and the launcher
+        # data that registers it go into separate with-emulator zips that the updater never picks.
+        release=$(curl -sfL -H "Authorization: token $GITHUB_TOKEN" \
+          "https://api.github.com/repos/junminlee2004/GR2fork/releases" |
+          jq -c '[.[] | select(.tag_name | startswith("Pre-release-GR2fork-EXODUS-"))][0]')
+        tag=$(echo "$release" | jq -r '.tag_name // empty')
+        if [ -z "$tag" ]; then
+          echo "No GR2fork pre-release found"
+          exit 1
+        fi
+        echo "Bundling $tag"
+        for platform in win64 linux macos; do
+          case $platform in
+            win64) exe=shadPS4.exe ;;
+            linux) exe=Shadps4-sdl.AppImage ;;
+            macos) exe=shadps4 ;;
+          esac
+          src=$(echo ./artifacts/GR2Launcher-$platform-qt-*)
+          dest=./bundles/$platform
+          version_dir="$dest/launcher/versions/Pre-release"
+          mkdir -p "$version_dir"
+          if [ $platform = macos ]; then
+            # The app opened from Finder runs from / and uses Application Support, so no user
+            # folder is added and the shortcut shares the launcher's emulator data.
+            tar -xf "$src/GR2Launcher-macos-qt.tar.gz" -C "$dest"
+          else
+            cp -a "$src/." "$dest/"
+          fi
+          url=$(echo "$release" | jq -r --arg p "$platform-sdl" \
+            '[.assets[] | select(.name | contains($p))][0].browser_download_url // empty')
+          if [ -z "$url" ]; then
+            echo "No $platform-sdl asset in $tag"
+            exit 1
+          fi
+          curl -sfL -o "emulator-$platform.zip" "$url"
+          unzip -q -o "emulator-$platform.zip" -d "$version_dir"
+
+          # Registers the bundled emulator the way the launcher's own pre-release install does.
+          exe_path="launcher/versions/Pre-release/$exe"
+          jq -n --arg path "$exe_path" --arg hash "${tag##*-}" \
+            --arg date "${{ needs.get-info.outputs.date }}" \
+            '[{codename: $hash, date: $date, name: "Pre-release (GR2fork-EXODUS)", path: $path, type: 1}]' \
+            > "$dest/launcher/versions.json"
+          printf '[version_manager]\nversionSelected=%s\n' "$exe_path" > "$dest/launcher/qt_ui.ini"
+
+          # Big picture shortcuts run from the launcher folder, so they use its user folder.
+          if [ $platform = win64 ]; then
+            printf '@echo off\r\ncd /d "%%~dp0"\r\nstart "" "launcher\\versions\\Pre-release\\%s" -b\r\n' \
+              "$exe" > "$dest/GR2fork Big Picture.cmd"
+          else
+            shortcut="$dest/GR2fork Big Picture.sh"
+            if [ $platform = macos ]; then
+              shortcut="$dest/GR2fork Big Picture.command"
+            fi
+            printf '#!/bin/sh\ncd "$(dirname "$0")" || exit 1\nexec ./%s -b\n' "$exe_path" > "$shortcut"
+            chmod a+x "$shortcut"
+          fi
+
+          # -y keeps the symlinks inside the macOS app.
+          (cd "$dest" && zip -qry "../../artifacts/GR2Launcher-$platform-with-emulator-${{ needs.get-info.outputs.date }}-${{ needs.get-info.outputs.shorthash }}.zip" .)
+        done
+
     - name: Get latest release information
       id: get_latest_release
       env:
