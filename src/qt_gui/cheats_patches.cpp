@@ -1,10 +1,13 @@
 ﻿// SPDX-FileCopyrightText: Copyright 2024 shadPS4 Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <algorithm>
+
 #include <QDir>
 #include <QEvent>
 #include <QFile>
 #include <QFileInfo>
+#include <QFont>
 #include <QHBoxLayout>
 #include <QItemSelectionModel>
 #include <QJsonArray>
@@ -22,6 +25,8 @@
 #include <QStringListModel>
 #include <QTabWidget>
 #include <QTextStream>
+#include <QToolButton>
+#include <QVBoxLayout>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
@@ -31,6 +36,70 @@
 #include "common/path_util.h"
 #include "core/emulator_state.h"
 #include "ui_cheats_patches.h"
+
+namespace {
+
+// A collapsible group of the patches that share a Category attribute: a header button that
+// folds the body, which holds the checkboxes.
+struct PatchSection {
+    QToolButton* header{};
+    QWidget* body{};
+};
+
+PatchSection addPatchSection(QVBoxLayout* list) {
+    PatchSection section{new QToolButton, new QWidget};
+    section.header->setCheckable(true);
+    section.header->setArrowType(Qt::RightArrow);
+    section.header->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    section.header->setAutoRaise(true);
+    QFont font = section.header->font();
+    font.setBold(true);
+    section.header->setFont(font);
+
+    auto* bodyLayout = new QVBoxLayout(section.body);
+    bodyLayout->setContentsMargins(20, 0, 0, 4);
+    section.body->setVisible(false);
+
+    QObject::connect(section.header, &QToolButton::toggled, section.body,
+                     [header = section.header, body = section.body](bool expanded) {
+                         header->setArrowType(expanded ? Qt::DownArrow : Qt::RightArrow);
+                         body->setVisible(expanded);
+                     });
+    list->addWidget(section.header, 0, Qt::AlignLeft);
+    list->addWidget(section.body);
+    return section;
+}
+
+qsizetype countCheckedPatches(const PatchSection& section) {
+    const QList<QCheckBox*> boxes = section.body->findChildren<QCheckBox*>();
+    return std::count_if(boxes.begin(), boxes.end(),
+                         [](const QCheckBox* box) { return box->isChecked(); });
+}
+
+void updatePatchSectionHeader(const PatchSection& section, const QString& category) {
+    // "&&" shows a literal '&' instead of marking a shortcut mnemonic.
+    const QString title = QString(category).replace("&", "&&");
+    const qsizetype total = section.body->findChildren<QCheckBox*>().size();
+    section.header->setText(
+        CheatsPatches::tr("%1 (%2 of %3 on)")
+            .arg(title, QString::number(countCheckedPatches(section)), QString::number(total)));
+}
+
+void addPatchToSection(const PatchSection& section, const QString& category,
+                       QCheckBox* patchCheckBox) {
+    QLayout* bodyLayout = section.body->layout();
+    QWidget* previous = bodyLayout->count() > 0
+                            ? bodyLayout->itemAt(bodyLayout->count() - 1)->widget()
+                            : section.header;
+    bodyLayout->addWidget(patchCheckBox);
+    // A widget added to a layout joins the end of the window's focus chain, so this keeps Tab in
+    // screen order when a category reappears later in the file.
+    QWidget::setTabOrder(previous, patchCheckBox);
+    QObject::connect(patchCheckBox, &QCheckBox::toggled, section.body,
+                     [section, category]() { updatePatchSectionHeader(section, category); });
+}
+
+} // namespace
 
 CheatsPatches::CheatsPatches(std::shared_ptr<gui_settings> gui_settings,
                              std::shared_ptr<IpcClient> ipc_client, const QString& gameName,
@@ -360,22 +429,7 @@ void CheatsPatches::onSaveButtonClicked() {
 }
 
 QCheckBox* CheatsPatches::findCheckBoxByName(const QString& name) {
-    for (int i = 0; i < ui->patchesGroupBoxLayout->count(); ++i) {
-        QLayoutItem* item = ui->patchesGroupBoxLayout->itemAt(i);
-        if (!item) {
-            continue;
-        }
-        QWidget* widget = item->widget();
-        QCheckBox* checkBox = qobject_cast<QCheckBox*>(widget);
-        if (checkBox) {
-            const auto patchName = checkBox->property("patchName");
-            if (patchName.isValid() &&
-                patchName.toString().toStdString().find(name.toStdString()) != std::string::npos) {
-                return checkBox;
-            }
-        }
-    }
-    return nullptr;
+    return m_patchCheckBoxes.value(name, nullptr);
 }
 
 void CheatsPatches::downloadCheats(const QString& source, const QString& gameSerial,
@@ -508,6 +562,7 @@ void CheatsPatches::populateFileListPatches() {
         delete item;
     }
     m_patchInfos.clear();
+    m_patchCheckBoxes.clear();
 
     QString patchesDir;
     Common::FS::PathToQString(patchesDir,
@@ -986,6 +1041,7 @@ void CheatsPatches::addPatchesToLayout(const QString& filePath) {
         delete item;
     }
     m_patchInfos.clear();
+    m_patchCheckBoxes.clear();
 
     QDir dir(Common::FS::GetUserPath(Common::FS::PathType::PatchesDir));
     QString fullPath = dir.filePath(folderPath);
@@ -1012,6 +1068,10 @@ void CheatsPatches::addPatchesToLayout(const QString& filePath) {
     QJsonObject jsonObject = jsonDoc.object();
 
     bool patchAdded = false;
+    QStringList failedFiles;
+    // Patches with a Category attribute go into one collapsible section per category, placed where
+    // the category first appears; the others stay in file order.
+    QMap<QString, PatchSection> sections;
 
     // Iterate over each entry in the JSON file
     for (auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); ++it) {
@@ -1024,15 +1084,14 @@ void CheatsPatches::addPatchesToLayout(const QString& filePath) {
             QFile xmlFile(xmlFilePath);
 
             if (!xmlFile.open(QIODevice::ReadOnly)) {
-                QMessageBox::warning(
-                    this, tr("Error"),
-                    QString(tr("Failed to open file:") + "\n%1").arg(xmlFile.fileName()));
+                failedFiles << xmlFile.fileName();
                 continue;
             }
             QXmlStreamReader xmlReader(&xmlFile);
             QString patchName;
             QString patchAuthor;
             QString patchNote;
+            QString patchCategory;
             QJsonArray patchLines;
             bool isEnabled = false;
 
@@ -1047,6 +1106,7 @@ void CheatsPatches::addPatchesToLayout(const QString& filePath) {
                             patchName = attributes.value("Name").toString();
                             patchAuthor = attributes.value("Author").toString();
                             patchNote = attributes.value("Note").toString();
+                            patchCategory = attributes.value("Category").toString();
                             isEnabled =
                                 attributes.value("isEnabled").toString() == QStringLiteral("true");
                         }
@@ -1054,6 +1114,7 @@ void CheatsPatches::addPatchesToLayout(const QString& filePath) {
                             patchName = attributes.value("Name").toString() + " (any version)";
                             patchAuthor = attributes.value("Author").toString();
                             patchNote = attributes.value("Note").toString();
+                            patchCategory = attributes.value("Category").toString();
                             isEnabled =
                                 attributes.value("isEnabled").toString() == QStringLiteral("true");
                         }
@@ -1081,7 +1142,19 @@ void CheatsPatches::addPatchesToLayout(const QString& filePath) {
                     QCheckBox* patchCheckBox = new QCheckBox(patchName);
                     patchCheckBox->setProperty("patchName", patchName);
                     patchCheckBox->setChecked(isEnabled);
-                    ui->patchesGroupBoxLayout->addWidget(patchCheckBox);
+                    if (patchCategory.isEmpty()) {
+                        ui->patchesGroupBoxLayout->addWidget(patchCheckBox);
+                    } else {
+                        auto found = sections.find(patchCategory);
+                        if (found == sections.end()) {
+                            found = sections.insert(patchCategory,
+                                                    addPatchSection(ui->patchesGroupBoxLayout));
+                        }
+                        addPatchToSection(*found, patchCategory, patchCheckBox);
+                    }
+                    if (!m_patchCheckBoxes.contains(patchName)) {
+                        m_patchCheckBoxes.insert(patchName, patchCheckBox);
+                    }
 
                     PatchInfo patchInfo;
                     patchInfo.name = patchName;
@@ -1099,12 +1172,19 @@ void CheatsPatches::addPatchesToLayout(const QString& filePath) {
                     patchName.clear();
                     patchAuthor.clear();
                     patchNote.clear();
+                    patchCategory.clear();
                     patchLines = QJsonArray();
                     patchAdded = true;
                 }
             }
             xmlFile.close();
         }
+    }
+
+    // A section starts folded unless one of its patches is enabled.
+    for (auto it = sections.constBegin(); it != sections.constEnd(); ++it) {
+        updatePatchSectionHeader(it.value(), it.key());
+        it.value().header->setChecked(countCheckedPatches(it.value()) > 0);
     }
 
     // Remove the item from the list view if no patches were added
@@ -1120,6 +1200,14 @@ void CheatsPatches::addPatchesToLayout(const QString& filePath) {
                 model->setStringList(items);
             }
         }
+    }
+
+    // QMessageBox runs a nested event loop in which a finished download can rebuild the list, so
+    // the warning waits until the section widgets are no longer used.
+    if (!failedFiles.isEmpty()) {
+        QMessageBox::warning(
+            this, tr("Error"),
+            QString(tr("Failed to open file:") + "\n%1").arg(failedFiles.join("\n")));
     }
 }
 
