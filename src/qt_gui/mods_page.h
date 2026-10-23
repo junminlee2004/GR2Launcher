@@ -8,6 +8,7 @@
 
 class QCheckBox;
 class QGroupBox;
+class QLineEdit;
 
 // The mod switches of the GR2fork emulator, one section per game. The values are keys of the
 // "GR2Fork" section of config.json or of a per-game file, read and written by Gr2Mods.
@@ -30,7 +31,7 @@ public:
     void SetDefaults();
 
 signals:
-    /// The description of the switch under the pointer, or an empty text when it leaves one.
+    /// The description of the setting under the pointer, or an empty text when it leaves one.
     void DescriptionChanged(const QString& text);
 
 protected:
@@ -40,4 +41,6 @@ private:
     QGroupBox* m_gr2Group{};
     QGroupBox* m_grrGroup{};
     QCheckBox* m_fsr3CheckBox{};
+    QCheckBox* m_fsr4CheckBox{};
+    QLineEdit* m_fsr4DirEdit{};
 };

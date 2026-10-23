@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <filesystem>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -26,5 +27,25 @@ std::optional<bool> ReadFsr3Enable(const std::string& serial = "");
 /// file as it is. A missing file is created when a value is set; a file that holds no JSON object
 /// is left alone.
 void WriteFsr3Enable(std::optional<bool> enable, const std::string& serial = "");
+
+/// fsr4Enable (the experimental FSR 4 INT8 upscaler of Gravity Rush 2) of the per-game file of
+/// serial, or of config.json for an empty serial. Empty when the file does not set it.
+std::optional<bool> ReadFsr4Enable(const std::string& serial = "");
+
+/// Sets fsr4Enable as WriteFsr3Enable sets fsr3Enable.
+void WriteFsr4Enable(std::optional<bool> enable, const std::string& serial = "");
+
+/// fsr4AssetDir, the UTF-8 path of the folder of the FSR 4 shader and model files, of the
+/// per-game file of serial, or of config.json for an empty serial. Empty when the file does not
+/// set it.
+std::optional<std::string> ReadFsr4AssetDir(const std::string& serial = "");
+
+/// Sets fsr4AssetDir as WriteFsr3Enable sets fsr3Enable.
+void WriteFsr4AssetDir(std::optional<std::string> dir, const std::string& serial = "");
+
+/// The folder the emulator reads the FSR 4 files from for the fsr4AssetDir value dir: the fsr4_v07
+/// folder of the user folder for an empty value, else dir, taken from the user folder when it is
+/// relative.
+std::filesystem::path ResolveFsr4AssetDir(const std::string& dir);
 
 } // namespace Gr2Mods

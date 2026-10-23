@@ -17,6 +17,8 @@ namespace {
 
 constexpr const char* Section = "GR2Fork";
 constexpr const char* Fsr3EnableKey = "fsr3Enable";
+constexpr const char* Fsr4EnableKey = "fsr4Enable";
+constexpr const char* Fsr4AssetDirKey = "fsr4AssetDir";
 
 // The same serials as the emulator's Common::IsGravityRush2 and Common::IsGravityRushRemastered.
 constexpr std::array<std::string_view, 7> Gr2Serials = {
@@ -40,6 +42,52 @@ nlohmann::json ParseFile(const std::filesystem::path& path) {
     return nlohmann::json::parse(in, nullptr, false);
 }
 
+// The value of key in the "GR2Fork" section of the file of serial when it is a T. contains() is
+// false for a value that is not an object.
+template <typename T>
+std::optional<T> ReadKey(const char* key, const std::string& serial) {
+    const auto root = ParseFile(ConfigFile(serial));
+    if (!root.contains(Section) || !root.at(Section).contains(key)) {
+        return std::nullopt;
+    }
+    if (const T* value = root.at(Section).at(key).get_ptr<const T*>()) {
+        return *value;
+    }
+    return std::nullopt;
+}
+
+// Sets key in the "GR2Fork" section of the file of serial, or removes it for an empty value.
+template <typename T>
+void WriteKey(const char* key, const std::optional<T>& value, const std::string& serial) {
+    const auto path = ConfigFile(serial);
+    std::error_code ec;
+    const bool exists = std::filesystem::exists(path, ec);
+    auto root = exists ? ParseFile(path) : nlohmann::json::object();
+    if (!root.is_object()) {
+        LOG_ERROR(Config, "Cannot store GR2Fork.{}: {} is not a settings file", key,
+                  Common::FS::PathToUTF8String(path));
+        return;
+    }
+    auto& section = root[Section];
+    if (!section.is_object()) {
+        section = nlohmann::json::object();
+    }
+    if (value) {
+        section[key] = *value;
+    } else {
+        section.erase(key);
+    }
+    if (section.empty()) {
+        root.erase(Section);
+    }
+    if (!exists && root.empty()) {
+        return;
+    }
+    std::filesystem::create_directories(path.parent_path(), ec);
+    std::ofstream out{path};
+    out << std::setw(2) << root;
+}
+
 } // Anonymous namespace
 
 bool IsGravityRush2(std::string_view serial) {
@@ -51,45 +99,35 @@ bool IsGravityRushRemastered(std::string_view serial) {
 }
 
 std::optional<bool> ReadFsr3Enable(const std::string& serial) {
-    const auto root = ParseFile(ConfigFile(serial));
-    if (!root.is_object() || !root.contains(Section) || !root.at(Section).is_object()) {
-        return std::nullopt;
-    }
-    const auto& section = root.at(Section);
-    if (!section.contains(Fsr3EnableKey) || !section.at(Fsr3EnableKey).is_boolean()) {
-        return std::nullopt;
-    }
-    return section.at(Fsr3EnableKey).get<bool>();
+    return ReadKey<bool>(Fsr3EnableKey, serial);
 }
 
 void WriteFsr3Enable(std::optional<bool> enable, const std::string& serial) {
-    const auto path = ConfigFile(serial);
-    std::error_code ec;
-    const bool exists = std::filesystem::exists(path, ec);
-    auto root = exists ? ParseFile(path) : nlohmann::json::object();
-    if (!root.is_object()) {
-        LOG_ERROR(Config, "Cannot store the FSR 3.1 switch: {} is not a settings file",
-                  path.string());
-        return;
+    WriteKey(Fsr3EnableKey, enable, serial);
+}
+
+std::optional<bool> ReadFsr4Enable(const std::string& serial) {
+    return ReadKey<bool>(Fsr4EnableKey, serial);
+}
+
+void WriteFsr4Enable(std::optional<bool> enable, const std::string& serial) {
+    WriteKey(Fsr4EnableKey, enable, serial);
+}
+
+std::optional<std::string> ReadFsr4AssetDir(const std::string& serial) {
+    return ReadKey<std::string>(Fsr4AssetDirKey, serial);
+}
+
+void WriteFsr4AssetDir(std::optional<std::string> dir, const std::string& serial) {
+    WriteKey(Fsr4AssetDirKey, dir, serial);
+}
+
+std::filesystem::path ResolveFsr4AssetDir(const std::string& dir) {
+    const auto& user = Common::FS::GetUserPath(Common::FS::PathType::UserDir);
+    if (dir.empty()) {
+        return user / "fsr4_v07";
     }
-    auto& section = root[Section];
-    if (!section.is_object()) {
-        section = nlohmann::json::object();
-    }
-    if (enable) {
-        section[Fsr3EnableKey] = *enable;
-    } else {
-        section.erase(Fsr3EnableKey);
-    }
-    if (section.empty()) {
-        root.erase(Section);
-    }
-    if (!exists && root.empty()) {
-        return;
-    }
-    std::filesystem::create_directories(path.parent_path(), ec);
-    std::ofstream out{path};
-    out << std::setw(2) << root;
+    return user / std::filesystem::path{std::u8string(dir.begin(), dir.end())};
 }
 
 } // namespace Gr2Mods
