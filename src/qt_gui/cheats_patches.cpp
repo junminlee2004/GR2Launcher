@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include <algorithm>
+#include <utility>
 
 #include <QDir>
 #include <QEvent>
@@ -39,15 +40,20 @@
 
 namespace {
 
-// A collapsible group of the patches that share a Category attribute: a header button that
-// folds the body, which holds the checkboxes.
+// Separates the levels of a Category path: "Resolution/FSR upscaling/16:9" is a section inside a
+// section inside a section.
+constexpr QChar CategorySeparator = u'/';
+
+// A collapsible group of patches: a header button that folds the body, which holds the patch
+// checkboxes and the nested groups.
 struct PatchSection {
     QToolButton* header{};
     QWidget* body{};
+    QString title; ///< The last level of the Category path
 };
 
-PatchSection addPatchSection(QVBoxLayout* list) {
-    PatchSection section{new QToolButton, new QWidget};
+PatchSection addPatchSection(QVBoxLayout* list, const QString& title) {
+    PatchSection section{new QToolButton, new QWidget, title};
     section.header->setCheckable(true);
     section.header->setArrowType(Qt::RightArrow);
     section.header->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -76,27 +82,61 @@ qsizetype countCheckedPatches(const PatchSection& section) {
                          [](const QCheckBox* box) { return box->isChecked(); });
 }
 
-void updatePatchSectionHeader(const PatchSection& section, const QString& category) {
+void updatePatchSectionHeader(const PatchSection& section) {
     // "&&" shows a literal '&' instead of marking a shortcut mnemonic.
-    const QString title = QString(category).replace("&", "&&");
+    const QString title = QString(section.title).replace("&", "&&");
     const qsizetype total = section.body->findChildren<QCheckBox*>().size();
     section.header->setText(
         CheatsPatches::tr("%1 (%2 of %3 on)")
             .arg(title, QString::number(countCheckedPatches(section)), QString::number(total)));
 }
 
-void addPatchToSection(const PatchSection& section, const QString& category,
-                       QCheckBox* patchCheckBox) {
-    QLayout* bodyLayout = section.body->layout();
-    QWidget* previous = bodyLayout->count() > 0
-                            ? bodyLayout->itemAt(bodyLayout->count() - 1)->widget()
-                            : section.header;
-    bodyLayout->addWidget(patchCheckBox);
-    // A widget added to a layout joins the end of the window's focus chain, so this keeps Tab in
-    // screen order when a category reappears later in the file.
-    QWidget::setTabOrder(previous, patchCheckBox);
-    QObject::connect(patchCheckBox, &QCheckBox::toggled, section.body,
-                     [section, category]() { updatePatchSectionHeader(section, category); });
+// Returns the sections of a Category path from the outermost one, creating the missing ones at the
+// end of their parent. Empty levels are skipped; a path without levels gives no section.
+QList<PatchSection> findOrAddSections(QMap<QString, PatchSection>& sections, QVBoxLayout* list,
+                                      const QString& path) {
+    QList<PatchSection> chain;
+    QString key;
+    QVBoxLayout* parent = list;
+    for (const QString& level : path.split(CategorySeparator, Qt::SkipEmptyParts)) {
+        const QString title = level.trimmed();
+        if (title.isEmpty()) {
+            continue;
+        }
+        key = key.isEmpty() ? title : key + CategorySeparator + title;
+        auto found = sections.find(key);
+        if (found == sections.end()) {
+            found = sections.insert(key, addPatchSection(parent, title));
+        }
+        chain << *found;
+        parent = qobject_cast<QVBoxLayout*>(found->body->layout());
+    }
+    return chain;
+}
+
+void addPatchToSections(const QList<PatchSection>& chain, QCheckBox* patchCheckBox) {
+    chain.last().body->layout()->addWidget(patchCheckBox);
+    QObject::connect(patchCheckBox, &QCheckBox::toggled, chain.last().body, [chain]() {
+        for (const PatchSection& section : chain) {
+            updatePatchSectionHeader(section);
+        }
+    });
+}
+
+// The headers and checkboxes of a patch list in screen order: a section body is a plain widget
+// with a layout, the buttons have none.
+void collectPatchFocusOrder(QLayout* layout, QList<QWidget*>& order) {
+    for (int i = 0; i < layout->count(); ++i) {
+        QWidget* widget = layout->itemAt(i)->widget();
+        if (!widget) {
+            continue;
+        }
+        if (QLayout* inner = widget->layout()) {
+            collectPatchFocusOrder(inner, order);
+        } else {
+            order << widget;
+        }
+    }
 }
 
 } // namespace
@@ -1069,8 +1109,8 @@ void CheatsPatches::addPatchesToLayout(const QString& filePath) {
 
     bool patchAdded = false;
     QStringList failedFiles;
-    // Patches with a Category attribute go into one collapsible section per category, placed where
-    // the category first appears; the others stay in file order.
+    // Patches with a Category attribute go into collapsible sections, one per level of the path,
+    // each placed where it first appears; the others stay in file order. Keyed by the path.
     QMap<QString, PatchSection> sections;
 
     // Iterate over each entry in the JSON file
@@ -1142,15 +1182,12 @@ void CheatsPatches::addPatchesToLayout(const QString& filePath) {
                     QCheckBox* patchCheckBox = new QCheckBox(patchName);
                     patchCheckBox->setProperty("patchName", patchName);
                     patchCheckBox->setChecked(isEnabled);
-                    if (patchCategory.isEmpty()) {
+                    const QList<PatchSection> chain =
+                        findOrAddSections(sections, ui->patchesGroupBoxLayout, patchCategory);
+                    if (chain.isEmpty()) {
                         ui->patchesGroupBoxLayout->addWidget(patchCheckBox);
                     } else {
-                        auto found = sections.find(patchCategory);
-                        if (found == sections.end()) {
-                            found = sections.insert(patchCategory,
-                                                    addPatchSection(ui->patchesGroupBoxLayout));
-                        }
-                        addPatchToSection(*found, patchCategory, patchCheckBox);
+                        addPatchToSections(chain, patchCheckBox);
                     }
                     if (!m_patchCheckBoxes.contains(patchName)) {
                         m_patchCheckBoxes.insert(patchName, patchCheckBox);
@@ -1181,10 +1218,18 @@ void CheatsPatches::addPatchesToLayout(const QString& filePath) {
         }
     }
 
-    // A section starts folded unless one of its patches is enabled.
-    for (auto it = sections.constBegin(); it != sections.constEnd(); ++it) {
-        updatePatchSectionHeader(it.value(), it.key());
-        it.value().header->setChecked(countCheckedPatches(it.value()) > 0);
+    // A section starts folded unless one of its patches, nested ones included, is enabled.
+    for (const PatchSection& section : std::as_const(sections)) {
+        updatePatchSectionHeader(section);
+        section.header->setChecked(countCheckedPatches(section) > 0);
+    }
+
+    // Widgets join the end of the window's focus chain as they are added, in file order. Tab
+    // follows the screen order instead, which differs when a section reappears later in the file.
+    QList<QWidget*> focusOrder;
+    collectPatchFocusOrder(ui->patchesGroupBoxLayout, focusOrder);
+    for (qsizetype i = 1; i < focusOrder.size(); ++i) {
+        QWidget::setTabOrder(focusOrder[i - 1], focusOrder[i]);
     }
 
     // Remove the item from the list view if no patches were added

@@ -67,9 +67,9 @@ bool ModsPage::eventFilter(QObject* obj, QEvent* event) {
         emit DescriptionChanged(
             m_fsr3CheckBox->text() + ":\n" +
             tr("Replaces the game's anti-aliasing with AMD FSR 3.1. Needs a GR2fork build with "
-               "FSR 3.1. For upscaling, also turn on one of the \"FSR 3.1: ...\" patches in "
-               "Cheats / Patches; without one, FSR 3.1 runs at the game's resolution as "
-               "anti-aliasing.\nA change takes effect the next time the game starts. The other "
+               "FSR 3.1. For upscaling, also turn on one of the patches under Resolution > FSR "
+               "upscaling in Cheats / Patches; without one, FSR 3.1 runs at the game's resolution "
+               "as anti-aliasing.\nA change takes effect the next time the game starts. The other "
                "FSR 3.1 settings are in the debug menu: Ctrl+F10 > Display > FSR 3.1 (GR2). Its "
                "Save button saves the values the game runs with, this switch included.") +
             "\n\nGR2Fork.fsr3Enable");
