@@ -273,6 +273,8 @@ set(CORE src/core/file_format/elf.cpp
          src/core/emulator_state.h
          src/core/emulator_settings.cpp
          src/core/emulator_settings.h
+         src/core/gr2_mods.cpp
+         src/core/gr2_mods.h
          src/core/gr2_online.cpp
          src/core/gr2_online.h
          src/core/user_manager.cpp
@@ -338,6 +340,8 @@ set(QT_GUI src/qt_gui/about_dialog.cpp
            src/qt_gui/settings_dialog.cpp
            src/qt_gui/settings_dialog.h
            src/qt_gui/settings_dialog.ui
+           src/qt_gui/mods_page.cpp
+           src/qt_gui/mods_page.h
            src/qt_gui/tuning_page.cpp
            src/qt_gui/tuning_page.h
            src/qt_gui/tuning_table.cpp
