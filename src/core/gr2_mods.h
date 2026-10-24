@@ -35,6 +35,21 @@ std::optional<bool> ReadFsr4Enable(const std::string& serial = "");
 /// Sets fsr4Enable as WriteFsr3Enable sets fsr3Enable.
 void WriteFsr4Enable(std::optional<bool> enable, const std::string& serial = "");
 
+/// grrFsr3Enable (the FSR 3.1 anti-aliasing of Gravity Rush Remastered) of the per-game file of
+/// serial, or of config.json for an empty serial. Empty when the file does not set it.
+std::optional<bool> ReadGrrFsr3Enable(const std::string& serial = "");
+
+/// Sets grrFsr3Enable as WriteFsr3Enable sets fsr3Enable.
+void WriteGrrFsr3Enable(std::optional<bool> enable, const std::string& serial = "");
+
+/// grrFsr4Enable (the experimental FSR 4 INT8 anti-aliasing of Gravity Rush Remastered) of the
+/// per-game file of serial, or of config.json for an empty serial. Empty when the file does not
+/// set it.
+std::optional<bool> ReadGrrFsr4Enable(const std::string& serial = "");
+
+/// Sets grrFsr4Enable as WriteFsr3Enable sets fsr3Enable.
+void WriteGrrFsr4Enable(std::optional<bool> enable, const std::string& serial = "");
+
 /// fsr4AssetDir, the UTF-8 path of the folder of the FSR 4 shader and model files, of the
 /// per-game file of serial, or of config.json for an empty serial. Empty when the file does not
 /// set it.

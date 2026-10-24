@@ -43,4 +43,6 @@ private:
     QCheckBox* m_fsr3CheckBox{};
     QCheckBox* m_fsr4CheckBox{};
     QLineEdit* m_fsr4DirEdit{};
+    QCheckBox* m_grrFsr3CheckBox{};
+    QCheckBox* m_grrFsr4CheckBox{};
 };

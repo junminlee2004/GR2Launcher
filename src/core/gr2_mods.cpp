@@ -18,6 +18,8 @@ namespace {
 constexpr const char* Section = "GR2Fork";
 constexpr const char* Fsr3EnableKey = "fsr3Enable";
 constexpr const char* Fsr4EnableKey = "fsr4Enable";
+constexpr const char* GrrFsr3EnableKey = "grrFsr3Enable";
+constexpr const char* GrrFsr4EnableKey = "grrFsr4Enable";
 constexpr const char* Fsr4AssetDirKey = "fsr4AssetDir";
 
 // The same serials as the emulator's Common::IsGravityRush2 and Common::IsGravityRushRemastered.
@@ -112,6 +114,22 @@ std::optional<bool> ReadFsr4Enable(const std::string& serial) {
 
 void WriteFsr4Enable(std::optional<bool> enable, const std::string& serial) {
     WriteKey(Fsr4EnableKey, enable, serial);
+}
+
+std::optional<bool> ReadGrrFsr3Enable(const std::string& serial) {
+    return ReadKey<bool>(GrrFsr3EnableKey, serial);
+}
+
+void WriteGrrFsr3Enable(std::optional<bool> enable, const std::string& serial) {
+    WriteKey(GrrFsr3EnableKey, enable, serial);
+}
+
+std::optional<bool> ReadGrrFsr4Enable(const std::string& serial) {
+    return ReadKey<bool>(GrrFsr4EnableKey, serial);
+}
+
+void WriteGrrFsr4Enable(std::optional<bool> enable, const std::string& serial) {
+    WriteKey(GrrFsr4EnableKey, enable, serial);
 }
 
 std::optional<std::string> ReadFsr4AssetDir(const std::string& serial) {
