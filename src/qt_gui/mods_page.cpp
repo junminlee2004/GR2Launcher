@@ -172,20 +172,23 @@ bool ModsPage::eventFilter(QObject* obj, QEvent* event) {
         } else if (obj == m_grrFsr3CheckBox) {
             emit DescriptionChanged(
                 m_grrFsr3CheckBox->text() + ":\n" +
-                tr("Replaces the game's FXAA anti-aliasing with AMD FSR 3.1 at the game's "
-                   "resolution. Needs a GR2fork build with the FSR upscaler for Gravity Rush "
-                   "Remastered. Menus and comic scenes keep the game's FXAA.\nA change takes "
-                   "effect the next time the game starts. The other FSR 3.1 settings are in the "
-                   "debug menu: Ctrl+F10 > Display > FSR 3.1 (GRR). Its Save button saves the "
-                   "values the game runs with, this switch included.") +
+                tr("Replaces the game's FXAA anti-aliasing with AMD FSR 3.1. Needs a GR2fork "
+                   "build with the FSR upscaler for Gravity Rush Remastered. For upscaling, also "
+                   "turn on a patch under Resolution > FSR upscaling in Cheats / Patches; without "
+                   "one, FSR 3.1 runs at the game's resolution as anti-aliasing. Menus and comic "
+                   "scenes keep the game's FXAA.\nA change takes effect the next time the game "
+                   "starts. The other FSR 3.1 settings are in the debug menu: Ctrl+F10 > Display "
+                   "> FSR 3.1 (GRR). Its Save button saves the values the game runs with, this "
+                   "switch included.") +
                 "\n\nGR2Fork.grrFsr3Enable");
         } else if (obj == m_grrFsr4CheckBox) {
             emit DescriptionChanged(
                 m_grrFsr4CheckBox->text() + ":\n" +
-                tr("Replaces the game's FXAA anti-aliasing, at the game's resolution, with the "
-                   "experimental source-v07 FSR 4 INT8 upscaler, which is not AMD FSR 4.1 and can "
-                   "also run on RDNA2, RDNA3 and other GPUs. Needs a GR2fork build with the FSR "
-                   "upscaler for Gravity Rush Remastered. Its shader and model files are not "
+                tr("Replaces the game's FXAA anti-aliasing with the experimental source-v07 FSR 4 "
+                   "INT8 upscaler, which is not AMD FSR 4.1 and can also run on RDNA2, RDNA3 and "
+                   "other GPUs. Needs a GR2fork build with the FSR upscaler for Gravity Rush "
+                   "Remastered. For upscaling, also turn on a patch under Resolution > FSR "
+                   "upscaling in Cheats / Patches. Its shader and model files are not "
                    "included with GR2fork or this launcher; it reads them from the same FSR 4 "
                    "asset folder as Gravity Rush 2, set in the global settings. Without them or "
                    "driver support, FSR 3.1 runs if it is on.\nA change takes effect the next "
