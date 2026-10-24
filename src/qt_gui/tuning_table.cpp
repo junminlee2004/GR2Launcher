@@ -18,6 +18,10 @@ std::vector<TuningPage::Group> TuningPage::Table() {
                  "and takes that core away from every other thread of the process, guest threads "
                  "included. Hosts with fewer than 6 logical CPUs or 4 physical cores are left "
                  "alone.")},
+             {"vk_record_thread", tr("Vulkan Record Thread"),
+              tr("Records the draw scheduler's Vulkan commands and issues its queue submits on a "
+                 "dedicated thread; the GPU command thread stores each call as a closure instead "
+                 "of calling the driver.")},
          }},
         {tr("Renderer Behavior and Pacing"),
          true,
