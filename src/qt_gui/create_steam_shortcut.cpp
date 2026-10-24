@@ -314,7 +314,8 @@ void SteamShortcut::requestAddToSteam(const GameInfo& selectedInfo, QString emuP
     if (const QString appImage = qEnvironmentVariable("APPIMAGE"); !appImage.isEmpty())
         exePath = appImage;
 #endif
-    QString startDir = QFileInfo(exePath).absolutePath();
+    // The launcher finds its user and launcher folders in the working directory.
+    QString startDir = QDir::currentPath();
 
     QString launchOptions;
     if (emuPath.isEmpty()) {
