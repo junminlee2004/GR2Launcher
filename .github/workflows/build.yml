@@ -318,6 +318,12 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         path: ./artifacts
+
+    - name: Check out the FSR 4 files
+      uses: actions/checkout@v5
+      with:
+        path: source
+        sparse-checkout: dist/fsr4_v07
   
     - name: Compress individual directories (without parent directory)
       run: |
@@ -340,6 +346,8 @@ jobs:
       run: |
         # The self-updater copies its whole zip over the install, so the emulator and the launcher
         # data that registers it go into separate with-emulator zips that the updater never picks.
+        # The FSR 4 files go there too: a non-empty user folder in the updater's zip would make a
+        # non-portable install portable.
         release=$(curl -sfL -H "Authorization: token $GITHUB_TOKEN" \
           "https://api.github.com/repos/junminlee2004/GR2fork/releases" |
           jq -c '[.[] | select(.tag_name | startswith("Pre-release-GR2fork-EXODUS-"))][0]')
@@ -365,6 +373,8 @@ jobs:
             tar -xf "$src/GR2Launcher-macos-qt.tar.gz" -C "$dest"
           else
             cp -a "$src/." "$dest/"
+            # The emulator reads its FSR 4 files from the user folder. macOS builds have no FSR.
+            cp -a ./source/dist/fsr4_v07 "$dest/user/fsr4_v07"
           fi
           url=$(echo "$release" | jq -r --arg p "$platform-sdl" \
             '[.assets[] | select(.name | contains($p))][0].browser_download_url // empty')
