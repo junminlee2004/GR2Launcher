@@ -1184,8 +1184,8 @@ bool GuiContextMenus::createShortcutWin(const QString& linkPath, const QString& 
         // Defines the path to the program executable
         pShellLink->SetPath((LPCWSTR)exePath.utf16());
 
-        // Sets the home directory ("Start in")
-        pShellLink->SetWorkingDirectory((LPCWSTR)QFileInfo(exePath).absolutePath().utf16());
+        // Sets the "Start in" folder, where the launcher finds its user and launcher folders
+        pShellLink->SetWorkingDirectory((LPCWSTR)QDir::currentPath().utf16());
 
         // Set arguments, eboot.bin file location
 
@@ -1242,6 +1242,8 @@ bool GuiContextMenus::createShortcutLinux(const QString& linkPath, const std::st
             << targetPath << "\"\n";
     }
     out << "Icon=" << iconPath << "\n";
+    // The launcher finds its user and launcher folders in the working directory.
+    out << "Path=" << QDir::currentPath() << "\n";
     out << "Terminal=false\n";
     out << "Type=Application\n";
     shortcutFile.close();
