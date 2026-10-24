@@ -100,3 +100,9 @@ SPDX-License-Identifier = "BSL-1.0"
 path = "cmake/CMakeRC.cmake"
 SPDX-FileCopyrightText = "Copyright (c) 2017 vector-of-bool <vectorofbool@gmail.com>"
 SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "dist/fsr4_v07/**"
+precedence = "override"
+SPDX-FileCopyrightText = "Copyright (c) 2025 Advanced Micro Devices, Inc."
+SPDX-License-Identifier = "MIT"
