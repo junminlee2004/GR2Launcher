@@ -28,6 +28,7 @@
 #include "control_settings.h"
 #include "core/emulator_state.h"
 #include "core/file_sys/game_backend.h"
+#include "core/prompt_packs.h"
 #include "crypto_key_dialog.h"
 #include "dimensions_dialog.h"
 #include "game_install_dialog.h"
@@ -38,6 +39,7 @@
 #include "kbm_gui.h"
 #include "main_window.h"
 #include "profile_widget.h"
+#include "prompt_pack_offer.h"
 #include "settings_dialog.h"
 #include "skylander_dialog.h"
 #include "trophy_viewer.h"
@@ -77,6 +79,7 @@ bool MainWindow::Init() {
     }
 #endif
 
+    PromptPacks::SyncBundledPacks();
     AddUiWidgets();
     CreateActions();
     CreateRecentGameActions();
@@ -1099,6 +1102,9 @@ void MainWindow::StartGameWithArgs(QStringList args) {
         if (!eboot_present) {
             QMessageBox::critical(nullptr, tr("Run Game"), QString(tr("Eboot.bin file not found")));
             return;
+        }
+        if (table_mode != 2) {
+            PromptPackOffer::Run(this, runningGameSerial, *m_gui_settings);
         }
         StartEmulator(path, args);
 

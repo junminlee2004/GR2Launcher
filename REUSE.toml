@@ -106,3 +106,9 @@ path = "dist/fsr4_v07/**"
 precedence = "override"
 SPDX-FileCopyrightText = "Copyright (c) 2025 Advanced Micro Devices, Inc."
 SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "dist/prompt_mods/**"
+precedence = "override"
+SPDX-FileCopyrightText = "Copyright 2026 shadPS4 Emulator Project"
+SPDX-License-Identifier = "GPL-2.0-or-later"

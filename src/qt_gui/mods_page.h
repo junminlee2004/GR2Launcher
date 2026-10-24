@@ -7,6 +7,7 @@
 #include <QWidget>
 
 class QCheckBox;
+class QComboBox;
 class QGroupBox;
 class QLineEdit;
 
@@ -45,4 +46,6 @@ private:
     QLineEdit* m_fsr4DirEdit{};
     QCheckBox* m_grrFsr3CheckBox{};
     QCheckBox* m_grrFsr4CheckBox{};
+    QComboBox* m_gr2PromptCombo{};
+    QComboBox* m_grrPromptCombo{};
 };
