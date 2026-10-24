@@ -97,6 +97,8 @@ private:
 
     QMap<QString, Cheat> m_cheats;
     QMap<QString, PatchInfo> m_patchInfos;
+    // The checkbox of each listed patch by its name, the first one when names repeat.
+    QMap<QString, QCheckBox*> m_patchCheckBoxes;
 
     QVector<QCheckBox*> m_cheatCheckBoxes;
 

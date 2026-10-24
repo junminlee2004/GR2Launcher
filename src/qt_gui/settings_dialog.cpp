@@ -27,6 +27,7 @@
 #include "core/gr2_online.h"
 #include "core/user_settings.h"
 #include "log_presets_dialog.h"
+#include "mods_page.h"
 #include "sdl_event_wrapper.h"
 #include "settings_dialog.h"
 #include "ui_settings_dialog.h"
@@ -160,10 +161,18 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
         // General tab: the FPS counter has no per-game value
         ui->showFpsCounterCheckBox->setVisible(false);
 
+        // Mods tab: only Gravity Rush 2 and Gravity Rush Remastered have mods
+        if (!ModsPage::HasSection(gs_serial)) {
+            ui->tabWidgetSettings->setTabVisible(ui->tabWidgetSettings->indexOf(ui->modsTab),
+                                                 false);
+        }
+
     } else {
         // Experimental tab
         ui->tabWidgetSettings->setTabVisible(9, false);
-        ui->chooseHomeTabComboBox->removeItem(10);
+        // Experimental is the last start-tab item, so the item texts that retranslateUi sets by
+        // index still match the remaining items.
+        ui->chooseHomeTabComboBox->removeItem(11);
 
         // User tab: the shadNet account is set in a game's settings only
         ui->shadnetGroupBox->setVisible(false);
@@ -190,7 +199,7 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
                         {tr("Input"), "Input"},       {tr("Network"), "Network"},
                         {tr("Paths"), "Paths"},       {tr("Log"), "Log"},
                         {tr("Debug"), "Debug"},       {tr("Experimental"), "Experimental"},
-                        {tr("Tuning"), "Tuning"}};
+                        {tr("Tuning"), "Tuning"},     {tr("Mods"), "Mods"}};
     micMap = {{tr("None"), "None"}, {tr("Default Device"), "Default Device"}};
     audioBackendMap = {{0, "SDL"}, {1, "OpenAL"}};
 
@@ -309,6 +318,7 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
                 EmulatorSettings.SetGyroSwapYawRoll(true, is_game_specific);
                 EmulatorSettings.SetGyroInvertYaw(true, is_game_specific);
             }
+            ui->modsPage->SetDefaults();
             SaveSettings();
             LoadValuesFromConfig();
         } else if (button == ui->buttonBox->button(QDialogButtonBox::Close)) {
@@ -704,6 +714,11 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
         connect(ui->tuningPage, &TuningPage::DescriptionChanged, this, [this](const QString& text) {
             ui->descriptionText->setText(text.isEmpty() ? defaultTextEdit : text);
         });
+
+        // Mods
+        connect(ui->modsPage, &ModsPage::DescriptionChanged, this, [this](const QString& text) {
+            ui->descriptionText->setText(text.isEmpty() ? defaultTextEdit : text);
+        });
     }
 
     SDL_InitSubSystem(SDL_INIT_EVENTS);
@@ -993,6 +1008,9 @@ void SettingsDialog::LoadValuesFromConfig() {
     // Tuning tab
     ui->tuningPage->Load();
 
+    // Mods tab
+    ui->modsPage->Load(gs_serial);
+
     // Frontend settings
     QString chooseHomeTab = m_gui_settings->GetValue(gui::gen_homeTab).toString();
     QString translatedText = chooseHomeTabMap.key(chooseHomeTab);
@@ -1003,7 +1021,7 @@ void SettingsDialog::LoadValuesFromConfig() {
 
     QStringList tabNames = {tr("General"), tr("Frontend"),     tr("Graphics"), tr("User"),
                             tr("Input"),   tr("Network"),      tr("Paths"),    tr("Log"),
-                            tr("Debug"),   tr("Experimental"), tr("Tuning")};
+                            tr("Debug"),   tr("Experimental"), tr("Tuning"),   tr("Mods")};
     int indexTab = tabNames.indexOf(translatedText);
     if (indexTab == -1 || !ui->tabWidgetSettings->isTabVisible(indexTab) || is_newly_created)
         indexTab = 0;
@@ -1571,6 +1589,7 @@ void SettingsDialog::SaveSettings() {
     Gr2Online::WriteServer(
         {ui->gr2HostLineEdit->text().trimmed().toStdString(), ui->gr2PortLineEdit->text().toInt()},
         gs_serial);
+    ui->modsPage->Save(gs_serial);
 };
 
 void SettingsDialog::PollSDLevents() {

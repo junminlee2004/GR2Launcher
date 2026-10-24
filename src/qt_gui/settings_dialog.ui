@@ -730,6 +730,11 @@
                  </item>
                  <item>
                   <property name="text">
+                   <string>Mods</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
                    <string>Experimental</string>
                   </property>
                  </item>
@@ -3150,6 +3155,15 @@
       </attribute>
       <widget class="TuningPage" name="tuningPage"/>
      </widget>
+     <widget class="QScrollArea" name="modsTab">
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <attribute name="title">
+       <string>Mods</string>
+      </attribute>
+      <widget class="ModsPage" name="modsPage"/>
+     </widget>
     </widget>
    </item>
    <item>
@@ -3185,6 +3199,11 @@
    <class>TuningPage</class>
    <extends>QWidget</extends>
    <header>src/qt_gui/tuning_page.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ModsPage</class>
+   <extends>QWidget</extends>
+   <header>src/qt_gui/mods_page.h</header>
   </customwidget>
  </customwidgets>
  <resources>
