@@ -15,8 +15,4 @@ namespace PromptPacks {
 /// when it is connected, else the first pad with a layout.
 std::string ConnectedPadLayout(const std::string& selected_guid);
 
-/// Copies each pack of the install folder into the user folder when the copy there is missing or
-/// has another pack.json.
-void SyncBundledPacks();
-
 } // namespace PromptPacks

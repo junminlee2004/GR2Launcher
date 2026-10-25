@@ -114,6 +114,11 @@ jobs:
         mkdir upload/qtplugins
         move build/GR2Launcher.exe upload
         cp dist/qt.conf upload/qt.conf
+        # The prompt packs and the FSR 4 files sit next to the launcher, so the self-updater's zip
+        # carries them too, outside the user folder: a non-empty user folder in that zip would make
+        # a non-portable install portable. The launcher copies them into the user folder.
+        Copy-Item -Recurse dist/prompt_mods upload/prompt_mods
+        Copy-Item -Recurse dist/fsr4_v07 upload/fsr4_v07
         windeployqt --plugindir upload/qtplugins --no-compiler-runtime --no-system-d3d-compiler --no-system-dxc-compiler --dir upload upload/GR2Launcher.exe
         mkdir upload/user
         mkdir upload/launcher
@@ -252,10 +257,13 @@ jobs:
     - name: Package and Upload Linux Qt artifact
       run: |
         tar cf GR2Launcher-linux-qt.tar.gz -C ${{github.workspace}}/build GR2Launcher
+        # The prompt packs and the FSR 4 files sit next to the launcher as in the Windows artifact.
+        mkdir upload
+        cp -a GR2Launcher.AppImage dist/prompt_mods dist/fsr4_v07 upload/
     - uses: actions/upload-artifact@v7
       with:
         name: GR2Launcher-linux-qt-${{ needs.get-info.outputs.date }}-${{ needs.get-info.outputs.shorthash }}
-        path: GR2Launcher.AppImage
+        path: upload/
         
   linux-qt-gcc:
     runs-on: ubuntu-24.04
@@ -319,14 +327,6 @@ jobs:
       with:
         path: ./artifacts
 
-    - name: Check out the FSR 4 files and the prompt packs
-      uses: actions/checkout@v5
-      with:
-        path: source
-        sparse-checkout: |
-          dist/fsr4_v07
-          dist/prompt_mods
-  
     - name: Compress individual directories (without parent directory)
       run: |
         cd ./artifacts
@@ -337,12 +337,6 @@ jobs:
           if [ -d "$dir" ]; then
             dir_name=${dir%/}
             mkdir -p "$dir_name/user" "$dir_name/launcher"
-            # The prompt packs sit next to the launcher, outside the user folder, so the updater's
-            # zip carries them too; the launcher copies them into the user folder.
-            case $dir_name in
-              *-macos-*) ;;
-              *) cp -a ../source/dist/prompt_mods "$dir_name/prompt_mods" ;;
-            esac
             echo "Creating zip for $dir_name"
             (cd "$dir_name" && zip -r "../${dir_name}.zip" .)
           fi
@@ -354,8 +348,8 @@ jobs:
       run: |
         # The self-updater copies its whole zip over the install, so the emulator and the launcher
         # data that registers it go into separate with-emulator zips that the updater never picks.
-        # The FSR 4 files go there too: a non-empty user folder in the updater's zip would make a
-        # non-portable install portable.
+        # Their user folder also holds the FSR 4 files, for the big picture shortcut, which starts
+        # the emulator without the launcher that copies them there.
         release=$(curl -sfL -H "Authorization: token $GITHUB_TOKEN" \
           "https://api.github.com/repos/junminlee2004/GR2fork/releases" |
           jq -c '[.[] | select(.tag_name | startswith("Pre-release-GR2fork-EXODUS-"))][0]')
@@ -382,7 +376,7 @@ jobs:
           else
             cp -a "$src/." "$dest/"
             # The emulator reads its FSR 4 files from the user folder. macOS builds have no FSR.
-            cp -a ./source/dist/fsr4_v07 "$dest/user/fsr4_v07"
+            cp -a "$src/fsr4_v07" "$dest/user/fsr4_v07"
           fi
           url=$(echo "$release" | jq -r --arg p "$platform-sdl" \
             '[.assets[] | select(.name | contains($p))][0].browser_download_url // empty')
