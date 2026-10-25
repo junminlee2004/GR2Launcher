@@ -335,6 +335,16 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="registerPatchesButton">
+           <property name="toolTip">
+            <string>Adds the patch files already in the patches folder to the patch list without downloading or replacing any file</string>
+           </property>
+           <property name="text">
+            <string>Register Patches</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="deletePatchButton">
            <property name="text">
             <string>Delete File</string>
