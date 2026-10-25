@@ -90,6 +90,9 @@ ModsPage::ModsPage(QWidget* parent) : QWidget(parent) {
     fsr4DirLayout->addWidget(browseButton);
     gr2Layout->addWidget(fsr4DirRow);
     m_gr2PromptCombo = AddPromptRow(m_gr2Group, gr2Layout, this);
+    m_halloweenCheckBox = new QCheckBox(tr("Halloween photo items"), m_gr2Group);
+    m_halloweenCheckBox->installEventFilter(this);
+    gr2Layout->addWidget(m_halloweenCheckBox);
     layout->addWidget(m_gr2Group);
 
     m_grrGroup = new QGroupBox(tr("Gravity Rush Remastered"), this);
@@ -137,6 +140,7 @@ void ModsPage::Load(const std::string& serial) {
     m_grrFsr4CheckBox->setChecked(read(Gr2Mods::ReadGrrFsr4Enable).value_or(false));
     SelectLayout(m_gr2PromptCombo, read(Gr2Mods::ReadGr2PromptLayout).value_or("off"));
     SelectLayout(m_grrPromptCombo, read(Gr2Mods::ReadGrrPromptLayout).value_or("off"));
+    m_halloweenCheckBox->setChecked(read(Gr2Mods::ReadGr2HalloweenItems).value_or(true));
 }
 
 void ModsPage::Save(const std::string& serial) {
@@ -147,6 +151,7 @@ void ModsPage::Save(const std::string& serial) {
     const bool grrFsr4 = m_grrFsr4CheckBox->isChecked();
     const std::string gr2Prompts = SelectedLayout(m_gr2PromptCombo);
     const std::string grrPrompts = SelectedLayout(m_grrPromptCombo);
+    const bool halloween = m_halloweenCheckBox->isChecked();
     if (serial.empty()) {
         Gr2Mods::WriteFsr3Enable(fsr3);
         Gr2Mods::WriteFsr4Enable(fsr4);
@@ -158,6 +163,8 @@ void ModsPage::Save(const std::string& serial) {
                                                           : std::optional{gr2Prompts});
         Gr2Mods::WriteGrrPromptLayout(grrPrompts == "off" ? std::nullopt
                                                           : std::optional{grrPrompts});
+        // A missing key also turns the Halloween photo items on.
+        Gr2Mods::WriteGr2HalloweenItems(halloween ? std::nullopt : std::optional{false});
         return;
     }
     // The per-game file keeps only the values that differ from the ones of config.json.
@@ -173,6 +180,8 @@ void ModsPage::Save(const std::string& serial) {
                                    serial);
         Gr2Mods::WriteGr2PromptLayout(
             unlessGlobal(gr2Prompts, Gr2Mods::ReadGr2PromptLayout().value_or("off")), serial);
+        Gr2Mods::WriteGr2HalloweenItems(
+            unlessGlobal(halloween, Gr2Mods::ReadGr2HalloweenItems().value_or(true)), serial);
     } else if (Gr2Mods::IsGravityRushRemastered(serial)) {
         Gr2Mods::WriteGrrFsr3Enable(
             unlessGlobal(grrFsr3, Gr2Mods::ReadGrrFsr3Enable().value_or(false)), serial);
@@ -191,6 +200,7 @@ void ModsPage::SetDefaults() {
     m_grrFsr4CheckBox->setChecked(false);
     m_gr2PromptCombo->setCurrentIndex(0);
     m_grrPromptCombo->setCurrentIndex(0);
+    m_halloweenCheckBox->setChecked(true);
 }
 
 bool ModsPage::eventFilter(QObject* obj, QEvent* event) {
@@ -244,6 +254,17 @@ bool ModsPage::eventFilter(QObject* obj, QEvent* event) {
                    "time the game starts. FSR 4 model and status: Ctrl+F10 > Display > FSR 3.1 "
                    "(GRR).") +
                 "\n\nGR2Fork.grrFsr4Enable");
+        } else if (obj == m_halloweenCheckBox) {
+            emit DescriptionChanged(
+                m_halloweenCheckBox->text() + ":\n" +
+                tr("Adds two photo items to Photo Mode: a Small Jack-o'-Lantern, unlocked at 1,000 "
+                   "Dusty Tokens, and a Large Jack-o'-Lantern, unlocked at 8,000. The unlock comes "
+                   "in free roam, also when the tokens were earned before. The unlocks are kept in "
+                   "two photo item flags of the save that the game leaves unused, and the game "
+                   "files stay as they are. Works with every button prompt layout. The mod pack "
+                   "ships with this launcher and needs a GR2fork build that reads it.\nA change "
+                   "takes effect the next time the game starts.") +
+                "\n\nGR2Fork.gr2HalloweenItems");
         } else if (obj == m_gr2PromptCombo || obj == m_grrPromptCombo) {
             const bool gr2 = obj == m_gr2PromptCombo;
             QString text =
