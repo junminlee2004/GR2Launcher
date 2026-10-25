@@ -74,6 +74,14 @@ std::optional<std::string> ReadGrrPromptLayout(const std::string& serial = "");
 /// Sets grrPromptLayout as WriteFsr3Enable sets fsr3Enable.
 void WriteGrrPromptLayout(std::optional<std::string> layout, const std::string& serial = "");
 
+/// gr2HalloweenItems (the Halloween photo item mod pack of Gravity Rush 2, on when the key is
+/// missing) of the per-game file of serial, or of config.json for an empty serial. Empty when the
+/// file does not set it.
+std::optional<bool> ReadGr2HalloweenItems(const std::string& serial = "");
+
+/// Sets gr2HalloweenItems as WriteFsr3Enable sets fsr3Enable.
+void WriteGr2HalloweenItems(std::optional<bool> enable, const std::string& serial = "");
+
 /// The folder the emulator reads the FSR 4 files from for the fsr4AssetDir value dir: the fsr4_v07
 /// folder of the user folder for an empty value, else dir, taken from the user folder when it is
 /// relative.

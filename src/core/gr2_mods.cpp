@@ -23,6 +23,7 @@ constexpr const char* GrrFsr4EnableKey = "grrFsr4Enable";
 constexpr const char* Fsr4AssetDirKey = "fsr4AssetDir";
 constexpr const char* Gr2PromptLayoutKey = "gr2PromptLayout";
 constexpr const char* GrrPromptLayoutKey = "grrPromptLayout";
+constexpr const char* Gr2HalloweenItemsKey = "gr2HalloweenItems";
 
 // The same serials as the emulator's Common::IsGravityRush2 and Common::IsGravityRushRemastered.
 constexpr std::array<std::string_view, 7> Gr2Serials = {
@@ -156,6 +157,14 @@ std::optional<std::string> ReadGrrPromptLayout(const std::string& serial) {
 
 void WriteGrrPromptLayout(std::optional<std::string> layout, const std::string& serial) {
     WriteKey(GrrPromptLayoutKey, layout, serial);
+}
+
+std::optional<bool> ReadGr2HalloweenItems(const std::string& serial) {
+    return ReadKey<bool>(Gr2HalloweenItemsKey, serial);
+}
+
+void WriteGr2HalloweenItems(std::optional<bool> enable, const std::string& serial) {
+    WriteKey(Gr2HalloweenItemsKey, enable, serial);
 }
 
 std::filesystem::path ResolveFsr4AssetDir(const std::string& dir) {

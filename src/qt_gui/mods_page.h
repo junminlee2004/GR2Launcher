@@ -47,5 +47,6 @@ private:
     QCheckBox* m_grrFsr3CheckBox{};
     QCheckBox* m_grrFsr4CheckBox{};
     QComboBox* m_gr2PromptCombo{};
+    QCheckBox* m_halloweenCheckBox{};
     QComboBox* m_grrPromptCombo{};
 };
