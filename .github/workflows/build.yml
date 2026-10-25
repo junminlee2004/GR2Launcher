@@ -319,11 +319,13 @@ jobs:
       with:
         path: ./artifacts
 
-    - name: Check out the FSR 4 files
+    - name: Check out the FSR 4 files and the prompt packs
       uses: actions/checkout@v5
       with:
         path: source
-        sparse-checkout: dist/fsr4_v07
+        sparse-checkout: |
+          dist/fsr4_v07
+          dist/prompt_mods
   
     - name: Compress individual directories (without parent directory)
       run: |
@@ -335,6 +337,12 @@ jobs:
           if [ -d "$dir" ]; then
             dir_name=${dir%/}
             mkdir -p "$dir_name/user" "$dir_name/launcher"
+            # The prompt packs sit next to the launcher, outside the user folder, so the updater's
+            # zip carries them too; the launcher copies them into the user folder.
+            case $dir_name in
+              *-macos-*) ;;
+              *) cp -a ../source/dist/prompt_mods "$dir_name/prompt_mods" ;;
+            esac
             echo "Creating zip for $dir_name"
             (cd "$dir_name" && zip -r "../${dir_name}.zip" .)
           fi

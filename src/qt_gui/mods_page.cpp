@@ -1,8 +1,10 @@
 // SPDX-FileCopyrightText: Copyright 2026 shadPS4 Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <algorithm>
 #include <optional>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QEvent>
 #include <QFileDialog>
 #include <QGroupBox>
@@ -16,6 +18,36 @@
 #include "common/path_util.h"
 #include "core/gr2_mods.h"
 #include "mods_page.h"
+
+namespace {
+
+// A row with a label and a combo box of the button prompt layouts, the values of gr2PromptLayout
+// and grrPromptLayout.
+QComboBox* AddPromptRow(QWidget* group, QVBoxLayout* layout, QObject* filter) {
+    auto* row = new QWidget(group);
+    auto* rowLayout = new QHBoxLayout(row);
+    rowLayout->setContentsMargins(0, 0, 0, 0);
+    rowLayout->addWidget(new QLabel(ModsPage::tr("Button prompts:"), row));
+    auto* combo = new QComboBox(row);
+    combo->addItem(ModsPage::tr("PlayStation"), QStringLiteral("off"));
+    combo->addItem(ModsPage::tr("Xbox"), QStringLiteral("xbox"));
+    combo->addItem(ModsPage::tr("Nintendo Switch Pro"), QStringLiteral("switch"));
+    combo->installEventFilter(filter);
+    rowLayout->addWidget(combo);
+    rowLayout->addStretch();
+    layout->addWidget(row);
+    return combo;
+}
+
+void SelectLayout(QComboBox* combo, const std::string& layout) {
+    combo->setCurrentIndex(std::max(combo->findData(QString::fromStdString(layout)), 0));
+}
+
+std::string SelectedLayout(const QComboBox* combo) {
+    return combo->currentData().toString().toStdString();
+}
+
+} // Anonymous namespace
 
 ModsPage::ModsPage(QWidget* parent) : QWidget(parent) {
     auto* layout = new QVBoxLayout(this);
@@ -57,6 +89,7 @@ ModsPage::ModsPage(QWidget* parent) : QWidget(parent) {
     });
     fsr4DirLayout->addWidget(browseButton);
     gr2Layout->addWidget(fsr4DirRow);
+    m_gr2PromptCombo = AddPromptRow(m_gr2Group, gr2Layout, this);
     layout->addWidget(m_gr2Group);
 
     m_grrGroup = new QGroupBox(tr("Gravity Rush Remastered"), this);
@@ -67,6 +100,7 @@ ModsPage::ModsPage(QWidget* parent) : QWidget(parent) {
     m_grrFsr4CheckBox = new QCheckBox(tr("Enable FSR 4 (INT8, experimental)"), m_grrGroup);
     m_grrFsr4CheckBox->installEventFilter(this);
     grrLayout->addWidget(m_grrFsr4CheckBox);
+    m_grrPromptCombo = AddPromptRow(m_grrGroup, grrLayout, this);
     layout->addWidget(m_grrGroup);
 
     // Both games read the folder of config.json, so the FSR 4 box of Gravity Rush Remastered also
@@ -101,6 +135,8 @@ void ModsPage::Load(const std::string& serial) {
     m_fsr4DirEdit->setText(QString::fromStdString(read(Gr2Mods::ReadFsr4AssetDir).value_or("")));
     m_grrFsr3CheckBox->setChecked(read(Gr2Mods::ReadGrrFsr3Enable).value_or(false));
     m_grrFsr4CheckBox->setChecked(read(Gr2Mods::ReadGrrFsr4Enable).value_or(false));
+    SelectLayout(m_gr2PromptCombo, read(Gr2Mods::ReadGr2PromptLayout).value_or("off"));
+    SelectLayout(m_grrPromptCombo, read(Gr2Mods::ReadGrrPromptLayout).value_or("off"));
 }
 
 void ModsPage::Save(const std::string& serial) {
@@ -109,12 +145,19 @@ void ModsPage::Save(const std::string& serial) {
     const std::string fsr4Dir = m_fsr4DirEdit->text().trimmed().toStdString();
     const bool grrFsr3 = m_grrFsr3CheckBox->isChecked();
     const bool grrFsr4 = m_grrFsr4CheckBox->isChecked();
+    const std::string gr2Prompts = SelectedLayout(m_gr2PromptCombo);
+    const std::string grrPrompts = SelectedLayout(m_grrPromptCombo);
     if (serial.empty()) {
         Gr2Mods::WriteFsr3Enable(fsr3);
         Gr2Mods::WriteFsr4Enable(fsr4);
         Gr2Mods::WriteFsr4AssetDir(fsr4Dir.empty() ? std::nullopt : std::optional{fsr4Dir});
         Gr2Mods::WriteGrrFsr3Enable(grrFsr3);
         Gr2Mods::WriteGrrFsr4Enable(grrFsr4);
+        // A missing key also selects the PlayStation buttons.
+        Gr2Mods::WriteGr2PromptLayout(gr2Prompts == "off" ? std::nullopt
+                                                          : std::optional{gr2Prompts});
+        Gr2Mods::WriteGrrPromptLayout(grrPrompts == "off" ? std::nullopt
+                                                          : std::optional{grrPrompts});
         return;
     }
     // The per-game file keeps only the values that differ from the ones of config.json.
@@ -128,11 +171,15 @@ void ModsPage::Save(const std::string& serial) {
                                  serial);
         Gr2Mods::WriteFsr4AssetDir(unlessGlobal(fsr4Dir, Gr2Mods::ReadFsr4AssetDir().value_or("")),
                                    serial);
+        Gr2Mods::WriteGr2PromptLayout(
+            unlessGlobal(gr2Prompts, Gr2Mods::ReadGr2PromptLayout().value_or("off")), serial);
     } else if (Gr2Mods::IsGravityRushRemastered(serial)) {
         Gr2Mods::WriteGrrFsr3Enable(
             unlessGlobal(grrFsr3, Gr2Mods::ReadGrrFsr3Enable().value_or(false)), serial);
         Gr2Mods::WriteGrrFsr4Enable(
             unlessGlobal(grrFsr4, Gr2Mods::ReadGrrFsr4Enable().value_or(false)), serial);
+        Gr2Mods::WriteGrrPromptLayout(
+            unlessGlobal(grrPrompts, Gr2Mods::ReadGrrPromptLayout().value_or("off")), serial);
     }
 }
 
@@ -142,11 +189,13 @@ void ModsPage::SetDefaults() {
     m_fsr4DirEdit->clear();
     m_grrFsr3CheckBox->setChecked(false);
     m_grrFsr4CheckBox->setChecked(false);
+    m_gr2PromptCombo->setCurrentIndex(0);
+    m_grrPromptCombo->setCurrentIndex(0);
 }
 
 bool ModsPage::eventFilter(QObject* obj, QEvent* event) {
     if (event->type() == QEvent::Enter) {
-        // The filter is installed only on the check boxes and the folder row.
+        // The filter is installed only on the check boxes, the folder row and the combo boxes.
         if (obj == m_fsr3CheckBox) {
             emit DescriptionChanged(
                 m_fsr3CheckBox->text() + ":\n" +
@@ -195,6 +244,24 @@ bool ModsPage::eventFilter(QObject* obj, QEvent* event) {
                    "time the game starts. FSR 4 model and status: Ctrl+F10 > Display > FSR 3.1 "
                    "(GRR).") +
                 "\n\nGR2Fork.grrFsr4Enable");
+        } else if (obj == m_gr2PromptCombo || obj == m_grrPromptCombo) {
+            const bool gr2 = obj == m_gr2PromptCombo;
+            QString text =
+                tr("Shows the buttons of an Xbox pad or a Nintendo Switch Pro controller instead "
+                   "of PlayStation buttons in the game's menus, tutorials, controls page and the "
+                   "button icons in its text. The game's controls stay on the same buttons and "
+                   "the game files stay as they are. The prompt packs ship with this launcher and "
+                   "need a GR2fork build that reads them.");
+            if (gr2) {
+                text += " " + tr("With Xbox or Switch Pro prompts, touchpad swipes are done by "
+                                 "holding L3 and pressing triangle (up), cross (down), square "
+                                 "(left) or circle (right) in their place.");
+            }
+            text += " " + tr("Xbox prompts turn motion controls off.") + "\n" +
+                    tr("A change takes effect the next time the game starts.");
+            emit DescriptionChanged(
+                tr("Button prompts:") + "\n" + text +
+                (gr2 ? "\n\nGR2Fork.gr2PromptLayout" : "\n\nGR2Fork.grrPromptLayout"));
         } else {
             emit DescriptionChanged(
                 tr("FSR 4 asset folder:") + "\n" +

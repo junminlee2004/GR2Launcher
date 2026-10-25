@@ -277,6 +277,8 @@ set(CORE src/core/file_format/elf.cpp
          src/core/gr2_mods.h
          src/core/gr2_online.cpp
          src/core/gr2_online.h
+         src/core/prompt_packs.cpp
+         src/core/prompt_packs.h
          src/core/user_manager.cpp
          src/core/user_manager.h
          src/core/user_settings.cpp
@@ -342,6 +344,8 @@ set(QT_GUI src/qt_gui/about_dialog.cpp
            src/qt_gui/settings_dialog.ui
            src/qt_gui/mods_page.cpp
            src/qt_gui/mods_page.h
+           src/qt_gui/prompt_pack_offer.cpp
+           src/qt_gui/prompt_pack_offer.h
            src/qt_gui/tuning_page.cpp
            src/qt_gui/tuning_page.h
            src/qt_gui/tuning_table.cpp
