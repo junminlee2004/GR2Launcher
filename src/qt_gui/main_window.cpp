@@ -26,7 +26,6 @@
 #include "common/scm_rev.h"
 #include "common/versions.h"
 #include "control_settings.h"
-#include "core/bundled_data.h"
 #include "core/emulator_state.h"
 #include "core/file_sys/game_backend.h"
 #include "crypto_key_dialog.h"
@@ -79,7 +78,6 @@ bool MainWindow::Init() {
     }
 #endif
 
-    BundledData::Sync();
     AddUiWidgets();
     CreateActions();
     CreateRecentGameActions();

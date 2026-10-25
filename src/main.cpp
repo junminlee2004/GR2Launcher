@@ -9,6 +9,7 @@
 #include "common/key_manager.h"
 #include "common/logging/log.h"
 #include "common/versions.h"
+#include "core/bundled_data.h"
 #include "core/emulator_settings.h"
 #include "core/emulator_state.h"
 #include "core/user_settings.h"
@@ -160,6 +161,10 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error: Please provide a name or path for the emulator core.\n";
         exit(1);
     }
+
+    // Every start copies the bundled files into the user folder, also a start from a shortcut that
+    // runs the emulator without opening the main window.
+    BundledData::Sync();
 
     // Initialize the main window
     MainWindow* m_main_window = new MainWindow(nullptr, !show_gui && has_emulator_argument);
