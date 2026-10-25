@@ -290,9 +290,10 @@ bool ModsPage::eventFilter(QObject* obj, QEvent* event) {
                 tr("FSR 4 asset folder:") + "\n" +
                 tr("The folder that directly holds the shader and model files of the experimental "
                    "source-v07 FSR 4 INT8 upscaler, which is not AMD FSR 4.1: "
-                   "fsr4_model_v07_i8_*.spv and fsr4_model_v07_i8_*.bin. These files are not "
-                   "included with GR2fork or this launcher. Empty selects the fsr4_v07 folder in "
-                   "the emulator's user folder; a relative path starts from that user folder.\n"
+                   "fsr4_model_v07_i8_*.spv and fsr4_model_v07_i8_*.bin. Empty selects the "
+                   "fsr4_v07 folder in the emulator's user folder, which this launcher fills with "
+                   "the files it ships and replaces when they change; a relative path starts from "
+                   "that user folder.\n"
                    "A change takes effect the next time the game starts.") +
                 "\n\nGR2Fork.fsr4AssetDir");
         }

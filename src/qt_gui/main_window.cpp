@@ -26,9 +26,9 @@
 #include "common/scm_rev.h"
 #include "common/versions.h"
 #include "control_settings.h"
+#include "core/bundled_data.h"
 #include "core/emulator_state.h"
 #include "core/file_sys/game_backend.h"
-#include "core/prompt_packs.h"
 #include "crypto_key_dialog.h"
 #include "dimensions_dialog.h"
 #include "game_install_dialog.h"
@@ -79,7 +79,7 @@ bool MainWindow::Init() {
     }
 #endif
 
-    PromptPacks::SyncBundledPacks();
+    BundledData::Sync();
     AddUiWidgets();
     CreateActions();
     CreateRecentGameActions();

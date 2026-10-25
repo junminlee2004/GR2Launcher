@@ -269,6 +269,8 @@ set(CORE src/core/file_format/elf.cpp
          src/core/file_sys/backends/host_directory_backend.h
          src/core/file_sys/backends/zarchive_backend.cpp
          src/core/file_sys/backends/zarchive_backend.h
+         src/core/bundled_data.cpp
+         src/core/bundled_data.h
          src/core/emulator_state.cpp
          src/core/emulator_state.h
          src/core/emulator_settings.cpp
