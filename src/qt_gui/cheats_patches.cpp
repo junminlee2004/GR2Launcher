@@ -280,6 +280,16 @@ void CheatsPatches::setupUI() {
         downloadPatches(selectedOption, true);
     });
 
+    // Register local patches
+    connect(ui->registerPatchesButton, &QPushButton::clicked, this, [this]() {
+        const int folders = registerLocalPatches();
+        populateFileListPatches();
+        QMessageBox::information(this, tr("Register Patches"),
+                                 tr("Patch files registered from %1 folders. Nothing was "
+                                    "downloaded or replaced.")
+                                     .arg(folders));
+    });
+
     // Delete patch
     connect(ui->deletePatchButton, &QPushButton::clicked, this, [this, patchesDir]() {
         QStringListModel* model = qobject_cast<QStringListModel*>(ui->patchesListView->model());
@@ -885,6 +895,22 @@ void CheatsPatches::createFilesJson(const QString& repository) {
     QJsonDocument jsonDoc(filesObject);
     jsonFile.write(jsonDoc.toJson());
     jsonFile.close();
+}
+
+int CheatsPatches::registerLocalPatches() {
+    // A folder with no XML file is skipped unless it holds a files.json, which then gets emptied.
+    QDir patchesDir(Common::FS::GetUserPath(Common::FS::PathType::PatchesDir));
+    int processed = 0;
+    for (const QString& folder : patchesDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+        QDir subDir(patchesDir.filePath(folder));
+        if (subDir.entryList(QStringList() << "*.xml", QDir::Files).isEmpty() &&
+            !subDir.exists("files.json")) {
+            continue;
+        }
+        createFilesJson(folder);
+        ++processed;
+    }
+    return processed;
 }
 
 void CheatsPatches::clearListCheats() {
