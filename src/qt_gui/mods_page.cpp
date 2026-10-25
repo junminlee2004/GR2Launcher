@@ -259,11 +259,13 @@ bool ModsPage::eventFilter(QObject* obj, QEvent* event) {
                 m_halloweenCheckBox->text() + ":\n" +
                 tr("Adds two photo items to Photo Mode: a Small Jack-o'-Lantern, unlocked at 1,000 "
                    "Dusty Tokens, and a Large Jack-o'-Lantern, unlocked at 8,000. The unlock comes "
-                   "in free roam, also when the tokens were earned before. The unlocks are kept in "
-                   "two photo item flags of the save that the game leaves unused, and the game "
-                   "files stay as they are. Works with every button prompt layout. The mod pack "
-                   "ships with this launcher and needs a GR2fork build that reads it.\nA change "
-                   "takes effect the next time the game starts.") +
+                   "in free roam, also when the tokens were earned before, with the reward jingle, "
+                   "a caption and a gift announcement. The Dusty Token checklist in Statistics "
+                   "lists both items. The unlocks are kept in two photo item flags of the save "
+                   "that the game leaves unused, and the game files stay as they are. Works with "
+                   "every button prompt layout. Needs game version 1.11. The mod pack ships with "
+                   "this launcher and needs a GR2fork build that reads it.\nA change takes effect "
+                   "the next time the game starts.") +
                 "\n\nGR2Fork.gr2HalloweenItems");
         } else if (obj == m_gr2PromptCombo || obj == m_grrPromptCombo) {
             const bool gr2 = obj == m_gr2PromptCombo;
