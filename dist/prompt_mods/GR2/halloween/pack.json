@@ -2,7 +2,7 @@
   "format": 3,
   "game": "GR2",
   "mod": "halloween",
-  "version": "2026.10.25",
+  "version": "2026.10.25+943de07e",
   "members": [
     {
       "archive": "Gravite2_Chunk0.psarc",
@@ -123,10 +123,10 @@
       "path": "lua/Game/Event2/photo_item.lua",
       "orig_size": 606,
       "orig_crc32": "e9178c94",
-      "new_size": 2978,
-      "new_crc32": "16bda21b",
+      "new_size": 2832,
+      "new_crc32": "d6705342",
       "orig_sha256": "c8c18a83e1cfb9caf47db6f66d7f9b7fdda7470e320cc39e98f2e3397e626604",
-      "new_sha256": "b6acfb1dc19dea656cdb66245fcb5a8a2131c75cdf53bcb3a2b3fe9a359ede4d",
+      "new_sha256": "0de93fb41e3c8d229f51ed8610fb5ed6781bee3fd4103de3792aa0df8e649e90",
       "delta": "deltas/0007.gpd"
     },
     {
@@ -186,601 +186,6 @@
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_BP.txb",
-      "orig_size": 113604,
-      "orig_crc32": "ad4ed9ee",
-      "new_size": 113924,
-      "new_crc32": "5ce27e09",
-      "orig_sha256": "028dbd5c094efe08b495dde1201bfc087767c5133dcd5173af3c0026204cb882",
-      "new_sha256": "f6d9d7cdc7fbd21624b59de300fd9a634845d1fa93a703ea27ba92c7008c2a46",
-      "delta": "deltas/0013.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_BP.txb",
-      "orig_size": 114204,
-      "orig_crc32": "20d4852c",
-      "new_size": 114524,
-      "new_crc32": "608d697d",
-      "orig_sha256": "ea39dfe97c6890cb89b92c074640ad022107e19074e6bfcfad2546b87a8c7827",
-      "new_sha256": "7f133b218d9d88cebcb580d6f11bbd241cee76404e131d6ea298b3256905bc8c",
-      "delta": "deltas/0014.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_BP.txb",
-      "orig_size": 113976,
-      "orig_crc32": "e07f7f93",
-      "new_size": 114296,
-      "new_crc32": "efa3cb52",
-      "orig_sha256": "cef905004e1cc61702ce5d06b285bd1723c66ebdb398e8df27a432efa7c2232e",
-      "new_sha256": "578f52c31ec973f8b093b19809c10fbab645ad4580ede90f3c7123188d9c968a",
-      "delta": "deltas/0015.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_CA.txb",
-      "orig_size": 119412,
-      "orig_crc32": "75284cb4",
-      "new_size": 119732,
-      "new_crc32": "90dcf02c",
-      "orig_sha256": "954bd7898b5b3e2a55189dac07bdf86c47188331ad62c68a3fa26fd4c7fdb944",
-      "new_sha256": "eb9d6bca94d4feab722e56907edbd03c7c1247f6a1790ee6050ce0ff9e9b5838",
-      "delta": "deltas/0016.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_CA.txb",
-      "orig_size": 119976,
-      "orig_crc32": "c9a5adf5",
-      "new_size": 120296,
-      "new_crc32": "ed7ffe5b",
-      "orig_sha256": "55b88210af93d3712a5e77cb8b72d686e6c3e3a7aaa8e1b85174abe77e799529",
-      "new_sha256": "3b478b96449f5465b046a479ded09ee5167d91345a22859303da5aac1dae60a2",
-      "delta": "deltas/0017.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_CA.txb",
-      "orig_size": 119768,
-      "orig_crc32": "98fca93d",
-      "new_size": 120088,
-      "new_crc32": "bcf142f5",
-      "orig_sha256": "2a2b03138304df46deedf2c4d8834bf8add9696c9b81f62fb34950c8fdb2f539",
-      "new_sha256": "1e3ad2c8c951fd226ea4ae68c9d6cf438ddc3b6bdaf9715a4711d57443ce09fb",
-      "delta": "deltas/0018.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_CS.txb",
-      "orig_size": 101008,
-      "orig_crc32": "631640c8",
-      "new_size": 101296,
-      "new_crc32": "860a042a",
-      "orig_sha256": "6a482012be980c7e89b3a1851555b8183c8dcdac317a2f51de467c7d72870e6b",
-      "new_sha256": "8c8e6cd4fff4adf571e55a20235832416a52941707de409eb0f5ab1090b10923",
-      "delta": "deltas/0019.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_CS.txb",
-      "orig_size": 101728,
-      "orig_crc32": "a9eab153",
-      "new_size": 102016,
-      "new_crc32": "0f77aa57",
-      "orig_sha256": "3062769f84aa5e6df682c90fcdb654330ce127dcf3a1fa8a7a33b1a997387cb9",
-      "new_sha256": "44fb5c3533d1bd175a26bf36fb9f01de57ce7e03927bc6c7d36ed6be0b4f9cfa",
-      "delta": "deltas/0020.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_CS.txb",
-      "orig_size": 101560,
-      "orig_crc32": "faa59058",
-      "new_size": 101848,
-      "new_crc32": "f01e3b87",
-      "orig_sha256": "b8ae16d8193d9f4b6d64ce05635156c32750a5343d3afe10ffd471f5b718209b",
-      "new_sha256": "935cbf3869dc553505acae5facbffe8560d2f5ba32d1edc8dc99f223c48e47dd",
-      "delta": "deltas/0021.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_CT.txb",
-      "orig_size": 99996,
-      "orig_crc32": "70e0bb4c",
-      "new_size": 100300,
-      "new_crc32": "bb340331",
-      "orig_sha256": "ae918c404e75ebecc6ba383531dfcaa3140137644a165d130668a5f9313ce49f",
-      "new_sha256": "a06054a2b86c0dc657e3ba02323f4dacbb55b05eea0c3f38e2efd9f4bc752b20",
-      "delta": "deltas/0022.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_CT.txb",
-      "orig_size": 100764,
-      "orig_crc32": "f8ed18e5",
-      "new_size": 101068,
-      "new_crc32": "de027c5c",
-      "orig_sha256": "b1a0d43b0502160ea6a46480372466db0a0bab96b79fe0a1a104186100bab4a4",
-      "new_sha256": "d43c4e5d10f29015761c9045812bccad6c3f06c5f9c581a52300b646293fac9c",
-      "delta": "deltas/0023.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_CT.txb",
-      "orig_size": 100612,
-      "orig_crc32": "185d9d82",
-      "new_size": 100916,
-      "new_crc32": "0521b736",
-      "orig_sha256": "c824ebc308e05d8c2fe3f6aefda0426d30416f0b2edb9299f2fce4542b27f282",
-      "new_sha256": "53cc27554a76ba2dc6a4bc87ab3a681562af157bac02f7ac5241d0beeac43dc3",
-      "delta": "deltas/0024.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_DE.txb",
-      "orig_size": 116224,
-      "orig_crc32": "e5fcd343",
-      "new_size": 116536,
-      "new_crc32": "1b2839d2",
-      "orig_sha256": "62b39ef3ea263c9f7f42e70c409032ed1b858a2173ddf39fbffff25b9c982696",
-      "new_sha256": "8f30b8339a03ac574d915b77042362eab57ac46090ab8d4a5a08f77625c3f7a7",
-      "delta": "deltas/0025.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_DE.txb",
-      "orig_size": 117004,
-      "orig_crc32": "1b8cce48",
-      "new_size": 117316,
-      "new_crc32": "4ec9ec36",
-      "orig_sha256": "ead763c34150dd2064ae1b282295a95762768a0df309962695179dda2ccc2648",
-      "new_sha256": "be5c55e7227f02c37b081c54ba96ca512f29562e5297668811fb92dff9607295",
-      "delta": "deltas/0026.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_DE.txb",
-      "orig_size": 116772,
-      "orig_crc32": "0b15c7a6",
-      "new_size": 117084,
-      "new_crc32": "9876b373",
-      "orig_sha256": "84b8334b6ae9c5ad089d22c9a6385b21ef95e1e8502657b8b189c953770a929f",
-      "new_sha256": "cb26030b70e957a346c803a1455326b75d0fcce0234f48e5a038fd577f148c5f",
-      "delta": "deltas/0027.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_EN.txb",
-      "orig_size": 106652,
-      "orig_crc32": "74c5c9d5",
-      "new_size": 106948,
-      "new_crc32": "2e4f98b3",
-      "orig_sha256": "7347c78d101db8e38ec10d26e24852f416278ed2649906a0e52d65acdf4916bc",
-      "new_sha256": "9cde97f669f82bc0824ba045a272679e69c2e14b972de3725c16ba0402743415",
-      "delta": "deltas/0028.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_EN.txb",
-      "orig_size": 107444,
-      "orig_crc32": "5b1ea6ff",
-      "new_size": 107740,
-      "new_crc32": "1e02c85f",
-      "orig_sha256": "c57d7fb66a1eede8b2f3dee1904b96c82fe716e8687d21fc2be4276f74e64618",
-      "new_sha256": "6c4ce74b4e2b50e1be340e0c7c2152f9ec13a533c10794080a71188416c51d67",
-      "delta": "deltas/0029.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_EN.txb",
-      "orig_size": 107248,
-      "orig_crc32": "67002004",
-      "new_size": 107544,
-      "new_crc32": "cf47bc6a",
-      "orig_sha256": "487b21a1e545fc1e571162650a82cc64dd2d255b189df67f8919ca4643ea5a47",
-      "new_sha256": "54d4e82a293d1ec6245ab246cdbe77f2c578716c4f18ab6247b7b1529bf4de21",
-      "delta": "deltas/0030.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_ES.txb",
-      "orig_size": 117472,
-      "orig_crc32": "3276a6c6",
-      "new_size": 117824,
-      "new_crc32": "9cbbe227",
-      "orig_sha256": "f7210d2ccfb6364ad837ad42640eac65c48de9c030b773dc06e7dcee8316becb",
-      "new_sha256": "0251964ae630cb096243b4997bd805eedcc962bb0d10020073c3da4f237be58f",
-      "delta": "deltas/0031.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_ES.txb",
-      "orig_size": 118204,
-      "orig_crc32": "088c700e",
-      "new_size": 118556,
-      "new_crc32": "07e506b1",
-      "orig_sha256": "ed0ab1d43786c6d3ecf5f44b88e15e266c2a72cc9e1b89daba225465fb23dc22",
-      "new_sha256": "227a68bc9e7cce37b8f9ecd1cbe504e1b0cf36fa5e8161856cc5860db79b50fb",
-      "delta": "deltas/0032.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_ES.txb",
-      "orig_size": 117992,
-      "orig_crc32": "5803b3a4",
-      "new_size": 118344,
-      "new_crc32": "7536d293",
-      "orig_sha256": "656eebbb3a7316c4dd8e1fbea7ec142a342b6931df252b51adc65453793de64b",
-      "new_sha256": "c1b823b90bdf3e0d4f5c02e81fe5eafd562fbfbb5b5988c48bfbaf7ce20a0277",
-      "delta": "deltas/0033.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_FR.txb",
-      "orig_size": 119412,
-      "orig_crc32": "9b386070",
-      "new_size": 119732,
-      "new_crc32": "2ce0a463",
-      "orig_sha256": "4c6131c3556d00c9f881a497b4bc8e1432fc75b80672d5e917c58bae7577e44a",
-      "new_sha256": "3d7c5c222d958b9bfdc80ad39ca8104bd0e64e2a54ca2967ce35a4438338d82c",
-      "delta": "deltas/0034.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_FR.txb",
-      "orig_size": 119976,
-      "orig_crc32": "22fbf9d4",
-      "new_size": 120296,
-      "new_crc32": "5c19a7ac",
-      "orig_sha256": "7164842f4d6478ee12cf7ec2f1f4c5a24aa2a02883bd1d06f58b0727bf9fd126",
-      "new_sha256": "b3e7503a435a0e82d9a209304ceba3fb164df33d3e2592ac00a1ec970f476f2f",
-      "delta": "deltas/0035.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_FR.txb",
-      "orig_size": 119768,
-      "orig_crc32": "d9ad9d97",
-      "new_size": 120088,
-      "new_crc32": "a3166760",
-      "orig_sha256": "c5d5b7886132a28be203456ab00f153b9cff4492b3c0fff2b65d6c03ea044493",
-      "new_sha256": "0d881e8025f1e27bfee97b32a595824d4a67e1f45d9a0a5ea355f8559a077b25",
-      "delta": "deltas/0036.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_IT.txb",
-      "orig_size": 113580,
-      "orig_crc32": "32b052f2",
-      "new_size": 113908,
-      "new_crc32": "76dd31f0",
-      "orig_sha256": "92ce6feb172e5d7676ce6ae84d276d051eb231ec75b2885478709513e529fccf",
-      "new_sha256": "35a57c6eae07bfb2cca5a931e3e37dfcd59e45d67504642ffba60555d62ab7b6",
-      "delta": "deltas/0037.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_IT.txb",
-      "orig_size": 114328,
-      "orig_crc32": "67bdb574",
-      "new_size": 114656,
-      "new_crc32": "e0e0d8ed",
-      "orig_sha256": "fe5329030e0bb4399cb764fb200db88e922588f1fc0a6d28a8936b61ffcd9eea",
-      "new_sha256": "cabf3a1019dc85841bbc489f04f4b0097345870f436bcb8e83e8908c80e2ac8d",
-      "delta": "deltas/0038.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_IT.txb",
-      "orig_size": 114120,
-      "orig_crc32": "7b8ab12a",
-      "new_size": 114448,
-      "new_crc32": "1033ea93",
-      "orig_sha256": "b66fa7ac66fbcb274e37947c4ade9f616bf138f0933ecab44f477abaecd60fe2",
-      "new_sha256": "8b25ef94ead0886c2406229b21fa5138523f7851fadec5c1d485377d1312504f",
-      "delta": "deltas/0039.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_JP.txb",
-      "orig_size": 130152,
-      "orig_crc32": "66f3a86c",
-      "new_size": 130608,
-      "new_crc32": "0d7ef93e",
-      "orig_sha256": "306a6710d3490203066c664a9bbeef01f793ab7731c73a14a62fdd322e1639e0",
-      "new_sha256": "1c5364fa261c51c90e885dd7caff7861eff0e3e89619ecc2c0c9a7f2dcd98464",
-      "delta": "deltas/0040.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_JP.txb",
-      "orig_size": 130496,
-      "orig_crc32": "7959e0a4",
-      "new_size": 130952,
-      "new_crc32": "ec35a8af",
-      "orig_sha256": "44fb51c8515a1189cee592fc90fc305eff88ae2d53e268a7a9c8ee5d9c4af3b0",
-      "new_sha256": "423fc9ae7699fbf88a6acb24ee17526fafbb6b2f37baafb389355de7c88183c3",
-      "delta": "deltas/0041.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_JP.txb",
-      "orig_size": 130164,
-      "orig_crc32": "e85ce366",
-      "new_size": 130620,
-      "new_crc32": "6e5bbff7",
-      "orig_sha256": "85608d4a883a89202d0eb40d9bf4cd94f1fd330cf57f1588358793e1d3fcedf7",
-      "new_sha256": "b3d1c1adff0f59e29d8dc8b6d3e1334d172a8a418ca2f53e2547a5700581c5f7",
-      "delta": "deltas/0042.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_KR.txb",
-      "orig_size": 120208,
-      "orig_crc32": "42436194",
-      "new_size": 120552,
-      "new_crc32": "04c7b8b3",
-      "orig_sha256": "1afcffdef6ca583cfe70469f4d7b242ff92d67ff65c57b870059674473aefd7c",
-      "new_sha256": "a5509b54add2bc1f95bf9d33bd9584a6394b52c8cd82d5cb369a59f2080b9ec8",
-      "delta": "deltas/0043.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_KR.txb",
-      "orig_size": 120984,
-      "orig_crc32": "6450f922",
-      "new_size": 121328,
-      "new_crc32": "c9efb150",
-      "orig_sha256": "ddf8164e8a4bfe7dc14be7d6a7fa72a8b6c46db8fd35ebac8caee5dbb3edee5d",
-      "new_sha256": "e77812daa95bea65d0d611a788398f6c819d57081f3edecc96fbdc06b298f393",
-      "delta": "deltas/0044.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_KR.txb",
-      "orig_size": 120728,
-      "orig_crc32": "44948eca",
-      "new_size": 121072,
-      "new_crc32": "7a8b88b5",
-      "orig_sha256": "3291c9e9fb215b8113240c50e888e7961c5a0656e843cce43e626a50c54bb12e",
-      "new_sha256": "129fc3aac9f7c0d12c643525e49a0228047a9ac82eb26bb30bd03d54a34143a1",
-      "delta": "deltas/0045.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_MX.txb",
-      "orig_size": 116756,
-      "orig_crc32": "0a021dc1",
-      "new_size": 117100,
-      "new_crc32": "1178e6cd",
-      "orig_sha256": "7e62c775c3152abe925ae63ef1a6001595a2e240b58475d45784e49cce6f280d",
-      "new_sha256": "5825e3d00aebb9341f949d110d849f8b729fff51b50c2074d3839e8e158a2225",
-      "delta": "deltas/0046.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_MX.txb",
-      "orig_size": 117444,
-      "orig_crc32": "c6b45264",
-      "new_size": 117788,
-      "new_crc32": "dad7feb0",
-      "orig_sha256": "3b2324af7c3c81bf036beec1c1377fdc54f4ab28e6347b4b84834f68cc52bdc5",
-      "new_sha256": "9062ceb7a0257a2de45a0491fa482f64b98ae4e725939a1312648ced64f9863c",
-      "delta": "deltas/0047.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_MX.txb",
-      "orig_size": 117212,
-      "orig_crc32": "04eba9d3",
-      "new_size": 117556,
-      "new_crc32": "f2711e0c",
-      "orig_sha256": "b0ad94a0932de0e33fe39d4395b2113f165b90ea4b60085840f2aa60f5ebab43",
-      "new_sha256": "32c8c76cea5c7847c23968d4ba476866e906eead906c544e9f775e72d92e38d1",
-      "delta": "deltas/0048.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_NL.txb",
-      "orig_size": 110068,
-      "orig_crc32": "6761aa48",
-      "new_size": 110340,
-      "new_crc32": "0f122f90",
-      "orig_sha256": "f4bbf4d1f7b7cf4138ca51b1f77a3e64647f845b5ed9e50da9d1bd24665fa463",
-      "new_sha256": "4535b90aba8a53f5ea882b1d6c3745f6144714e26605f21f75586480447e4ccb",
-      "delta": "deltas/0049.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_NL.txb",
-      "orig_size": 110872,
-      "orig_crc32": "19c90163",
-      "new_size": 111144,
-      "new_crc32": "aaed98ad",
-      "orig_sha256": "c4ac73f1f9380ceddfa3354cf9c1a20ab400c8f4536193bc90603ad2365fa459",
-      "new_sha256": "7b0e35b8006505240ee9c1492a9a788ee423fc7c803af4036cdbbbcfbe98f000",
-      "delta": "deltas/0050.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_NL.txb",
-      "orig_size": 110668,
-      "orig_crc32": "cca04f4e",
-      "new_size": 110940,
-      "new_crc32": "ef423eb6",
-      "orig_sha256": "f273a2448f2087f05d20c89ee66b545be1750d78c0a3a0f6004a7a9291e543c2",
-      "new_sha256": "46d802745cc073d137f3736ed69a04e165eed28cacb103181f6a4e1bc187a379",
-      "delta": "deltas/0051.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_PL.txb",
-      "orig_size": 113532,
-      "orig_crc32": "35ba8b47",
-      "new_size": 113876,
-      "new_crc32": "2d13304f",
-      "orig_sha256": "4ec84a32772dfa917f442314c0e9b3357bddcb303d95b1a8316ccb9fbf658081",
-      "new_sha256": "2ac4f61a3789ae5021f09fef7a9c0046c9915fb96e99edba13be76eb21a1ad69",
-      "delta": "deltas/0052.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_PL.txb",
-      "orig_size": 114116,
-      "orig_crc32": "70dec0a8",
-      "new_size": 114460,
-      "new_crc32": "b1d7610f",
-      "orig_sha256": "7d8032e621e230a86255992ec4c8b3749ae6230f712d046bb0508e2d95c822a1",
-      "new_sha256": "20bcf826f6dc680c242c0275a63305c0f48d94b6938bd7483bf4d0fb8530e24b",
-      "delta": "deltas/0053.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_PL.txb",
-      "orig_size": 113928,
-      "orig_crc32": "b4985631",
-      "new_size": 114272,
-      "new_crc32": "8cc60e6c",
-      "orig_sha256": "0461aad259591eeada57255b46d0520c0525bcc2ed807af4cc4cd0a2c84caad9",
-      "new_sha256": "3dc35389fa361fecb9a5e22208bece30d0d48bc2b22ffcf99ad0b16149c147d0",
-      "delta": "deltas/0054.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_PT.txb",
-      "orig_size": 117012,
-      "orig_crc32": "bab4bb1c",
-      "new_size": 117332,
-      "new_crc32": "cb802bf3",
-      "orig_sha256": "fee78188d1e159549e9fda045f749feb8694b0b8a3d01f3b0d260947f4013f4c",
-      "new_sha256": "1998230595fe7a0a181e8febead0f1ddfc7d260446a8fb23c4661cb5e054f85f",
-      "delta": "deltas/0055.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_PT.txb",
-      "orig_size": 117728,
-      "orig_crc32": "c671920f",
-      "new_size": 118048,
-      "new_crc32": "55a9db6e",
-      "orig_sha256": "61a761d43f952648b80c3434cca5422649d5a8d553102d0b6aefa8b249423e84",
-      "new_sha256": "224ca4e07b25aef8c74f3acb1a8232dd7f14050e48b5d3d384436d1ece73f15c",
-      "delta": "deltas/0056.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_PT.txb",
-      "orig_size": 117520,
-      "orig_crc32": "b7831139",
-      "new_size": 117840,
-      "new_crc32": "91b9e14c",
-      "orig_sha256": "28e7d33b7b272729ad1f5d1c534e61a4189a94b23ab6101744759c80b016a833",
-      "new_sha256": "f1efda7a934a19aa493dc77a9421c6a5451d23a8c95a3f73df66dcd047a09251",
-      "delta": "deltas/0057.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_RU.txb",
-      "orig_size": 153716,
-      "orig_crc32": "b7aa1bfa",
-      "new_size": 154152,
-      "new_crc32": "523e846c",
-      "orig_sha256": "93f79373580ee3efcc07bf34ac370bcdd02cd2bb1739dd59a61d9c388e093fb6",
-      "new_sha256": "0f0584680dbad088a06a7ff7ebb8c005105407e2d5d5393c3fed6a77d9bd52e1",
-      "delta": "deltas/0058.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_RU.txb",
-      "orig_size": 154420,
-      "orig_crc32": "19dfdb60",
-      "new_size": 154856,
-      "new_crc32": "3be667d7",
-      "orig_sha256": "46f0173f379dea46f55577388f365324541a28180eee10255ee2e675fae18b30",
-      "new_sha256": "23fbd52ba462b3510cea6820fae76edda971ccdf72f6ed03cfb66cae8d975b2d",
-      "delta": "deltas/0059.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_RU.txb",
-      "orig_size": 154132,
-      "orig_crc32": "a783b8a2",
-      "new_size": 154568,
-      "new_crc32": "a1fcf1e6",
-      "orig_sha256": "620ac983f6631c2942135b2ea54ecc16f95ff4e5c2d527d82626ac87286d5ab7",
-      "new_sha256": "9ad57a144b0c59c6e077587508a08db8745c113a9a32c64b4304cba1ece83510",
-      "delta": "deltas/0060.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_UK.txb",
-      "orig_size": 106656,
-      "orig_crc32": "bb88f543",
-      "new_size": 106952,
-      "new_crc32": "340026c5",
-      "orig_sha256": "6cf4803067196d5753d7045101894620ef68d17d28aa81594cdff97ce642d77b",
-      "new_sha256": "81b58ab90aa0f1268a8cb01c88cab6b5722c9ebec0e22c4e2a55b34885ab8fbc",
-      "delta": "deltas/0061.gpd"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_UK.txb",
-      "orig_size": 107448,
-      "orig_crc32": "90e92405",
-      "new_size": 107744,
-      "new_crc32": "085507fa",
-      "orig_sha256": "1b6cc5e7c5eaa62834407cdbb6337eddaa4997ad0a01128ecbacc3cfe4cd6548",
-      "new_sha256": "e9a322b9ef14158cb09337fae3d833f991dcadd3cf7ebbe46447b09aaf52f045",
-      "delta": "deltas/0062.gpd",
-      "base": "switch"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
-      "path": "txb/common_UK.txb",
-      "orig_size": 107252,
-      "orig_crc32": "7b614faf",
-      "new_size": 107548,
-      "new_crc32": "9ff1e844",
-      "orig_sha256": "9e83b93a7f09378a10f4116d5ebeb2f21018b16cdc533e85b722530348138c83",
-      "new_sha256": "5f8e1ba7fdc71d33288a9c799271115d8b459745e0666cbb6cd22d4ca42c71c1",
-      "delta": "deltas/0063.gpd",
-      "base": "xbox"
-    },
-    {
-      "archive": "Gravite2_Patch_Chunk0.psarc",
       "path": "txb/UI_BP.txb",
       "orig_size": 214812,
       "orig_crc32": "0b640247",
@@ -788,7 +193,7 @@
       "new_crc32": "c75793cd",
       "orig_sha256": "f76c73d185dcac565bcc1ca38bbcb11131794a32e64f784668de6a48b4a909c1",
       "new_sha256": "d0094d1ab655bd7abacdad2be57d2e7985f3adcb9c2a5da82f06a2bae7c17202",
-      "delta": "deltas/0064.gpd"
+      "delta": "deltas/0013.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -799,7 +204,7 @@
       "new_crc32": "37c09c47",
       "orig_sha256": "f1028e563417bee3df4422532973fcb082a9837b818f71bfba8a809271465d50",
       "new_sha256": "f9bfd4cc53a9b4b0c26018d2187b5570bd0df78d9d466fc01c5c095a4d51e4d6",
-      "delta": "deltas/0065.gpd",
+      "delta": "deltas/0014.gpd",
       "base": "switch"
     },
     {
@@ -811,7 +216,7 @@
       "new_crc32": "d36741fe",
       "orig_sha256": "3b50e43b8effa18dcde02537b5a3bbb0a5f494587f70a7256ab9537c8a3add47",
       "new_sha256": "462ea7397fb870c1bc6891140c29f53f478b688d1de2e9776ff4858c19607485",
-      "delta": "deltas/0066.gpd",
+      "delta": "deltas/0015.gpd",
       "base": "xbox"
     },
     {
@@ -823,7 +228,7 @@
       "new_crc32": "e2974664",
       "orig_sha256": "ac28d2e7008904b74614c071133355d614fce96de12cb28b4a0be9fd1b4bc752",
       "new_sha256": "0fbc5a4524d0b69ea6ba159adb766011cd3e7326f3f176c2afa1a3b6380f9c07",
-      "delta": "deltas/0067.gpd"
+      "delta": "deltas/0016.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -834,7 +239,7 @@
       "new_crc32": "223dfb0c",
       "orig_sha256": "6126915e512bd423cb1eb2da2c97629112857672e9b4a32010dd73cd73726491",
       "new_sha256": "daa5910bed0e7fde08046c2eb9e0bb632b80905f041e94f5e2e6ba57c27d3cea",
-      "delta": "deltas/0068.gpd",
+      "delta": "deltas/0017.gpd",
       "base": "switch"
     },
     {
@@ -846,7 +251,7 @@
       "new_crc32": "91bc8e39",
       "orig_sha256": "81d2d12e4671962368fad0f6d8955d5ddb6ab6577ecbf36dd8944ce52d01c7f6",
       "new_sha256": "617c3b5b28d98e071bde138bd854b3939a080b39caa34ac1e8376b9140d09454",
-      "delta": "deltas/0069.gpd",
+      "delta": "deltas/0018.gpd",
       "base": "xbox"
     },
     {
@@ -858,7 +263,7 @@
       "new_crc32": "f605a724",
       "orig_sha256": "fa20e5997dc3f06bf03619a590e9cced0860717d9f5f1d551b296c9afae27af7",
       "new_sha256": "777c70f088c4859dd5755bd00bfb2707d9b8675fa9eaba079c2914bb410432d9",
-      "delta": "deltas/0070.gpd"
+      "delta": "deltas/0019.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -869,7 +274,7 @@
       "new_crc32": "84370db8",
       "orig_sha256": "bb350a882286f2b4bd2c59b4449633eef7eb344fe3ec8317ac5f8a57f9a2aa48",
       "new_sha256": "afcd52d014a1df6b1e250f5e38a06b3e1a6da242220ac83e60d31ef441407edf",
-      "delta": "deltas/0071.gpd",
+      "delta": "deltas/0020.gpd",
       "base": "switch"
     },
     {
@@ -881,7 +286,7 @@
       "new_crc32": "4bf3e480",
       "orig_sha256": "be047d3377867c2a41ae4b5f1db24a398fbc86443fdc4b5ba5846bde80c90afb",
       "new_sha256": "ca374f9c3b3c4e193bc2db6cfaef6f2c4b837c5350e52105c8233e65c78d21f3",
-      "delta": "deltas/0072.gpd",
+      "delta": "deltas/0021.gpd",
       "base": "xbox"
     },
     {
@@ -893,7 +298,7 @@
       "new_crc32": "5ebd304c",
       "orig_sha256": "c0f986d74e057a495a4f8fe01bd81a84579f3b265d8dfc4dee8a46e6c498d464",
       "new_sha256": "851fdfc4b2995d7b3f89de121319c4f13adbe1f94f88baf61fbd24667917cf28",
-      "delta": "deltas/0073.gpd"
+      "delta": "deltas/0022.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -904,7 +309,7 @@
       "new_crc32": "f812504c",
       "orig_sha256": "30e679258a041f9a074545f1210da2c978ca84dd6480c2cbd43b6f1db75b0724",
       "new_sha256": "ade2b738edf882726d8848938b681543929c3220aec35174ccf63716b921b3d1",
-      "delta": "deltas/0074.gpd",
+      "delta": "deltas/0023.gpd",
       "base": "switch"
     },
     {
@@ -916,7 +321,7 @@
       "new_crc32": "dbda0b89",
       "orig_sha256": "1690dccd2c6ccde73e977e9bbdccd5041e9a32444543c64995630b019c62624f",
       "new_sha256": "60ae2ae8ce955edfbe5303c48c15d3898753fb75c826ac463e9b7abf140217e4",
-      "delta": "deltas/0075.gpd",
+      "delta": "deltas/0024.gpd",
       "base": "xbox"
     },
     {
@@ -928,7 +333,7 @@
       "new_crc32": "feafdc5a",
       "orig_sha256": "3d622ccb39ced258eb56202b2f20ce7668708e3d9d206bb8a4c23a82af8b8891",
       "new_sha256": "c0489cdd7e0f8a10c7a55319c7be099f586d42576aafb9a28a2e942a27148ef0",
-      "delta": "deltas/0076.gpd"
+      "delta": "deltas/0025.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -939,7 +344,7 @@
       "new_crc32": "00caf60d",
       "orig_sha256": "519b596a4a37786dfca191db097f0c8afd845f24994b1591f4400c461b55d6d4",
       "new_sha256": "2b951e052c33ae013773a2d9130d6cc5f5625db130607e9231ea3165a3b59e71",
-      "delta": "deltas/0077.gpd",
+      "delta": "deltas/0026.gpd",
       "base": "switch"
     },
     {
@@ -951,7 +356,7 @@
       "new_crc32": "2915ec1e",
       "orig_sha256": "da1986be470f75c6bd2ab2954c1030e5fc1fd8d13ad1c0a5de1b58cbc5ff7b63",
       "new_sha256": "57bb7541750d1744cffae553ec0e59e702e1e5e2366931cb62d12f8fa64c0616",
-      "delta": "deltas/0078.gpd",
+      "delta": "deltas/0027.gpd",
       "base": "xbox"
     },
     {
@@ -963,7 +368,7 @@
       "new_crc32": "b7e53227",
       "orig_sha256": "332ea4521a9c78986b7e27b8380491b9159521cb9374c6ebcc5743a077c13199",
       "new_sha256": "4f6a048f6bd3e237a15cbfedef5de48a1738d7e80310f77bb5a5a9100751f333",
-      "delta": "deltas/0079.gpd"
+      "delta": "deltas/0028.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -974,7 +379,7 @@
       "new_crc32": "2bddb19d",
       "orig_sha256": "b315b0a2d60a9fc61cb4bc82cd426c94277d1f9a87d71389a93d6289ae3f0f93",
       "new_sha256": "fd82c99d3f42f7dd9a99e8dc805fe261e7962a89a18010f1fdfb47c9c060771b",
-      "delta": "deltas/0080.gpd",
+      "delta": "deltas/0029.gpd",
       "base": "switch"
     },
     {
@@ -986,7 +391,7 @@
       "new_crc32": "a2a54851",
       "orig_sha256": "3f00ecbe1864710de711df94b4ef7a263e249d92ce5894368840bdd0786a916a",
       "new_sha256": "a7c65af03cba73fb1d4fbbcea5f95dacaee11fb6455bf464df917442a1fa8bd7",
-      "delta": "deltas/0081.gpd",
+      "delta": "deltas/0030.gpd",
       "base": "xbox"
     },
     {
@@ -998,7 +403,7 @@
       "new_crc32": "ab591f38",
       "orig_sha256": "96d323acc063700fe679873201927a2379a2d7c16de66ac1b0c4aecdb7f4412f",
       "new_sha256": "08a3565d57f4efa1b559359bc2d648a988868b7f66206e05f1620a02971c29b5",
-      "delta": "deltas/0082.gpd"
+      "delta": "deltas/0031.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -1009,7 +414,7 @@
       "new_crc32": "28b437b4",
       "orig_sha256": "595662d497bff5fd13e040fa1e4af98085514f049a20777613635fe5e8d8bf4b",
       "new_sha256": "15de7cd59b91e9132a57d7708db38b4bbef952c13a5a662129430373462a12cc",
-      "delta": "deltas/0083.gpd",
+      "delta": "deltas/0032.gpd",
       "base": "switch"
     },
     {
@@ -1021,7 +426,7 @@
       "new_crc32": "e815274e",
       "orig_sha256": "ed420f206ce928b19291db1253a90d2f5fdfc3eb60ecee1d3a01d0f6f72add98",
       "new_sha256": "616884b313cb79dd482199c2390902d02dd6afb0ef3792016e894d8c1d4a6fd8",
-      "delta": "deltas/0084.gpd",
+      "delta": "deltas/0033.gpd",
       "base": "xbox"
     },
     {
@@ -1033,7 +438,7 @@
       "new_crc32": "81c385c9",
       "orig_sha256": "3d7bc1798bd3872978fe0302997dac1bd989701984090379f7c8a305f9d64100",
       "new_sha256": "59085fa6ab9f6c76c43f8380d0b954e2be8c5ef022c2c9ceee1f65288b545731",
-      "delta": "deltas/0085.gpd"
+      "delta": "deltas/0034.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -1044,7 +449,7 @@
       "new_crc32": "01893781",
       "orig_sha256": "e8cf6c2b728836443b83c93c83e2ffb73c5d593477d314abb7174b18fc586a03",
       "new_sha256": "ec63a2c949149677d842ee0b8eef14e689aabe18e00b3d62a13d19c19a2eff94",
-      "delta": "deltas/0086.gpd",
+      "delta": "deltas/0035.gpd",
       "base": "switch"
     },
     {
@@ -1056,7 +461,7 @@
       "new_crc32": "3662d806",
       "orig_sha256": "6a578cf70f5fbcb75953e07cb0250073ea9fd50aab5b69e7738a798b4ee2b27a",
       "new_sha256": "7e6a3e214715c6ed0dbf3fb85b8eff8aa17e1f14571f6d32cae72ddaa9568469",
-      "delta": "deltas/0087.gpd",
+      "delta": "deltas/0036.gpd",
       "base": "xbox"
     },
     {
@@ -1068,7 +473,7 @@
       "new_crc32": "c1db9e9f",
       "orig_sha256": "733dbd89f68f869a121e9da795e2cfaa960235ba0bfa94863aead36f59b58c82",
       "new_sha256": "388574bd93dbbe47b74bdca2a65708cd2897cafb44344d0b31c31b1212040002",
-      "delta": "deltas/0088.gpd"
+      "delta": "deltas/0037.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -1079,7 +484,7 @@
       "new_crc32": "7254bfa6",
       "orig_sha256": "d641ad51375f0ed603f39f8cd9bf674de5a4d18aaffd3e49d838ae4963d8e20c",
       "new_sha256": "542b8898565b510b115cbad6ac7b55a2558dd7443532a26b0e7c222941c22705",
-      "delta": "deltas/0089.gpd",
+      "delta": "deltas/0038.gpd",
       "base": "switch"
     },
     {
@@ -1091,7 +496,7 @@
       "new_crc32": "f1498736",
       "orig_sha256": "1a918ffbde6b188552e29b7ddc2b07b0aa90507d4926c21a3486e6dff00ed0ba",
       "new_sha256": "2d2ecbbc2b681a95f6c68a87a50a52a5012abdb81992842d427ef666cce9a968",
-      "delta": "deltas/0090.gpd",
+      "delta": "deltas/0039.gpd",
       "base": "xbox"
     },
     {
@@ -1103,7 +508,7 @@
       "new_crc32": "02735c7e",
       "orig_sha256": "f61f41297f8f860cf969e1664c160e5bce1b1ca8970e401a3d43d3d0f3681e0f",
       "new_sha256": "be804daac90bed185d6a190ba83a98a398f5cd119aed0ee627f37f947f6d3083",
-      "delta": "deltas/0091.gpd"
+      "delta": "deltas/0040.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -1114,7 +519,7 @@
       "new_crc32": "b718fe50",
       "orig_sha256": "47d588965557ee0e0c7cd0bf027510165d23d190384442012144f3a29fae8e4b",
       "new_sha256": "13f8a47015eb45a5eb6d764353d6dc7b03b0787bdbf19c814366350a5e6dc32c",
-      "delta": "deltas/0092.gpd",
+      "delta": "deltas/0041.gpd",
       "base": "switch"
     },
     {
@@ -1126,7 +531,7 @@
       "new_crc32": "6f67c82d",
       "orig_sha256": "290b4ca9e9f118f799d89f2c195d3fae44fb7308d6231f5df4cd553d0b4e59fc",
       "new_sha256": "378910f854f770099af137e43e4819c2dbdeaa2cd6b0bef8e8601b4d5f506dc0",
-      "delta": "deltas/0093.gpd",
+      "delta": "deltas/0042.gpd",
       "base": "xbox"
     },
     {
@@ -1138,7 +543,7 @@
       "new_crc32": "66d5c4e3",
       "orig_sha256": "e1ab4453a40cf29d8b75424603aec998e9a26759ceb80b7dda4aa0fe7cadfe59",
       "new_sha256": "96b78150f003d70f6210e338798c7a2cd332158cbde45e6a6a37de2b97a14476",
-      "delta": "deltas/0094.gpd"
+      "delta": "deltas/0043.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -1149,7 +554,7 @@
       "new_crc32": "f6cfd950",
       "orig_sha256": "0b4ffdbbeb4de95e9acbe572f568326e1a7e822a3a07d6a416c0805e608bc4e1",
       "new_sha256": "8efca2cf9920aebe4a4f6c3e7025a2fe77a4277a126e927cad00914097432bf3",
-      "delta": "deltas/0095.gpd",
+      "delta": "deltas/0044.gpd",
       "base": "switch"
     },
     {
@@ -1161,7 +566,7 @@
       "new_crc32": "2abae3a8",
       "orig_sha256": "3d16bf2f803160d07708a98090c8ac2d8a8f5b9b6a51767972a22f2a270be08b",
       "new_sha256": "66ce7e8996a893ce4020837a2a3b8573b7e04fe0fda9b121773a1532aac24775",
-      "delta": "deltas/0096.gpd",
+      "delta": "deltas/0045.gpd",
       "base": "xbox"
     },
     {
@@ -1173,7 +578,7 @@
       "new_crc32": "71514337",
       "orig_sha256": "93b59ef9b977b3585348597053df94e40fefdd7baf9670e97a282f9700ef1319",
       "new_sha256": "3a6133b69625620df3cced3f7e2b8410561365fa3fcda5357ae62b215212faf6",
-      "delta": "deltas/0097.gpd"
+      "delta": "deltas/0046.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -1184,7 +589,7 @@
       "new_crc32": "9b146596",
       "orig_sha256": "e03f5c6fd6ac248e7297254f5d08fb0f487afc5b47f63d134599b819ff614cde",
       "new_sha256": "c15b6ff02474cb63d06ef0468e988f679b342d502478c8b6bc3a709b9ec3a6df",
-      "delta": "deltas/0098.gpd",
+      "delta": "deltas/0047.gpd",
       "base": "switch"
     },
     {
@@ -1196,7 +601,7 @@
       "new_crc32": "0ffb9130",
       "orig_sha256": "05c29c4ef1568ef3f900d6222f4914fe7367077e5eb17224407dd24bf94c0dbb",
       "new_sha256": "1352bd596e3aa6519190e4f871dbe5d689a6414f335d99ce5fcdbbc5be092bbb",
-      "delta": "deltas/0099.gpd",
+      "delta": "deltas/0048.gpd",
       "base": "xbox"
     },
     {
@@ -1208,7 +613,7 @@
       "new_crc32": "c92ad696",
       "orig_sha256": "761479aacabff91e2fa438186cf3529ff0e15692a15669b864d758864f3eab2b",
       "new_sha256": "8d172afca040c9ea4c2ce67a31ff0b5cf81f4987f73638e35c38f244c977c463",
-      "delta": "deltas/0100.gpd"
+      "delta": "deltas/0049.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -1219,7 +624,7 @@
       "new_crc32": "7b76b201",
       "orig_sha256": "80cd17935eddfa5f9a8a03f62a8b9ba4d4992a4d4510024e177fd44e0a152997",
       "new_sha256": "e3e4c7db0d5e3fec0aee94ec846ba2694d04901f28c47b89addcb5abc6edd49e",
-      "delta": "deltas/0101.gpd",
+      "delta": "deltas/0050.gpd",
       "base": "switch"
     },
     {
@@ -1231,7 +636,7 @@
       "new_crc32": "6472d937",
       "orig_sha256": "f767b8c56e0776de2563695bdddd1dd19b037ef1fc5f96b01298bade5809e681",
       "new_sha256": "1b7b2b6176300808450854f850924e14761cc6ae7b219ef8aed4f198f6f042c2",
-      "delta": "deltas/0102.gpd",
+      "delta": "deltas/0051.gpd",
       "base": "xbox"
     },
     {
@@ -1243,7 +648,7 @@
       "new_crc32": "95388f09",
       "orig_sha256": "68ba5e7aab33cc193afe772009ead55d9dd5ec9355d7722cc3271be35479b26b",
       "new_sha256": "b6863ddfc389f117dfa5d8eb6e6af0d02af7383304547fa67aeb5eb327c1a80c",
-      "delta": "deltas/0103.gpd"
+      "delta": "deltas/0052.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -1254,7 +659,7 @@
       "new_crc32": "c78f5ce1",
       "orig_sha256": "5b47c6298f2795c8deab87cdbd49e68bf5aac8fd439d05480e21a789ae61f036",
       "new_sha256": "380db5dede0de1a2c0fb8a446a3e28f33e1422002d2894153c871d92c9dc0037",
-      "delta": "deltas/0104.gpd",
+      "delta": "deltas/0053.gpd",
       "base": "switch"
     },
     {
@@ -1266,7 +671,7 @@
       "new_crc32": "9f8f958b",
       "orig_sha256": "f87d396bbb730a2d049d5b6db20974b839372e5f9e130391c31b2b7271dfafaf",
       "new_sha256": "e73219faba353fcfb04592b58f21da16f806f0b4dc10e0c161fdba376347a4f0",
-      "delta": "deltas/0105.gpd",
+      "delta": "deltas/0054.gpd",
       "base": "xbox"
     },
     {
@@ -1278,7 +683,7 @@
       "new_crc32": "6984d7cf",
       "orig_sha256": "77b333ae69094a607fe6c6afd26bebdc89cb2cf85e17502f070d1cd7de4d57c6",
       "new_sha256": "c32def91e6e84c248c0aa2c33bfb2231b4972faa26b80813d5400f9e308bc9d3",
-      "delta": "deltas/0106.gpd"
+      "delta": "deltas/0055.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -1289,7 +694,7 @@
       "new_crc32": "a5a7b29a",
       "orig_sha256": "c40fe268065769538681b5d081ece4e7a23fca36de9844089cc47c9d4a3822bc",
       "new_sha256": "54d3b26a254387234de938e0880599baadee3ddcf69ef43aec3b3e18e5faf6e2",
-      "delta": "deltas/0107.gpd",
+      "delta": "deltas/0056.gpd",
       "base": "switch"
     },
     {
@@ -1301,7 +706,7 @@
       "new_crc32": "92ff4154",
       "orig_sha256": "70c4d06ca40e189ab8be17faec815d3d56ab1ecc3428cea4ffc8328511e60042",
       "new_sha256": "4ff31cae5fb72c801053d8ced3b1a93b9f1c9dda230150d1545a9670d0d0d201",
-      "delta": "deltas/0108.gpd",
+      "delta": "deltas/0057.gpd",
       "base": "xbox"
     },
     {
@@ -1313,7 +718,7 @@
       "new_crc32": "24e08529",
       "orig_sha256": "c0878f77443bf9c05fb78ba034e1bbcf3789211a5f2e065f7a7332133ff31de4",
       "new_sha256": "64048a84ebb4851d243126d95a65caf2f8f9d08cb1ff547c5604ab8f64e19206",
-      "delta": "deltas/0109.gpd"
+      "delta": "deltas/0058.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -1324,7 +729,7 @@
       "new_crc32": "7422ffc2",
       "orig_sha256": "72555865c0ec4e4c7e89d87a349424cc0fd3a1700c20d32337404cdbe8c89d22",
       "new_sha256": "0267f29be77f0d2ca9fce805fb8acd06f88e957e8e94e964170b3ed241fa287f",
-      "delta": "deltas/0110.gpd",
+      "delta": "deltas/0059.gpd",
       "base": "switch"
     },
     {
@@ -1336,7 +741,7 @@
       "new_crc32": "f498dc28",
       "orig_sha256": "dab5c0a2ee63e0dffd02d3a090d6803cc801e3adb9cf1921fc6d18c3d5b7163f",
       "new_sha256": "132be4d781cc4c0cf2dba2db6a2bbf89bd6c0654a97b08771eac8f9197794c20",
-      "delta": "deltas/0111.gpd",
+      "delta": "deltas/0060.gpd",
       "base": "xbox"
     },
     {
@@ -1348,7 +753,7 @@
       "new_crc32": "b5b281c8",
       "orig_sha256": "df7b0af2ca0679c9a24cff1a699d332e9e0c1019daf389602ec1b930fdf7c3a9",
       "new_sha256": "043cd226cf686aa06fb7ce9fa39f7db9ae428c4befe2aba9d5a9b19e904d0bc7",
-      "delta": "deltas/0112.gpd"
+      "delta": "deltas/0061.gpd"
     },
     {
       "archive": "Gravite2_Patch_Chunk0.psarc",
@@ -1359,7 +764,7 @@
       "new_crc32": "dadc7707",
       "orig_sha256": "ddf48e214aa8a9c2c75f600d3f2326ed14676ad3858abab2c7ff4553e08bea75",
       "new_sha256": "8795bd52af7d25efbff2bfd10b3fc0b29b01967ebf7e805865de4333ca98caa1",
-      "delta": "deltas/0113.gpd",
+      "delta": "deltas/0062.gpd",
       "base": "switch"
     },
     {
@@ -1371,7 +776,7 @@
       "new_crc32": "4b7f95e4",
       "orig_sha256": "fbb48c4b3eb35655768a27fd7c6802c19ffb3866da3417aa8deb98876d52711d",
       "new_sha256": "a7d16105c83f78e87af06eb6c7f921a681fb7e3a94ed925d55bade9706325c7d",
-      "delta": "deltas/0114.gpd",
+      "delta": "deltas/0063.gpd",
       "base": "xbox"
     }
   ],

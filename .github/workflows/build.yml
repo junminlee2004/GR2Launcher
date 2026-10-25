@@ -348,8 +348,8 @@ jobs:
       run: |
         # The self-updater copies its whole zip over the install, so the emulator and the launcher
         # data that registers it go into separate with-emulator zips that the updater never picks.
-        # Their user folder also holds the FSR 4 files, for the big picture shortcut, which starts
-        # the emulator without the launcher that copies them there.
+        # Their user folder also holds the FSR 4 files, for an emulator started without the
+        # launcher that copies them there.
         release=$(curl -sfL -H "Authorization: token $GITHUB_TOKEN" \
           "https://api.github.com/repos/junminlee2004/GR2fork/releases" |
           jq -c '[.[] | select(.tag_name | startswith("Pre-release-GR2fork-EXODUS-"))][0]')
@@ -395,15 +395,20 @@ jobs:
             > "$dest/launcher/versions.json"
           printf '[version_manager]\nversionSelected=%s\n' "$exe_path" > "$dest/launcher/qt_ui.ini"
 
-          # Big picture shortcuts run from the launcher folder, so they use its user folder.
+          # Big picture shortcuts run from the launcher folder, so they use its user folder. On
+          # Windows and Linux they start the emulator through the launcher (-d: its selected
+          # version, -i: no IPC, as a direct start), which first copies the bundled files into the
+          # user folder.
           if [ $platform = win64 ]; then
-            printf '@echo off\r\ncd /d "%%~dp0"\r\nstart "" "launcher\\versions\\Pre-release\\%s" -b\r\n' \
-              "$exe" > "$dest/GR2fork Big Picture.cmd"
-          else
+            printf '@echo off\r\ncd /d "%%~dp0"\r\nstart "" "GR2Launcher.exe" -i -d -- -b\r\n' \
+              > "$dest/GR2fork Big Picture.cmd"
+          elif [ $platform = linux ]; then
             shortcut="$dest/GR2fork Big Picture.sh"
-            if [ $platform = macos ]; then
-              shortcut="$dest/GR2fork Big Picture.command"
-            fi
+            printf '#!/bin/sh\ncd "$(dirname "$0")" || exit 1\nexec ./GR2Launcher.AppImage -i -d -- -b\n' \
+              > "$shortcut"
+            chmod a+x "$shortcut"
+          else
+            shortcut="$dest/GR2fork Big Picture.command"
             printf '#!/bin/sh\ncd "$(dirname "$0")" || exit 1\nexec ./%s -b\n' "$exe_path" > "$shortcut"
             chmod a+x "$shortcut"
           fi
