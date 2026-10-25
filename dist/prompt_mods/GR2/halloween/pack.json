@@ -123,10 +123,10 @@
       "path": "lua/Game/Event2/photo_item.lua",
       "orig_size": 606,
       "orig_crc32": "e9178c94",
-      "new_size": 2978,
-      "new_crc32": "16bda21b",
+      "new_size": 3510,
+      "new_crc32": "3075f969",
       "orig_sha256": "c8c18a83e1cfb9caf47db6f66d7f9b7fdda7470e320cc39e98f2e3397e626604",
-      "new_sha256": "b6acfb1dc19dea656cdb66245fcb5a8a2131c75cdf53bcb3a2b3fe9a359ede4d",
+      "new_sha256": "21da253154f4de2326e373d6a263a685bec8ff7b169550d8eaf7153af88d2ac8",
       "delta": "deltas/0007.gpd"
     },
     {
