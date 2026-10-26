@@ -36,25 +36,35 @@ std::string LayoutOfType(SDL_GamepadType type) {
     }
 }
 
-std::string LayoutOfPad(SDL_JoystickID id) {
-    if (SDL_GetGamepadVendorForID(id) == ValveVendor) {
-        const Uint16 product = SDL_GetGamepadProductForID(id);
-        if (product == SteamDeckProduct) {
-            return "steamdeck";
-        }
-        if (std::find(SteamControllerProducts.begin(), SteamControllerProducts.end(), product) !=
-            SteamControllerProducts.end()) {
-            return "steamcontroller";
-        }
-        // Steam's virtual gamepad without the information of the pad behind it. Steam sets
-        // SteamDeck=1 on a Steam Deck, where that pad is most likely the built-in controls.
-        const char* deck = SDL_getenv("SteamDeck");
-        if (product == SteamVirtualGamepadProduct && deck != nullptr &&
-            std::string_view(deck) == "1") {
-            return "steamdeck";
-        }
+std::string LayoutOfValvePad(Uint16 product) {
+    if (product == SteamDeckProduct) {
+        return "steamdeck";
     }
-    return LayoutOfType(SDL_GetGamepadTypeForID(id));
+    if (std::find(SteamControllerProducts.begin(), SteamControllerProducts.end(), product) !=
+        SteamControllerProducts.end()) {
+        return "steamcontroller";
+    }
+    // Steam's virtual gamepad without the information of the pad behind it. Steam sets
+    // SteamDeck=1 on a Steam Deck, where that pad is most likely the built-in controls.
+    const char* deck = SDL_getenv("SteamDeck");
+    if (product == SteamVirtualGamepadProduct && deck != nullptr && std::string_view(deck) == "1") {
+        return "steamdeck";
+    }
+    return {};
+}
+
+std::string LayoutOfPad(SDL_JoystickID id) {
+    const Uint16 vendor = SDL_GetGamepadVendorForID(id);
+    const Uint16 product = SDL_GetGamepadProductForID(id);
+    const SDL_GamepadType type = SDL_GetGamepadTypeForID(id);
+    std::string layout = vendor == ValveVendor ? LayoutOfValvePad(product) : std::string{};
+    if (layout.empty()) {
+        layout = LayoutOfType(type);
+    }
+    const char* type_name = SDL_GetGamepadStringForType(type);
+    LOG_INFO(Input, "Pad {:04x}:{:04x} ({}): button prompt layout \"{}\"", vendor, product,
+             type_name != nullptr ? type_name : "unknown", layout);
+    return layout;
 }
 
 } // Anonymous namespace
