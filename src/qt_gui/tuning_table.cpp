@@ -76,6 +76,11 @@ std::vector<TuningPage::Group> TuningPage::Table() {
                  "wait, which frees its core sibling. Ignored on CPUs without MWAITX. Read only "
                  "while the Stream Copy Lane is on."),
               {copy_lane}},
+             {"async_shader_recompiling", tr("Async Shader Compilation"),
+              tr("Compiles new graphics shaders and pipelines on worker threads while the GPU "
+                 "command thread keeps going. Draws that need one are skipped until it is ready, "
+                 "so objects can appear a moment late; the draws of a Gravity Rush 2 photo wait "
+                 "for it.")},
          }},
         {tr("Skip Caches and Register Stamps"),
          false,
