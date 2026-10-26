@@ -471,7 +471,7 @@ struct GPUSettings {
     Setting<bool> vk_record_thread{true};
     // Compile new graphics shaders and pipelines on worker threads. The draws that need one are
     // skipped until it is done, except the draws of a Gravity Rush 2 photo, which wait for it.
-    Setting<bool> async_shader_recompiling{false};
+    Setting<bool> async_shader_recompiling{true};
     // Rebuild the vertex input layout only when the pipeline, the instance step rates or an
     // attribute's format or stride changed, instead of on every draw.
     Setting<bool> vertex_layout_memo{true};
