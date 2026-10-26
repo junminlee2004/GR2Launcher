@@ -3,7 +3,7 @@
   "game": "GR2",
   "layout": "xbox",
   "version": "2026.10.24",
-  "motion_controls": false,
+  "motion_controls": true,
   "members": [
     {
       "archive": "Gravite2_Chunk0.psarc",
