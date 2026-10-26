@@ -469,6 +469,9 @@ struct GPUSettings {
     // Record the draw scheduler's Vulkan commands and issue its queue submits on a dedicated
     // thread; the GPU command thread stores each call as a closure instead of calling the driver.
     Setting<bool> vk_record_thread{true};
+    // Compile new graphics shaders and pipelines on worker threads. The draws that need one are
+    // skipped until it is done, except the draws of a Gravity Rush 2 photo, which wait for it.
+    Setting<bool> async_shader_recompiling{false};
     // Rebuild the vertex input layout only when the pipeline, the instance step rates or an
     // attribute's format or stride changed, instead of on every draw.
     Setting<bool> vertex_layout_memo{true};
@@ -747,6 +750,7 @@ struct GPUSettings {
             GPU_OVERRIDE(tracker_lock_spin_rounds),
             GPU_OVERRIDE(one_core_gpu_thread_pin),
             GPU_OVERRIDE(vk_record_thread),
+            GPU_OVERRIDE(async_shader_recompiling),
             GPU_OVERRIDE(vertex_layout_memo),
             GPU_OVERRIDE(covered_range_skip),
             GPU_OVERRIDE(residency_bitmap),
@@ -846,7 +850,7 @@ struct GPUSettings {
     vertex_layout_memo, covered_range_skip, residency_bitmap, \
     readback_linear_images_async, inline_fetch_shader, stream_barrier_skip, \
     clean_sync_peek, readback_offload, fast_shader_math, one_core_gpu_thread_pin, \
-    vk_record_thread
+    vk_record_thread, async_shader_recompiling
 // clang-format on
 template <
     typename BasicJsonType,
@@ -1182,6 +1186,7 @@ public:
     SETTING_FORWARD(m_gpu, TrackerLockSpinRounds, tracker_lock_spin_rounds)
     SETTING_FORWARD_BOOL(m_gpu, OneCoreGpuThreadPin, one_core_gpu_thread_pin)
     SETTING_FORWARD_BOOL(m_gpu, VkRecordThread, vk_record_thread)
+    SETTING_FORWARD_BOOL(m_gpu, AsyncShaderRecompiling, async_shader_recompiling)
     SETTING_FORWARD_BOOL(m_gpu, VertexLayoutMemo, vertex_layout_memo)
     SETTING_FORWARD_BOOL(m_gpu, CoveredRangeSkip, covered_range_skip)
     SETTING_FORWARD_BOOL(m_gpu, ResidencyBitmap, residency_bitmap)
