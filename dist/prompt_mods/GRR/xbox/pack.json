@@ -3,7 +3,7 @@
   "game": "GRR",
   "layout": "xbox",
   "version": "2026.10.24",
-  "motion_controls": false,
+  "motion_controls": true,
   "members": [
     {
       "archive": "arc_0_ep_0_0.psarc",

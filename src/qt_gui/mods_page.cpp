@@ -284,8 +284,7 @@ bool ModsPage::eventFilter(QObject* obj, QEvent* event) {
                                  "holding L3 and pressing triangle (up), cross (down), square "
                                  "(left) or circle (right) in their place.");
             }
-            text += " " + tr("Xbox prompts turn motion controls off.") + "\n" +
-                    tr("A change takes effect the next time the game starts.");
+            text += "\n" + tr("A change takes effect the next time the game starts.");
             emit DescriptionChanged(
                 tr("Button prompts:") + "\n" + text +
                 (gr2 ? "\n\nGR2Fork.gr2PromptLayout" : "\n\nGR2Fork.grrPromptLayout"));
