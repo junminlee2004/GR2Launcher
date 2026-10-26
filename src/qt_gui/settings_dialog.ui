@@ -1278,6 +1278,85 @@
              </widget>
             </item>
             <item>
+             <widget class="QGroupBox" name="syncBudgetGroupBox">
+              <property name="title">
+               <string>Shader Compilation</string>
+              </property>
+              <layout class="QVBoxLayout" name="syncBudgetLayout">
+               <item>
+                <layout class="QHBoxLayout" name="syncBudgetLabelLayout">
+                 <item>
+                  <widget class="QLabel" name="syncBudgetLabel">
+                   <property name="text">
+                    <string>Pipeline Sync Budget:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="syncBudgetValue">
+                   <property name="text">
+                    <string notr="true">50 ms</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="syncBudgetControlsLayout">
+                 <item>
+                  <widget class="QPushButton" name="syncBudgetDecreaseButton">
+                   <property name="maximumSize">
+                    <size>
+                     <width>56</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string notr="true">- 10 ms</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSlider" name="syncBudgetSlider">
+                   <property name="maximum">
+                    <number>50000</number>
+                   </property>
+                   <property name="singleStep">
+                    <number>10</number>
+                   </property>
+                   <property name="pageStep">
+                    <number>100</number>
+                   </property>
+                   <property name="value">
+                    <number>50</number>
+                   </property>
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="syncBudgetIncreaseButton">
+                   <property name="maximumSize">
+                    <size>
+                     <width>56</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string notr="true">+ 10 ms</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
              <spacer name="AdvancedSpacer">
               <property name="orientation">
                <enum>Qt::Orientation::Vertical</enum>

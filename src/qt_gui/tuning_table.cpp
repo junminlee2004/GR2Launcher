@@ -78,9 +78,10 @@ std::vector<TuningPage::Group> TuningPage::Table() {
               {copy_lane}},
              {"async_shader_recompiling", tr("Async Shader Compilation"),
               tr("Compiles new graphics shaders and pipelines on worker threads while the GPU "
-                 "command thread keeps going. Draws that need one are skipped until it is ready, "
-                 "so objects can appear a moment late; the draws of a Gravity Rush 2 photo wait "
-                 "for it.")},
+                 "command thread keeps going. A draw that needs one waits for it up to the "
+                 "Pipeline Sync Budget of the Graphics tab and is skipped past that until it is "
+                 "ready, so objects can appear a moment late; Gravity Rush 2 photos wait for "
+                 "it.")},
          }},
         {tr("Skip Caches and Register Stamps"),
          false,

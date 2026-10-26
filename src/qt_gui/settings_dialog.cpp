@@ -571,6 +571,13 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
         QString RCASValue = QString::number(value / 1000.0, 'f', 3);
         ui->RCASValue->setText(RCASValue);
     });
+    connect(ui->syncBudgetSlider, &QSlider::valueChanged, this, [this](int value) {
+        ui->syncBudgetValue->setText(QString::number(value) + QStringLiteral(" ms"));
+    });
+    connect(ui->syncBudgetDecreaseButton, &QPushButton::clicked, this,
+            [this]() { ui->syncBudgetSlider->setValue(ui->syncBudgetSlider->value() - 10); });
+    connect(ui->syncBudgetIncreaseButton, &QPushButton::clicked, this,
+            [this]() { ui->syncBudgetSlider->setValue(ui->syncBudgetSlider->value() + 10); });
 
     if (EmulatorState::GetInstance()->IsGameRunning()) {
         connect(ui->RCASSlider, &QSlider::valueChanged, this, [this](int value) {
@@ -641,6 +648,10 @@ SettingsDialog::SettingsDialog(std::shared_ptr<gui_settings> gui_settings,
         ui->heightDivider->installEventFilter(this);
         ui->nullGpuCheckBox->installEventFilter(this);
         ui->enableHDRCheckBox->installEventFilter(this);
+        ui->syncBudgetGroupBox->installEventFilter(this);
+        ui->syncBudgetSlider->installEventFilter(this);
+        ui->syncBudgetDecreaseButton->installEventFilter(this);
+        ui->syncBudgetIncreaseButton->installEventFilter(this);
         ui->chooseHomeTabGroupBox->installEventFilter(this);
 
         // Paths
@@ -870,6 +881,9 @@ void SettingsDialog::LoadValuesFromConfig() {
     ui->RCASCheckBox->setChecked(EmulatorSettings.IsRcasEnabled());
     ui->RCASSlider->setValue(EmulatorSettings.GetRcasAttenuation());
     ui->RCASValue->setText(QString::number(ui->RCASSlider->value() / 1000.0, 'f', 3));
+    ui->syncBudgetSlider->setValue(EmulatorSettings.GetPipelineSyncBudgetMs());
+    ui->syncBudgetValue->setText(QString::number(ui->syncBudgetSlider->value()) +
+                                 QStringLiteral(" ms"));
 
     // User tab
     ui->disableTrophycheckBox->setChecked(EmulatorSettings.IsTrophyPopupDisabled());
@@ -1186,6 +1200,10 @@ void SettingsDialog::updateNoteTextEdit(const QString& elementName) {
         text = tr("Enable Shaders Dumping:\\nFor the sake of technical debugging, saves the game's shaders to a folder as they render.");
     } else if (elementName == "nullGpuCheckBox") {
         text = tr("Enable Null GPU:\\nFor the sake of technical debugging, disables game rendering as if there were no graphics card. The screen will be black.");
+    } else if (elementName == "syncBudgetGroupBox" || elementName == "syncBudgetSlider" ||
+               elementName == "syncBudgetDecreaseButton" ||
+               elementName == "syncBudgetIncreaseButton") {
+        text = tr("Pipeline Sync Budget:\\nWith Async Shader Compilation on, a draw that needs new shaders or a new graphics pipeline waits up to this long for them to compile. Past that, the draw is skipped and the compile finishes in the background.\\nLower values give shorter hitches but more pop-in. Higher values give less pop-in but longer hitches. Values near 0 can cause endless loading screens, for example in Unreal Engine games.\\nGravity Rush 2 photos always wait for their shaders and pipelines.");
     }
 
     // Path
@@ -1350,6 +1368,7 @@ void SettingsDialog::UpdateSettings(bool is_specific) {
     EmulatorSettings.SetFsrEnabled(ui->FSRCheckBox->isChecked(), is_specific);
     EmulatorSettings.SetRcasEnabled(ui->RCASCheckBox->isChecked(), is_specific);
     EmulatorSettings.SetRcasAttenuation(ui->RCASSlider->value(), is_specific);
+    EmulatorSettings.SetPipelineSyncBudgetMs(ui->syncBudgetSlider->value(), is_specific);
 
     // User tab
     EmulatorSettings.SetTrophyPopupDisabled(ui->disableTrophycheckBox->isChecked(), is_specific);
