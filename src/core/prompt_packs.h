@@ -11,8 +11,9 @@
 namespace PromptPacks {
 
 /// The pack layout of the connected pad: "xbox" for an Xbox pad, "switch" for a Switch Pro
-/// controller or a pair of Joy-Cons, empty for any other pad or none. The selected gamepad decides
-/// when it is connected, else the first pad with a layout.
+/// controller or a pair of Joy-Cons, "steamdeck" for the controls of a Steam Deck,
+/// "steamcontroller" for a Steam Controller, empty for any other pad or none. The selected gamepad
+/// decides when it is connected, else the first pad with a layout.
 std::string ConnectedPadLayout(const std::string& selected_guid);
 
 } // namespace PromptPacks

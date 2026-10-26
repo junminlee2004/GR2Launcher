@@ -58,17 +58,17 @@ std::optional<std::string> ReadFsr4AssetDir(const std::string& serial = "");
 /// Sets fsr4AssetDir as WriteFsr3Enable sets fsr3Enable.
 void WriteFsr4AssetDir(std::optional<std::string> dir, const std::string& serial = "");
 
-/// gr2PromptLayout, the button prompt pack of Gravity Rush 2 ("off", "xbox" or "switch"), of the
-/// per-game file of serial, or of config.json for an empty serial. Empty when the file does not
-/// set it.
+/// gr2PromptLayout, the button prompt pack of Gravity Rush 2 ("off", "xbox", "switch",
+/// "steamdeck" or "steamcontroller"), of the per-game file of serial, or of config.json for an
+/// empty serial. Empty when the file does not set it.
 std::optional<std::string> ReadGr2PromptLayout(const std::string& serial = "");
 
 /// Sets gr2PromptLayout as WriteFsr3Enable sets fsr3Enable.
 void WriteGr2PromptLayout(std::optional<std::string> layout, const std::string& serial = "");
 
-/// grrPromptLayout, the button prompt pack of Gravity Rush Remastered ("off", "xbox" or
-/// "switch"), of the per-game file of serial, or of config.json for an empty serial. Empty when
-/// the file does not set it.
+/// grrPromptLayout, the button prompt pack of Gravity Rush Remastered ("off", "xbox", "switch",
+/// "steamdeck" or "steamcontroller"), of the per-game file of serial, or of config.json for an
+/// empty serial. Empty when the file does not set it.
 std::optional<std::string> ReadGrrPromptLayout(const std::string& serial = "");
 
 /// Sets grrPromptLayout as WriteFsr3Enable sets fsr3Enable.

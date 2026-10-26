@@ -43,7 +43,23 @@ void PromptPackOffer::Run(QWidget* parent, const std::string& serial, gui_settin
     }
 
     const bool xbox = pad == "xbox";
-    const QString layoutName = xbox ? tr("Xbox") : tr("Nintendo Switch Pro");
+    QString layoutName;
+    QString question;
+    if (xbox) {
+        layoutName = tr("Xbox");
+        question = tr("An Xbox controller is connected. Show Xbox button prompts in %1?");
+    } else if (pad == "switch") {
+        layoutName = tr("Nintendo Switch Pro");
+        question = tr("A Nintendo Switch controller is connected. Show Nintendo Switch Pro button "
+                      "prompts in %1?");
+    } else if (pad == "steamdeck") {
+        layoutName = tr("Steam Deck");
+        question = tr("Steam Deck controls are in use. Show Steam Deck button prompts in %1?");
+    } else {
+        layoutName = tr("Steam Controller");
+        question =
+            tr("A Steam Controller is connected. Show Steam Controller button prompts in %1?");
+    }
     QString details = tr("Menus, tutorials, the controls page and button icons in text then show "
                          "%1 buttons. The game's controls stay on the same buttons.")
                           .arg(layoutName);
@@ -58,11 +74,8 @@ void PromptPackOffer::Run(QWidget* parent, const std::string& serial, gui_settin
     QMessageBox box(parent);
     box.setIcon(QMessageBox::Question);
     box.setWindowTitle(tr("Button prompts"));
-    box.setText((xbox ? tr("An Xbox controller is connected. Show Xbox button prompts in %1?")
-                      : tr("A Nintendo Switch controller is connected. Show Nintendo Switch Pro "
-                           "button prompts in %1?"))
-                    .arg(gr2 ? QStringLiteral("Gravity Rush 2")
-                             : QStringLiteral("Gravity Rush Remastered")));
+    box.setText(question.arg(gr2 ? QStringLiteral("Gravity Rush 2")
+                                 : QStringLiteral("Gravity Rush Remastered")));
     box.setInformativeText(details);
     box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     box.setDefaultButton(QMessageBox::Yes);

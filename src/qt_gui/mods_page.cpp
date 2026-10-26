@@ -32,6 +32,8 @@ QComboBox* AddPromptRow(QWidget* group, QVBoxLayout* layout, QObject* filter) {
     combo->addItem(ModsPage::tr("PlayStation"), QStringLiteral("off"));
     combo->addItem(ModsPage::tr("Xbox"), QStringLiteral("xbox"));
     combo->addItem(ModsPage::tr("Nintendo Switch Pro"), QStringLiteral("switch"));
+    combo->addItem(ModsPage::tr("Steam Deck"), QStringLiteral("steamdeck"));
+    combo->addItem(ModsPage::tr("Steam Controller"), QStringLiteral("steamcontroller"));
     combo->installEventFilter(filter);
     rowLayout->addWidget(combo);
     rowLayout->addStretch();
@@ -271,13 +273,14 @@ bool ModsPage::eventFilter(QObject* obj, QEvent* event) {
         } else if (obj == m_gr2PromptCombo || obj == m_grrPromptCombo) {
             const bool gr2 = obj == m_gr2PromptCombo;
             QString text =
-                tr("Shows the buttons of an Xbox pad or a Nintendo Switch Pro controller instead "
-                   "of PlayStation buttons in the game's menus, tutorials, controls page and the "
-                   "button icons in its text. The game's controls stay on the same buttons and "
+                tr("Shows the buttons of an Xbox pad, a Nintendo Switch Pro controller, a Steam "
+                   "Deck or a Steam Controller instead of PlayStation buttons in the game's menus, "
+                   "tutorials, controls page and the button icons in its text. The game's controls "
+                   "stay on the same buttons and "
                    "the game files stay as they are. The prompt packs ship with this launcher and "
                    "need a GR2fork build that reads them.");
             if (gr2) {
-                text += " " + tr("With Xbox or Switch Pro prompts, touchpad swipes are done by "
+                text += " " + tr("With any of these prompts, touchpad swipes are done by "
                                  "holding L3 and pressing triangle (up), cross (down), square "
                                  "(left) or circle (right) in their place.");
             }
