@@ -17,6 +17,9 @@
 
 #include "common/path_util.h"
 #include "core/gr2_mods.h"
+#ifdef _WIN32
+#include "dlss_download.h"
+#endif
 #include "mods_page.h"
 
 namespace {
@@ -91,6 +94,11 @@ ModsPage::ModsPage(QWidget* parent) : QWidget(parent) {
     });
     fsr4DirLayout->addWidget(browseButton);
     gr2Layout->addWidget(fsr4DirRow);
+#ifdef _WIN32
+    m_dlssCheckBox = new QCheckBox(tr("Enable DLSS (NVIDIA RTX)"), m_gr2Group);
+    m_dlssCheckBox->installEventFilter(this);
+    gr2Layout->addWidget(m_dlssCheckBox);
+#endif
     m_gr2PromptCombo = AddPromptRow(m_gr2Group, gr2Layout, this);
     m_halloweenCheckBox = new QCheckBox(tr("Halloween photo items"), m_gr2Group);
     m_halloweenCheckBox->installEventFilter(this);
@@ -105,6 +113,11 @@ ModsPage::ModsPage(QWidget* parent) : QWidget(parent) {
     m_grrFsr4CheckBox = new QCheckBox(tr("Enable FSR 4 (INT8, experimental)"), m_grrGroup);
     m_grrFsr4CheckBox->installEventFilter(this);
     grrLayout->addWidget(m_grrFsr4CheckBox);
+#ifdef _WIN32
+    m_grrDlssCheckBox = new QCheckBox(tr("Enable DLSS (NVIDIA RTX)"), m_grrGroup);
+    m_grrDlssCheckBox->installEventFilter(this);
+    grrLayout->addWidget(m_grrDlssCheckBox);
+#endif
     m_grrPromptCombo = AddPromptRow(m_grrGroup, grrLayout, this);
     layout->addWidget(m_grrGroup);
 
@@ -116,6 +129,17 @@ ModsPage::ModsPage(QWidget* parent) : QWidget(parent) {
     };
     connect(m_fsr4CheckBox, &QCheckBox::toggled, this, enableFsr4Dir);
     connect(m_grrFsr4CheckBox, &QCheckBox::toggled, this, enableFsr4Dir);
+
+#ifdef _WIN32
+    // Only a tick by the user emits clicked, so only that tick starts a download.
+    for (QCheckBox* box : {m_dlssCheckBox, m_grrDlssCheckBox}) {
+        connect(box, &QCheckBox::clicked, this, [this, box](bool checked) {
+            if (checked && !DlssDownload::EnsureFiles(this)) {
+                box->setChecked(false);
+            }
+        });
+    }
+#endif
 
     layout->addStretch();
 }
@@ -140,6 +164,10 @@ void ModsPage::Load(const std::string& serial) {
     m_fsr4DirEdit->setText(QString::fromStdString(read(Gr2Mods::ReadFsr4AssetDir).value_or("")));
     m_grrFsr3CheckBox->setChecked(read(Gr2Mods::ReadGrrFsr3Enable).value_or(false));
     m_grrFsr4CheckBox->setChecked(read(Gr2Mods::ReadGrrFsr4Enable).value_or(false));
+#ifdef _WIN32
+    m_dlssCheckBox->setChecked(read(Gr2Mods::ReadDlssEnable).value_or(false));
+    m_grrDlssCheckBox->setChecked(read(Gr2Mods::ReadGrrDlssEnable).value_or(false));
+#endif
     SelectLayout(m_gr2PromptCombo, read(Gr2Mods::ReadGr2PromptLayout).value_or("off"));
     SelectLayout(m_grrPromptCombo, read(Gr2Mods::ReadGrrPromptLayout).value_or("off"));
     m_halloweenCheckBox->setChecked(read(Gr2Mods::ReadGr2HalloweenItems).value_or(true));
@@ -160,6 +188,10 @@ void ModsPage::Save(const std::string& serial) {
         Gr2Mods::WriteFsr4AssetDir(fsr4Dir.empty() ? std::nullopt : std::optional{fsr4Dir});
         Gr2Mods::WriteGrrFsr3Enable(grrFsr3);
         Gr2Mods::WriteGrrFsr4Enable(grrFsr4);
+#ifdef _WIN32
+        Gr2Mods::WriteDlssEnable(m_dlssCheckBox->isChecked());
+        Gr2Mods::WriteGrrDlssEnable(m_grrDlssCheckBox->isChecked());
+#endif
         // A missing key also selects the PlayStation buttons.
         Gr2Mods::WriteGr2PromptLayout(gr2Prompts == "off" ? std::nullopt
                                                           : std::optional{gr2Prompts});
@@ -180,6 +212,11 @@ void ModsPage::Save(const std::string& serial) {
                                  serial);
         Gr2Mods::WriteFsr4AssetDir(unlessGlobal(fsr4Dir, Gr2Mods::ReadFsr4AssetDir().value_or("")),
                                    serial);
+#ifdef _WIN32
+        Gr2Mods::WriteDlssEnable(
+            unlessGlobal(m_dlssCheckBox->isChecked(), Gr2Mods::ReadDlssEnable().value_or(false)),
+            serial);
+#endif
         Gr2Mods::WriteGr2PromptLayout(
             unlessGlobal(gr2Prompts, Gr2Mods::ReadGr2PromptLayout().value_or("off")), serial);
         Gr2Mods::WriteGr2HalloweenItems(
@@ -189,6 +226,11 @@ void ModsPage::Save(const std::string& serial) {
             unlessGlobal(grrFsr3, Gr2Mods::ReadGrrFsr3Enable().value_or(false)), serial);
         Gr2Mods::WriteGrrFsr4Enable(
             unlessGlobal(grrFsr4, Gr2Mods::ReadGrrFsr4Enable().value_or(false)), serial);
+#ifdef _WIN32
+        Gr2Mods::WriteGrrDlssEnable(unlessGlobal(m_grrDlssCheckBox->isChecked(),
+                                                 Gr2Mods::ReadGrrDlssEnable().value_or(false)),
+                                    serial);
+#endif
         Gr2Mods::WriteGrrPromptLayout(
             unlessGlobal(grrPrompts, Gr2Mods::ReadGrrPromptLayout().value_or("off")), serial);
     }
@@ -200,6 +242,10 @@ void ModsPage::SetDefaults() {
     m_fsr4DirEdit->clear();
     m_grrFsr3CheckBox->setChecked(false);
     m_grrFsr4CheckBox->setChecked(false);
+#ifdef _WIN32
+    m_dlssCheckBox->setChecked(false);
+    m_grrDlssCheckBox->setChecked(false);
+#endif
     m_gr2PromptCombo->setCurrentIndex(0);
     m_grrPromptCombo->setCurrentIndex(0);
     m_halloweenCheckBox->setChecked(true);
@@ -256,6 +302,24 @@ bool ModsPage::eventFilter(QObject* obj, QEvent* event) {
                    "time the game starts. FSR 4 model and status: Ctrl+F10 > Display > FSR 3.1 "
                    "(GRR).") +
                 "\n\nGR2Fork.grrFsr4Enable");
+#ifdef _WIN32
+        } else if (obj == m_dlssCheckBox || obj == m_grrDlssCheckBox) {
+            const bool gr2 = obj == m_dlssCheckBox;
+            emit DescriptionChanged(
+                static_cast<QCheckBox*>(obj)->text() + ":\n" +
+                tr("Replaces the game's anti-aliasing with NVIDIA DLSS Super Resolution, or DLAA "
+                   "at the game's resolution. Needs an NVIDIA GeForce RTX GPU and four files of "
+                   "NVIDIA's Streamline 2.14.16 release in the dlss folder of the user folder: "
+                   "sl.interposer.dll, sl.common.dll, sl.dlss.dll and nvngx_dlss.dll. When one is "
+                   "missing, ticking the box offers to download the release (263 MiB) from "
+                   "NVIDIA's GitHub page and keeps only these files. When DLSS cannot run, FSR 4 "
+                   "or FSR 3.1 runs if it is on. For upscaling, also turn on a "
+                   "patch under Resolution > FSR upscaling in Cheats / Patches.\nA change takes "
+                   "effect the next time the game starts. Preset and status: Ctrl+F10 > Display > "
+                   "%1.")
+                    .arg(gr2 ? QStringLiteral("FSR 3.1 (GR2)") : QStringLiteral("FSR 3.1 (GRR)")) +
+                (gr2 ? "\n\nGR2Fork.dlssEnable" : "\n\nGR2Fork.grrDlssEnable"));
+#endif
         } else if (obj == m_halloweenCheckBox) {
             emit DescriptionChanged(
                 m_halloweenCheckBox->text() + ":\n" +

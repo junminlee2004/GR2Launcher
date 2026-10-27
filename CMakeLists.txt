@@ -413,6 +413,8 @@ if(WIN32)
     target_sources(shadPS4QtLauncher PRIVATE
             src/common/bitlocker.cpp
             src/common/bitlocker.h
+            src/qt_gui/dlss_download.cpp
+            src/qt_gui/dlss_download.h
     )
 endif()
 

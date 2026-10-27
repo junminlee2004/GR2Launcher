@@ -46,6 +46,10 @@ private:
     QLineEdit* m_fsr4DirEdit{};
     QCheckBox* m_grrFsr3CheckBox{};
     QCheckBox* m_grrFsr4CheckBox{};
+#ifdef _WIN32
+    QCheckBox* m_dlssCheckBox{};
+    QCheckBox* m_grrDlssCheckBox{};
+#endif
     QComboBox* m_gr2PromptCombo{};
     QCheckBox* m_halloweenCheckBox{};
     QComboBox* m_grrPromptCombo{};

@@ -87,4 +87,20 @@ void WriteGr2HalloweenItems(std::optional<bool> enable, const std::string& seria
 /// relative.
 std::filesystem::path ResolveFsr4AssetDir(const std::string& dir);
 
+#ifdef _WIN32
+/// dlssEnable (NVIDIA DLSS of Gravity Rush 2) of the per-game file of serial, or of config.json
+/// for an empty serial. Empty when the file does not set it.
+std::optional<bool> ReadDlssEnable(const std::string& serial = "");
+
+/// Sets dlssEnable as WriteFsr3Enable sets fsr3Enable.
+void WriteDlssEnable(std::optional<bool> enable, const std::string& serial = "");
+
+/// grrDlssEnable (NVIDIA DLSS of Gravity Rush Remastered) of the per-game file of serial, or of
+/// config.json for an empty serial. Empty when the file does not set it.
+std::optional<bool> ReadGrrDlssEnable(const std::string& serial = "");
+
+/// Sets grrDlssEnable as WriteFsr3Enable sets fsr3Enable.
+void WriteGrrDlssEnable(std::optional<bool> enable, const std::string& serial = "");
+#endif
+
 } // namespace Gr2Mods

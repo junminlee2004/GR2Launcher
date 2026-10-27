@@ -24,6 +24,10 @@ constexpr const char* Fsr4AssetDirKey = "fsr4AssetDir";
 constexpr const char* Gr2PromptLayoutKey = "gr2PromptLayout";
 constexpr const char* GrrPromptLayoutKey = "grrPromptLayout";
 constexpr const char* Gr2HalloweenItemsKey = "gr2HalloweenItems";
+#ifdef _WIN32
+constexpr const char* DlssEnableKey = "dlssEnable";
+constexpr const char* GrrDlssEnableKey = "grrDlssEnable";
+#endif
 
 // The same serials as the emulator's Common::IsGravityRush2 and Common::IsGravityRushRemastered.
 constexpr std::array<std::string_view, 7> Gr2Serials = {
@@ -174,5 +178,23 @@ std::filesystem::path ResolveFsr4AssetDir(const std::string& dir) {
     }
     return user / std::filesystem::path{std::u8string(dir.begin(), dir.end())};
 }
+
+#ifdef _WIN32
+std::optional<bool> ReadDlssEnable(const std::string& serial) {
+    return ReadKey<bool>(DlssEnableKey, serial);
+}
+
+void WriteDlssEnable(std::optional<bool> enable, const std::string& serial) {
+    WriteKey(DlssEnableKey, enable, serial);
+}
+
+std::optional<bool> ReadGrrDlssEnable(const std::string& serial) {
+    return ReadKey<bool>(GrrDlssEnableKey, serial);
+}
+
+void WriteGrrDlssEnable(std::optional<bool> enable, const std::string& serial) {
+    WriteKey(GrrDlssEnableKey, enable, serial);
+}
+#endif
 
 } // namespace Gr2Mods
