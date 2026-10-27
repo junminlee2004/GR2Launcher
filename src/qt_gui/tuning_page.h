@@ -12,9 +12,13 @@
 
 #include "common/types.h"
 
+class QCheckBox;
+
 // Edits the boolean and unsigned settings of the GPU section of the settings model. The rows are
 // built from the keys the model has: Table() gives the label, description, range, choice list and
 // prerequisites of the keys it knows, and a key it does not name is listed under "Other".
+// Upstream Behavior sets the shown rows of the keys Table() names to 0, at which the emulator runs
+// the code paths of upstream shadPS4, and locks them.
 class TuningPage : public QWidget {
     Q_OBJECT
 public:
@@ -53,6 +57,7 @@ private:
         QWidget* line{}; ///< Hovered for the description, and disabled while a need is unmet
         QWidget* editor{};
         u32 value{}; ///< Value of a setting edited on another tab, which has no editor here
+        bool fork{}; ///< Shown, and named by Table(), so a setting upstream shadPS4 lacks
     };
     struct Group {
         /// Empty for the keys that have their control on another tab, which are not shown.
@@ -63,11 +68,16 @@ private:
     static std::vector<Group> Table();
 
     void Show(const nlohmann::json& values);
+    nlohmann::json Values() const;
     u32 Value(const Row& row) const;
+    /// Checks or unchecks Upstream Behavior and keeps the shown values.
+    void SetUpstream(bool checked);
     /// The row whose value keeps row from acting, following prerequisites of prerequisites.
     const Row* Blocker(const Row& row) const;
     void UpdateEnabled();
 
     std::vector<Row> rows;
     std::vector<Row> outside; ///< The rows of the group without a title
+    QCheckBox* upstream{};
+    nlohmann::json restore; ///< Shown when Upstream Behavior is unchecked
 };

@@ -8,6 +8,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <QSignalBlocker>
 #include <QSpinBox>
 #include <QToolButton>
 #include <QVBoxLayout>
@@ -27,6 +28,9 @@ TuningPage::TuningPage(QWidget* parent) : QWidget(parent) {
            "Defaults shows the defaults of this build; Save or Apply writes them."));
     warning->setWordWrap(true);
     page->addWidget(warning);
+    upstream = new QCheckBox(tr("Upstream Behavior"));
+    upstream->installEventFilter(this);
+    page->addWidget(upstream);
 
     const nlohmann::json model = EmulatorSettings.GetGroupValues(Section);
     std::vector<Group> groups = Table();
@@ -54,6 +58,7 @@ TuningPage::TuningPage(QWidget* parent) : QWidget(parent) {
             if (!model.contains(row.key)) {
                 continue;
             }
+            row.fork = !unnamed.contains(row.key);
             const nlohmann::json& value = model.at(row.key);
             if (value.is_boolean()) {
                 auto* check = new QCheckBox(row.label);
@@ -107,26 +112,39 @@ TuningPage::TuningPage(QWidget* parent) : QWidget(parent) {
         page->addWidget(content);
     }
 
+    connect(upstream, &QCheckBox::toggled, this, [this](bool checked) {
+        if (!checked) {
+            Show(restore);
+            return;
+        }
+        restore = Values();
+        nlohmann::json values = restore;
+        for (const Row& row : rows) {
+            if (row.fork) {
+                values[row.key] =
+                    values[row.key].is_boolean() ? nlohmann::json(false) : nlohmann::json(0u);
+            }
+        }
+        Show(values);
+    });
+
     auto* reset = new QPushButton(tr("Reset Tuning to Defaults"));
-    connect(reset, &QPushButton::clicked, this, [this] { Show(GPUSettings{}); });
+    connect(reset, &QPushButton::clicked, this, [this] {
+        SetUpstream(false);
+        Show(GPUSettings{});
+    });
     page->addWidget(reset, 0, Qt::AlignLeft);
     page->addStretch();
 }
 
 void TuningPage::Load() {
     Show(EmulatorSettings.GetGroupValues(Section));
+    SetUpstream(
+        std::ranges::all_of(rows, [this](const Row& row) { return !row.fork || Value(row) == 0; }));
 }
 
 void TuningPage::Save(bool specific) {
-    nlohmann::json values = nlohmann::json::object();
-    for (const Row& row : rows) {
-        if (qobject_cast<QCheckBox*>(row.editor)) {
-            values[row.key] = Value(row) != 0;
-        } else {
-            values[row.key] = Value(row);
-        }
-    }
-    EmulatorSettings.SetGroupValues(Section, values, specific);
+    EmulatorSettings.SetGroupValues(Section, Values(), specific);
 }
 
 void TuningPage::SetOutside(const char* key, u32 value) {
@@ -135,12 +153,22 @@ void TuningPage::SetOutside(const char* key, u32 value) {
 }
 
 bool TuningPage::eventFilter(QObject* obj, QEvent* event) {
-    if (event->type() == QEvent::Enter) {
-        // The filter is installed only on the line of a row in rows.
+    if (event->type() == QEvent::Enter && obj == upstream) {
+        emit DescriptionChanged(
+            upstream->text() + ":\n" +
+            tr("Sets every setting of this page that upstream shadPS4 lacks to 0 and locks it, "
+               "which turns off the changes of this fork that have a setting here. Unchecking it "
+               "shows the values from before, or the defaults of this build. The other tabs keep "
+               "their values; there, Precise (Offloaded) readbacks and Async linear image "
+               "readbacks are modes of this fork too."));
+    } else if (event->type() == QEvent::Enter) {
+        // Otherwise the filter is installed only on the line of a row in rows.
         const Row& row = *std::ranges::find(rows, obj, &Row::line);
         QString text = row.label + ":\n" + row.description + "\n\n" + Section + "." +
                        QString::fromStdString(row.key);
-        if (const Row* blocker = Blocker(row)) {
+        if (row.fork && upstream->isChecked()) {
+            text += "\n" + tr("Locked by Upstream Behavior.");
+        } else if (const Row* blocker = Blocker(row)) {
             text +=
                 "\n" + tr("Has no effect with the current value of \"%1\".").arg(blocker->label);
         }
@@ -170,6 +198,18 @@ void TuningPage::Show(const nlohmann::json& values) {
     UpdateEnabled();
 }
 
+nlohmann::json TuningPage::Values() const {
+    nlohmann::json values = nlohmann::json::object();
+    for (const Row& row : rows) {
+        if (qobject_cast<QCheckBox*>(row.editor)) {
+            values[row.key] = Value(row) != 0;
+        } else {
+            values[row.key] = Value(row);
+        }
+    }
+    return values;
+}
+
 u32 TuningPage::Value(const Row& row) const {
     if (!row.editor) {
         return row.value;
@@ -181,6 +221,13 @@ u32 TuningPage::Value(const Row& row) const {
         return spin->value();
     }
     return static_cast<QComboBox*>(row.editor)->currentData().toUInt();
+}
+
+void TuningPage::SetUpstream(bool checked) {
+    const QSignalBlocker blocker(upstream);
+    upstream->setChecked(checked);
+    restore = GPUSettings{};
+    UpdateEnabled();
 }
 
 const TuningPage::Row* TuningPage::Blocker(const Row& row) const {
@@ -205,6 +252,6 @@ const TuningPage::Row* TuningPage::Blocker(const Row& row) const {
 
 void TuningPage::UpdateEnabled() {
     for (const Row& row : rows) {
-        row.line->setEnabled(!Blocker(row));
+        row.line->setEnabled(!(row.fork && upstream->isChecked()) && !Blocker(row));
     }
 }

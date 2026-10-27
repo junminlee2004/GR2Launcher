@@ -5,6 +5,8 @@
 
 // Meanings, ranges and prerequisites follow the comments on the settings in
 // core/emulator_settings.h and the checks the emulator runs when the renderer starts.
+// Every key of a group with a title is a setting upstream shadPS4 lacks, and at 0 the emulator
+// runs upstream's code paths for it; Upstream Behavior relies on both.
 std::vector<TuningPage::Group> TuningPage::Table() {
     constexpr u32 Any = std::numeric_limits<u32>::max();
     const Need skip_caches{"adaptive_skipcaches_mode", 1, Any};
