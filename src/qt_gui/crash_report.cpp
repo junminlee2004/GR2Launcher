@@ -5,6 +5,7 @@
 #include <array>
 #include <initializer_list>
 #include <utility>
+#include <QCheckBox>
 #include <QClipboard>
 #include <QDateTime>
 #include <QDesktopServices>
@@ -344,7 +345,14 @@ void CrashReport::Offer(QWidget* parent, gui_settings& settings) const {
            "<p>The log is posted in a public issue at <a href=\"%1\">%1</a>. The first time, you "
            "sign in with your GitHub account.</p>")
             .arg(issues_url);
-    if (QMessageBox::question(parent, tr("Game ended abruptly"), question) != QMessageBox::Yes) {
+    QMessageBox box(QMessageBox::Question, tr("Game ended abruptly"), question,
+                    QMessageBox::Yes | QMessageBox::No, parent);
+    box.setCheckBox(new QCheckBox(tr("Do not show again")));
+    const int answer = box.exec();
+    if (box.checkBox()->isChecked()) {
+        settings.SetValue(gui::gen_hideCrashReports, true);
+    }
+    if (answer != QMessageBox::Yes) {
         return;
     }
 

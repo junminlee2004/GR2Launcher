@@ -211,6 +211,9 @@ void MainWindow::onGameClosed() {
     infinity_dialog* inf_diag = infinity_dialog::get_dlg(this, m_ipc_client);
     inf_diag->clear_all();
 
+    if (m_gui_settings->GetValue(gui::gen_hideCrashReports).toBool()) {
+        return;
+    }
     if (const auto report =
             CrashReport::Check(m_report_log_path, m_report_log_limit, m_report_game)) {
         // The question waits until IpcClient releases the closed process, as a game started from
