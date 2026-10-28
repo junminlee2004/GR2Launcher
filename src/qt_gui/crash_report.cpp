@@ -37,7 +37,7 @@ namespace {
 
 // GitHub App of the reports. Its user tokens write the issues of the repositories it is installed
 // on and the gists of the user who signed in.
-constexpr const char* ClientId = "GITHUB_APP_CLIENT_ID";
+constexpr const char* ClientId = "Iv23li5mOfrUyIQgFvKL";
 constexpr const char* Repository = "junminlee2004/GR2fork";
 
 // The emulator logs these at shutdown, and other threads may log a few lines after them.
