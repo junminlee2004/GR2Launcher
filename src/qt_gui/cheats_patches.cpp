@@ -271,8 +271,8 @@ void CheatsPatches::setupUI() {
     ui->patchesListView->setModel(patchesModel);
 
     // Patch repository
-    ui->patchesComboBox->addItem("shadPS4", "shadPS4");
     ui->patchesComboBox->addItem("GoldHEN (GR2 Fork)", "GoldHEN");
+    ui->patchesComboBox->addItem("shadPS4", "shadPS4");
 
     // Download patches
     connect(ui->patchesButton, &QPushButton::clicked, this, [this]() {
@@ -621,7 +621,8 @@ void CheatsPatches::populateFileListPatches() {
 
     QStringList folders = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
     QStringList matchingFiles;
-    QString shadPS4entry = "";
+    // A patch file of the GR2 fork's GoldHEN repository is listed first, so it opens first.
+    QString goldhenEntry = "";
 
     for (QString const& folder : folders) {
         QString folderPath = dir.filePath(folder);
@@ -644,8 +645,8 @@ void CheatsPatches::populateFileListPatches() {
                 if (serials.contains(QJsonValue(m_gameSerial))) {
                     QString fileEntry = fileName + " | " + folder;
                     if (!matchingFiles.contains(fileEntry)) {
-                        if (folder == "shadPS4") {
-                            shadPS4entry = fileEntry;
+                        if (folder == "GoldHEN") {
+                            goldhenEntry = fileEntry;
                         }
                         matchingFiles << fileEntry;
                     }
@@ -654,12 +655,12 @@ void CheatsPatches::populateFileListPatches() {
         }
     }
     QStringListModel* model = new QStringListModel(matchingFiles, this);
-    if (shadPS4entry != "") {
-        QModelIndexList matches = model->match(model->index(0, 0), Qt::DisplayRole, shadPS4entry, 1,
+    if (goldhenEntry != "") {
+        QModelIndexList matches = model->match(model->index(0, 0), Qt::DisplayRole, goldhenEntry, 1,
                                                Qt::MatchExactly | Qt::MatchCaseSensitive);
         if (!matches.isEmpty()) {
-            QModelIndex shadPS4Index = matches.first();
-            model->moveRow(QModelIndex(), shadPS4Index.row(), QModelIndex(), 0);
+            QModelIndex goldhenIndex = matches.first();
+            model->moveRow(QModelIndex(), goldhenIndex.row(), QModelIndex(), 0);
         }
     }
 
