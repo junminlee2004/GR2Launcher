@@ -309,6 +309,8 @@ set(QT_GUI src/qt_gui/about_dialog.cpp
            src/qt_gui/cheats_patches.ui
            src/qt_gui/compatibility_info.cpp
            src/qt_gui/compatibility_info.h
+           src/qt_gui/crash_report.cpp
+           src/qt_gui/crash_report.h
            src/qt_gui/control_settings.cpp
            src/qt_gui/control_settings.h
            src/qt_gui/control_settings.ui

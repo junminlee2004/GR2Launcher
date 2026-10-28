@@ -37,6 +37,11 @@ const gui_value gen_shadPath = gui_value(general_settings, "shadPath", "");
 const gui_value gen_checkCompatibilityAtStartup =
     gui_value(general_settings, "checkCompatibilityAtStartup", false);
 const gui_value gen_homeTab = gui_value(general_settings, "homeTab", "General");
+// GitHub sign-in of the crash reports.
+const gui_value gen_githubToken = gui_value(general_settings, "githubReportToken", "");
+const gui_value gen_githubRefreshToken =
+    gui_value(general_settings, "githubReportRefreshToken", "");
+const gui_value gen_githubTokenExpiry = gui_value(general_settings, "githubReportTokenExpiry", 0);
 
 // main window settings
 const gui_value mw_geometry = gui_value(main_window, "geometry", QByteArray());

@@ -96,6 +96,10 @@ private:
     bool isWhite = false;
     bool is_paused = false;
     std::string runningGameSerial = "";
+    // Log of the running game that the crash report checks, empty when there is none.
+    QString m_report_log_path;
+    QString m_report_game;
+    qint64 m_report_log_limit{};
 
     QActionGroup* m_icon_size_act_group = nullptr;
     QActionGroup* m_list_mode_act_group = nullptr;

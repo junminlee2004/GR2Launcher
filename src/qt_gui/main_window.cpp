@@ -30,6 +30,7 @@
 #include "control_settings.h"
 #include "core/emulator_state.h"
 #include "core/file_sys/game_backend.h"
+#include "crash_report.h"
 #include "crypto_key_dialog.h"
 #include "dimensions_dialog.h"
 #include "game_install_dialog.h"
@@ -209,6 +210,14 @@ void MainWindow::onGameClosed() {
     dim_diag->clear_all();
     infinity_dialog* inf_diag = infinity_dialog::get_dlg(this, m_ipc_client);
     inf_diag->clear_all();
+
+    if (const auto report =
+            CrashReport::Check(m_report_log_path, m_report_log_limit, m_report_game)) {
+        // The question waits until IpcClient releases the closed process, as a game started from
+        // it replaces that process.
+        QTimer::singleShot(0, this,
+                           [this, offer = *report] { offer.Offer(this, *m_gui_settings); });
+    }
 }
 
 void MainWindow::RestartGame() {
@@ -1103,6 +1112,7 @@ void MainWindow::PrepareLogFile(const QString& work_dir, const QStringList& args
         }
     }
     QString serial;
+    QString title;
     if (!game_path.isEmpty()) {
         auto root = Common::FS::PathFromQString(QDir(work_dir).absoluteFilePath(game_path));
         if (!Core::FileSys::ResolveGameRoot(root)) {
@@ -1114,12 +1124,16 @@ void MainWindow::PrepareLogFile(const QString& work_dir, const QStringList& args
                 if (const auto id = game_psf.GetString("TITLE_ID")) {
                     serial = QString::fromUtf8(id->data(), static_cast<qsizetype>(id->size()));
                 }
+                if (const auto name = game_psf.GetString("TITLE")) {
+                    title = QString::fromUtf8(name->data(), static_cast<qsizetype>(name->size()));
+                }
             }
         }
     }
 
     bool enabled = true;
     bool separate = false;
+    qint64 size_limit = 100_MB;
     const auto read_settings = [&](const QString& path) {
         QFile config(path);
         if (config.open(QIODevice::ReadOnly)) {
@@ -1130,6 +1144,9 @@ void MainWindow::PrepareLogFile(const QString& work_dir, const QStringList& args
             }
             if (const auto value = log.value("separate"); value.isBool()) {
                 separate = value.toBool();
+            }
+            if (const auto value = log.value("size_limit"); value.isDouble()) {
+                size_limit = value.toInteger();
             }
         }
     };
@@ -1147,6 +1164,9 @@ void MainWindow::PrepareLogFile(const QString& work_dir, const QStringList& args
     const QString path =
         QDir(user_dir).filePath(QString::fromLatin1(Common::FS::LOG_DIR) + "/" + filename);
     ui->logDisplay->SetSource(enabled ? path : QString(), true);
+    m_report_log_path = enabled && !serial.isEmpty() ? path : QString();
+    m_report_game = title.isEmpty() ? serial : QStringLiteral("%1 (%2)").arg(title, serial);
+    m_report_log_limit = size_limit;
 }
 
 void MainWindow::StartGameWithArgs(QStringList args) {
