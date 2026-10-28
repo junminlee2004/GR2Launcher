@@ -315,9 +315,8 @@ bool ModsPage::eventFilter(QObject* obj, QEvent* event) {
                    "NVIDIA's GitHub page and keeps only these files. When DLSS cannot run, FSR 4 "
                    "or FSR 3.1 runs if it is on. For upscaling, also turn on a "
                    "patch under Resolution > Upscaling in Cheats / Patches.\nA change takes "
-                   "effect the next time the game starts. Preset and status: Ctrl+F10 > Display > "
-                   "%1.")
-                    .arg(gr2 ? QStringLiteral("FSR 3.1 (GR2)") : QStringLiteral("FSR 3.1 (GRR)")) +
+                   "effect the next time the game starts. Preset and status: Ctrl+F10 > %1.")
+                    .arg(gr2 ? QStringLiteral("DLSS (GR2)") : QStringLiteral("DLSS (GRR)")) +
                 (gr2 ? "\n\nGR2Fork.dlssEnable" : "\n\nGR2Fork.grrDlssEnable"));
 #endif
         } else if (obj == m_halloweenCheckBox) {
