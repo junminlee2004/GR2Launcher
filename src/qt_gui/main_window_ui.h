@@ -16,7 +16,8 @@
 class Ui_MainWindow {
 public:
     QSplitter* splitter;
-    LogFileViewer* logDisplay;
+    // Created by MainWindow::Init, which a start from a shortcut skips.
+    LogFileViewer* logDisplay = nullptr;
     QAction* bootGameAct;
     QAction* addElfFolderAct;
     QAction* shadFolderAct;
