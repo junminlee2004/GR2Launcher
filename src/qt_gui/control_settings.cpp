@@ -492,9 +492,9 @@ void ControlSettings::SetDefault() {
     ui->RStickLeftButton->setText("axis_right_x");
     ui->RStickRightButton->setText("axis_right_x");
 
-    ui->LeftDeadzoneMinSlider->setValue(2);
+    ui->LeftDeadzoneMinSlider->setValue(20);
     ui->LeftDeadzoneMaxSlider->setValue(127);
-    ui->RightDeadzoneMinSlider->setValue(2);
+    ui->RightDeadzoneMinSlider->setValue(15);
     ui->RightDeadzoneMaxSlider->setValue(127);
 
     ui->RSlider->setValue(0);
@@ -727,9 +727,9 @@ void ControlSettings::SetUIValuestoMappings() {
                     ui->LeftDeadzoneMaxValue->setText(QString::number(deadzone_max_value));
                 }
             } else {
-                ui->LeftDeadzoneMinSlider->setValue(2);
+                ui->LeftDeadzoneMinSlider->setValue(20);
                 ui->LeftDeadzoneMaxSlider->setValue(127);
-                ui->LeftDeadzoneMinValue->setText("2");
+                ui->LeftDeadzoneMinValue->setText("20");
                 ui->LeftDeadzoneMaxValue->setText("127");
             }
         }
@@ -748,9 +748,9 @@ void ControlSettings::SetUIValuestoMappings() {
                     ui->RightDeadzoneMaxValue->setText(QString::number(deadzone_max_value));
                 }
             } else {
-                ui->RightDeadzoneMinSlider->setValue(2);
+                ui->RightDeadzoneMinSlider->setValue(15);
                 ui->RightDeadzoneMaxSlider->setValue(127);
-                ui->RightDeadzoneMinValue->setText("2");
+                ui->RightDeadzoneMinValue->setText("15");
                 ui->RightDeadzoneMaxValue->setText("127");
             }
         }

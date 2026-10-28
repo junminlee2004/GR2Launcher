@@ -396,7 +396,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string notr="true">2</string>
+                 <string notr="true">20</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -418,7 +418,7 @@
                  <number>127</number>
                 </property>
                 <property name="value">
-                 <number>2</number>
+                 <number>20</number>
                 </property>
                 <property name="orientation">
                  <enum>Qt::Orientation::Horizontal</enum>
@@ -1802,7 +1802,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string notr="true">2</string>
+                 <string notr="true">15</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -1824,7 +1824,7 @@
                  <number>127</number>
                 </property>
                 <property name="value">
-                 <number>2</number>
+                 <number>15</number>
                 </property>
                 <property name="orientation">
                  <enum>Qt::Orientation::Horizontal</enum>
