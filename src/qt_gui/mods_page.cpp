@@ -272,7 +272,7 @@ bool ModsPage::eventFilter(QObject* obj, QEvent* event) {
                    "upscaler, which is not AMD FSR 4.1 and can also run on RDNA2, RDNA3 and other "
                    "GPUs. Its shader and model files are not included with GR2fork or this "
                    "launcher; without them or driver support, FSR 3.1 runs if it is on. For "
-                   "upscaling, also turn on a patch under Resolution > FSR upscaling in Cheats / "
+                   "upscaling, also turn on a patch under Resolution > Upscaling in Cheats / "
                    "Patches.\nA change takes effect the next time the game starts. FSR 4 model and "
                    "status: Ctrl+F10 > Display > FSR 3.1 (GR2).") +
                 "\n\nGR2Fork.fsr4Enable");
@@ -281,7 +281,7 @@ bool ModsPage::eventFilter(QObject* obj, QEvent* event) {
                 m_grrFsr3CheckBox->text() + ":\n" +
                 tr("Replaces the game's FXAA anti-aliasing with AMD FSR 3.1. Needs a GR2fork "
                    "build with the FSR upscaler for Gravity Rush Remastered. For upscaling, also "
-                   "turn on a patch under Resolution > FSR upscaling in Cheats / Patches; without "
+                   "turn on a patch under Resolution > Upscaling in Cheats / Patches; without "
                    "one, FSR 3.1 runs at the game's resolution as anti-aliasing. Menus and comic "
                    "scenes keep the game's FXAA.\nA change takes effect the next time the game "
                    "starts. The other FSR 3.1 settings are in the debug menu: Ctrl+F10 > Display "
@@ -314,7 +314,7 @@ bool ModsPage::eventFilter(QObject* obj, QEvent* event) {
                    "missing, ticking the box offers to download the release (263 MiB) from "
                    "NVIDIA's GitHub page and keeps only these files. When DLSS cannot run, FSR 4 "
                    "or FSR 3.1 runs if it is on. For upscaling, also turn on a "
-                   "patch under Resolution > FSR upscaling in Cheats / Patches.\nA change takes "
+                   "patch under Resolution > Upscaling in Cheats / Patches.\nA change takes "
                    "effect the next time the game starts. Preset and status: Ctrl+F10 > Display > "
                    "%1.")
                     .arg(gr2 ? QStringLiteral("FSR 3.1 (GR2)") : QStringLiteral("FSR 3.1 (GRR)")) +

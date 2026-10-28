@@ -40,7 +40,7 @@
 
 namespace {
 
-// Separates the levels of a Category path: "Resolution/FSR upscaling/16:9" is a section inside a
+// Separates the levels of a Category path: "Resolution/Upscaling/16:9" is a section inside a
 // section inside a section.
 constexpr QChar CategorySeparator = u'/';
 
