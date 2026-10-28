@@ -9,13 +9,14 @@
 #include <QMenuBar>
 #include <QPushButton>
 #include <QSplitter>
-#include <QTextEdit>
 #include <QToolBar>
+
+#include "log_file_viewer.h"
 
 class Ui_MainWindow {
 public:
     QSplitter* splitter;
-    QTextEdit* logDisplay;
+    LogFileViewer* logDisplay;
     QAction* bootGameAct;
     QAction* addElfFolderAct;
     QAction* shadFolderAct;
@@ -399,8 +400,6 @@ public:
     } // setupUi
 
     void retranslateUi(QMainWindow* MainWindow) {
-        MainWindow->setWindowTitle(
-            QCoreApplication::translate("MainWindow", "GR2Launcher", nullptr));
         addElfFolderAct->setText(
             QCoreApplication::translate("MainWindow", "Open/Add Elf Folder", nullptr));
         bootGameAct->setText(QCoreApplication::translate("MainWindow", "Boot Game", nullptr));

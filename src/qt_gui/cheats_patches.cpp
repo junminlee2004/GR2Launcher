@@ -623,7 +623,7 @@ void CheatsPatches::populateFileListPatches() {
     QStringList matchingFiles;
     QString shadPS4entry = "";
 
-    foreach (const QString& folder, folders) {
+    for (QString const& folder : folders) {
         QString folderPath = dir.filePath(folder);
         QDir subDir(folderPath);
 
@@ -721,7 +721,7 @@ void CheatsPatches::downloadPatches(const QString repository, const bool showMes
             }
             dir.setPath(fullPath);
 
-            foreach (const QJsonValue& value, itemsArray) {
+            for (QJsonValue const& value : itemsArray) {
                 QJsonObject fileObj = value.toObject();
                 QString fileName = fileObj["name"].toString();
                 QString downloadUrl = fileObj["download_url"].toString();
@@ -781,7 +781,7 @@ void CheatsPatches::compatibleVersionNotice(const QString repository) {
     QStringList xmlFiles = dir.entryList(QStringList() << "*.xml", QDir::Files);
     QStringList incompatMessages;
 
-    foreach (const QString& xmlFile, xmlFiles) {
+    for (QString const& xmlFile : xmlFiles) {
         QFile file(dir.filePath(xmlFile));
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QMessageBox::warning(this, tr("Error"),
@@ -859,7 +859,7 @@ void CheatsPatches::createFilesJson(const QString& repository) {
     QJsonObject filesObject;
     QStringList xmlFiles = dir.entryList(QStringList() << "*.xml", QDir::Files);
 
-    foreach (const QString& xmlFile, xmlFiles) {
+    for (QString const& xmlFile : xmlFiles) {
         QFile file(dir.filePath(xmlFile));
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QMessageBox::warning(this, tr("Error"),
@@ -1290,7 +1290,7 @@ void CheatsPatches::updateNoteTextEdit(const QString& patchName) {
                            .arg(patchInfo.author)
                            .arg(patchInfo.note);
 
-        foreach (const QJsonValue& value, patchInfo.linesArray) {
+        for (QJsonValue const& value : patchInfo.linesArray) {
             QJsonObject lineObject = value.toObject();
             QString type = lineObject["Type"].toString();
             QString address = lineObject["Address"].toString();
@@ -1346,7 +1346,7 @@ void CheatsPatches::applyPatch(const QString& patchName, bool enabled) {
     if (m_patchInfos.contains(patchName)) {
         const PatchInfo& patchInfo = m_patchInfos[patchName];
 
-        foreach (const QJsonValue& value, patchInfo.linesArray) {
+        for (QJsonValue const& value : patchInfo.linesArray) {
             QJsonObject lineObject = value.toObject();
             QString type = lineObject["Type"].toString();
             QString address = lineObject["Address"].toString();

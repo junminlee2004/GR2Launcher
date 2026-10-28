@@ -73,12 +73,12 @@ private:
     void ReloadGameTable(bool force_size_refresh, const QString& force_size_serial = {});
     void onGameClosed();
     void RunGame();
-    void PrintLog(QString entry, QColor textColor);
 
 #ifdef ENABLE_UPDATER
     void CheckUpdateMain(bool checkSave);
 #endif
     void CreateConnects();
+    void PrepareLogFile(const QString& work_dir, const QStringList& args);
     void SetLastUsedTheme();
     void SetLastIconSizeBullet();
     void SetUiIcons(bool isWhite);
@@ -112,6 +112,7 @@ private:
     QScopedPointer<ElfViewer> m_elf_viewer;
     // Status Bar.
     QScopedPointer<QStatusBar> statusBar;
+    QLabel* statusLabel = nullptr;
 
     PSF psf;
 
