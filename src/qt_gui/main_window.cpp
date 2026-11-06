@@ -1166,7 +1166,7 @@ void MainWindow::PrepareLogFile(const QString& work_dir, const QStringList& args
                                                              : Common::FS::LOG_FILE;
     const QString path =
         QDir(user_dir).filePath(QString::fromLatin1(Common::FS::LOG_DIR) + "/" + filename);
-    if (ui->logDisplay) {
+    if (ui && ui->logDisplay) {
         ui->logDisplay->SetSource(enabled ? path : QString(), true);
     }
     m_report_log_path = enabled && !serial.isEmpty() ? path : QString();
